@@ -1,0 +1,142 @@
+/* ===== Modal overrides ===== */
+
+.cheatsheet-modal-overlay {
+  background: var(--dd-overlay);
+}
+
+.cheatsheet-modal-content {
+  background: var(--dd-surface-card);
+  border: 1px solid var(--dd-border);
+}
+
+.cheatsheet-modal-header {
+  background: var(--dd-surface-card);
+  border-bottom: 1px solid var(--dd-border);
+  padding: 1rem 1.5rem;
+}
+
+.cheatsheet-modal-title {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dd-text-muted);
+}
+
+.cheatsheet-modal-close {
+  color: var(--dd-text-subtle);
+}
+
+.cheatsheet-modal-close:hover {
+  color: var(--dd-text);
+  background: var(--dd-surface-elevated);
+}
+
+.cheatsheet-modal-body {
+  padding: 1.5rem;
+}
+
+/* ===== Tables container ===== */
+
+.cheatsheet-tables {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cheatsheet-table-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cheatsheet-table-title {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  color: var(--dd-text-subtle);
+}
+
+/* ===== Table ===== */
+
+.cheatsheet-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.cheatsheet-table td,
+.cheatsheet-table th {
+  font-family: var(--dd-font-mono);
+  border-bottom: 1px solid var(--dd-border);
+}
+
+/* Alternating row backgrounds for scanability */
+.cheatsheet-table tr:nth-child(even):not(.cheatsheet-header-row) {
+  background: var(--dd-surface-elevated);
+}
+
+/* Header row — bottom border separates headers from data */
+.cheatsheet-header-row td,
+.cheatsheet-header-row th {
+  border-bottom: 2px solid var(--dd-border-strong);
+}
+
+/* Corner cell (top-left, usually empty) */
+.cheatsheet-cell-corner {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--dd-text-subtle);
+}
+
+/* Column headers: Präsens, Präteritum — orientation labels */
+.cheatsheet-cell-col-header {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--dd-primary);
+}
+
+/* Row labels: ich, du, er/sie/es — navigation anchors */
+.cheatsheet-cell-row-label {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--dd-text-muted);
+  white-space: nowrap;
+}
+
+/* Data cells: mache, machst, macht — THE answers, most prominent */
+.cheatsheet-cell-data {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--dd-text);
+}
+
+/* Stem/ending split: "mach|e" → dim stem + bright ending */
+.cheatsheet-stem {
+  color: var(--dd-text-muted);
+  font-weight: 400;
+}
+
+.cheatsheet-ending {
+  color: var(--dd-error);
+  font-weight: 700;
+}
+
+/* ===== Notes ===== */
+
+.cheatsheet-notes {
+  padding-top: 0.25rem;
+}
+
+.cheatsheet-note {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  color: var(--dd-text-subtle);
+  line-height: 1.5;
+}

@@ -1,0 +1,496 @@
+/* ── Flow page shell ── */
+
+.flow-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--dd-surface-page);
+}
+
+/* ── Centered container (loading, summary) ── */
+
+.flow-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Drill area: two-zone layout ── */
+
+.flow-drill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+
+/* ── Prompt zone: owns upper space, centers prompt within ── */
+
+.flow-prompt-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 36rem;
+}
+
+/* ── Response zone: input + feedback at bottom ── */
+
+.flow-response-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 36rem;
+}
+
+/* ── Input + status hint ── */
+
+.flow-input-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ── Streak + example + cheatsheet hint ── */
+
+.flow-feedback-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* ── Input form ── */
+
+.flow-form {
+  width: 100%;
+}
+
+/* ── Input field ── */
+
+.flow-input {
+  border: 2px solid var(--dd-border-strong);
+  border-radius: var(--dd-radius);
+  font-family: var(--dd-font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 2rem;
+  transition: border-color 150ms, color 150ms, background 150ms, box-shadow 150ms;
+}
+
+.flow-input::placeholder {
+  color: var(--dd-text-subtle);
+  font-weight: 400;
+}
+
+.flow-input:focus {
+  border-color: var(--dd-primary);
+  box-shadow: 0 0 0 3px var(--dd-primary-glow);
+}
+
+/* ── Summary box ── */
+
+.flow-summary {
+  border: 1px solid var(--dd-border);
+  background: var(--dd-surface-card);
+  padding: 2rem;
+  width: 100%;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.flow-divider {
+  border: none;
+  height: 1px;
+  background: var(--dd-border);
+  margin: 0;
+}
+
+.flow-summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Streak dots row ── */
+
+.flow-streak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.flow-streak-dot {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--dd-primary-dim);
+  background: transparent;
+  transition: all 200ms ease-out;
+}
+
+.flow-streak-dot[data-state="filled"] {
+  border: none;
+  background: var(--dd-primary);
+  box-shadow: 0 0 6px var(--dd-primary-glow);
+}
+
+.flow-streak-dot[data-state="mastered"] {
+  border: none;
+  background: var(--dd-success);
+  box-shadow: 0 0 10px var(--dd-success);
+  animation: dotPop 0.3s ease-out;
+}
+
+.flow-streak-count {
+  font-family: var(--dd-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--dd-text-muted);
+}
+
+.flow-tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Example sentence ── */
+
+.flow-example {
+  text-align: left;
+  animation: fadeIn 0.3s ease-out;
+  border-left: 2px solid var(--dd-primary-dim);
+  padding-left: 1rem;
+  align-self: stretch;
+}
+
+/* ── Summary actions (button row) ── */
+
+.flow-summary-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* ── Summary row ── */
+
+.flow-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flow-summary-row-values {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── FlowPrompt styles ── */
+
+.fp-wrapper {
+  width: 100%;
+  max-width: 36rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  animation: promptEnter 0.2s ease-out;
+}
+
+.fp-hero {
+  font-family: var(--dd-font-mono);
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: var(--dd-text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.fp-grammar-hero {
+  font-family: var(--dd-font-mono);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--dd-text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.fp-grammar-examples {
+  font-family: var(--dd-font-mono);
+  font-size: 1.125rem;
+  color: var(--dd-text-muted);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 30rem;
+}
+
+.fp-fill-blank {
+  font-family: var(--dd-font-mono);
+  font-size: 1.5rem;
+  color: var(--dd-text);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.fp-meta {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fp-dot {
+  color: var(--dd-text-subtle);
+}
+
+.fp-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.fp-badge {
+  font-family: var(--dd-font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+}
+
+.fp-badge-sm {
+  font-size: 1rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.fp-context-word {
+  font-family: var(--dd-font-mono);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--dd-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fp-hint-btn {
+  background: none;
+  border: none;
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-subtle);
+  cursor: pointer;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  transition: color 150ms;
+}
+
+.fp-hint-btn:hover {
+  color: var(--dd-text-muted);
+}
+
+/* ── Status hints ── */
+
+.flow-status-hint {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--dd-warning);
+}
+
+.flow-retype-hint {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--dd-warning);
+}
+
+/* ── Example sentences ── */
+
+.flow-example-de {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--dd-text-muted);
+}
+
+.flow-example-en {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--dd-text-subtle);
+}
+
+/* ── Cheatsheet hint button ── */
+
+.flow-cheatsheet-hint {
+  background: none;
+  border: none;
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--dd-text-subtle);
+  cursor: pointer;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 150ms;
+}
+
+.flow-cheatsheet-hint:hover {
+  color: var(--dd-primary);
+}
+
+.flow-cheatsheet-kbd {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--dd-text-subtle);
+  background: var(--dd-surface-elevated);
+  border: 1px solid var(--dd-border);
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+}
+
+/* ── Keyboard shortcut hint inside buttons ── */
+
+.flow-kbd-hint {
+  opacity: 0.5;
+  font-size: 0.75rem;
+  margin-inline-start: 0.5rem;
+}
+
+/* ── FlowPrompt: language direction labels ── */
+
+.fp-lang-de {
+  color: var(--dd-masculine);
+}
+
+.fp-lang-en {
+  color: var(--dd-primary);
+}
+
+/* ── FlowPrompt: gender-colored text ── */
+
+.fp-gender-m {
+  color: var(--dd-masculine);
+}
+
+.fp-gender-f {
+  color: var(--dd-feminine);
+}
+
+.fp-gender-n {
+  color: var(--dd-neuter);
+}
+
+.fp-gender-label {
+  font-weight: 600;
+}
+
+/* ── FlowPrompt: fill-blank placeholder ── */
+
+.fp-blank {
+  color: var(--dd-primary);
+  border-bottom: 2px solid var(--dd-primary);
+  padding: 0 0.75rem;
+  margin: 0 0.25rem;
+}
+
+/* ── FlowPrompt: badge type variants ── */
+
+.fp-badge--gender-masculine {
+  background: var(--dd-masculine-bg);
+  color: var(--dd-masculine);
+  border: 2px solid var(--dd-masculine-border);
+}
+
+.fp-badge--gender-feminine {
+  background: var(--dd-feminine-bg);
+  color: var(--dd-feminine);
+  border: 2px solid var(--dd-feminine-border);
+}
+
+.fp-badge--gender-neuter {
+  background: var(--dd-neuter-bg);
+  color: var(--dd-neuter);
+  border: 2px solid var(--dd-neuter-border);
+}
+
+.fp-badge--case {
+  background: var(--dd-case-bg);
+  color: var(--dd-case);
+  border: 2px solid var(--dd-case-border);
+}
+
+.fp-badge--number {
+  background: var(--dd-number-bg);
+  color: var(--dd-number);
+  border: 2px solid var(--dd-number-border);
+}
+
+.fp-badge--person {
+  background: var(--dd-person-bg);
+  color: var(--dd-person);
+  border: 2px solid var(--dd-person-border);
+}
+
+.fp-badge--article-type {
+  background: var(--dd-article-type-bg);
+  color: var(--dd-article-type);
+  border: 2px solid var(--dd-article-type-border);
+}
+
+.fp-badge--tense {
+  background: var(--dd-tense-bg);
+  color: var(--dd-tense);
+  border: 2px solid var(--dd-tense-border);
+}
+
+.fp-badge--default {
+  background: var(--dd-surface-elevated);
+  color: var(--dd-text);
+  border: 2px solid var(--dd-border-strong);
+}
+
+/* ── Mobile responsive ── */
+
+@media (max-width: 40rem) {
+  .flow-drill {
+    padding: 1.5rem;
+  }
+
+  .fp-hero {
+    font-size: 3rem;
+  }
+
+  .fp-badge {
+    font-size: 1rem;
+    padding: 0.25rem 0.75rem;
+  }
+
+  .flow-input {
+    font-size: 1.125rem;
+    padding: 1.5rem;
+  }
+}

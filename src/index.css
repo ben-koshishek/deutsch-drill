@@ -1,0 +1,117 @@
+/* ===== GLOBAL RESETS ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--dd-font-mono);
+  background-color: var(--dd-surface-page);
+  color: var(--dd-text);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-variant-ligatures: none;
+  transition: background-color 200ms ease-out, color 200ms ease-out;
+}
+
+/* ===== FOCUS STYLES ===== */
+:focus-visible {
+  outline: 2px solid var(--dd-primary);
+  outline-offset: 2px;
+}
+
+/* ===== CUSTOM SELECTION ===== */
+::selection {
+  background-color: var(--dd-primary);
+  color: var(--dd-selection-text);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dd-surface-section);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dd-border-strong);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dd-text-subtle);
+}
+
+/* ===== PLACEHOLDER PAGES ===== */
+.placeholder-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 3rem 1.5rem;
+}
+
+.placeholder-title {
+  font-family: var(--dd-font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dd-text);
+  margin: 0;
+}
+
+.placeholder-text {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  margin: 0;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+@keyframes promptEnter {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dotPop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,244 @@
+/* ══════════════════════════════════════
+   How German Works — explainer page
+   ══════════════════════════════════════ */
+
+.hgw-page {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding: 2rem;
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+/* ── Section ── */
+
+.hgw-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Section header ── */
+
+.hgw-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hgw-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--dd-primary);
+  flex-shrink: 0;
+}
+
+.hgw-label {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dd-primary);
+  white-space: nowrap;
+}
+
+/* ── Title ── */
+
+.hgw-title {
+  font-family: var(--dd-font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dd-text);
+  margin: 0;
+}
+
+.hgw-intro {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Body text ── */
+
+.hgw-text {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text);
+  margin: 0;
+  line-height: 1.7;
+}
+
+.hgw-text-em {
+  color: var(--dd-primary);
+  font-weight: 600;
+}
+
+/* ── Definition grid ── */
+
+.hgw-defs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.hgw-def {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--dd-surface-card);
+  border: 1px solid var(--dd-border);
+  border-left: 2px solid var(--dd-primary);
+  padding: 1rem;
+}
+
+.hgw-def-term {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dd-text);
+}
+
+.hgw-def-example {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+}
+
+.hgw-def-desc {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  line-height: 1.6;
+}
+
+/* ── Sentence diagrams ── */
+
+.hgw-diagrams {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hgw-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--dd-border);
+  background: var(--dd-surface-card);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.hgw-diagram-roles {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.hgw-diagram-words {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.hgw-diagram-cell {
+  min-width: 4rem;
+  font-family: var(--dd-font-mono);
+}
+
+.hgw-diagram-role {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hgw-diagram-word {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--dd-text);
+}
+
+.hgw-diagram-verb {
+  color: var(--dd-text-muted);
+}
+
+.hgw-diagram-translation {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  color: var(--dd-text-muted);
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--dd-border);
+}
+
+/* ── Case colors for diagram roles ── */
+
+.hgw-case-nom { color: var(--dd-primary); }
+.hgw-case-akk { color: var(--dd-masculine); }
+.hgw-case-dat { color: var(--dd-category-pronouns); }
+
+/* ── Inline list (groups connection) ── */
+
+.hgw-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.hgw-group-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  background: var(--dd-surface-card);
+  border: 1px solid var(--dd-border);
+  padding: 1rem;
+}
+
+.hgw-group-bullet {
+  font-weight: 600;
+  color: var(--dd-primary);
+  flex-shrink: 0;
+}
+
+.hgw-group-name {
+  font-weight: 600;
+  color: var(--dd-text);
+}
+
+/* ── Note / aside ── */
+
+.hgw-note {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Mobile ── */
+
+@media (max-width: 40rem) {
+  .hgw-page {
+    padding: 1rem;
+    gap: 3rem;
+  }
+
+  .hgw-diagram {
+    padding: 0.75rem;
+  }
+
+  .hgw-diagram-roles,
+  .hgw-diagram-words {
+    gap: 1rem;
+  }
+
+  .hgw-diagram-cell {
+    min-width: 4rem;
+  }
+}

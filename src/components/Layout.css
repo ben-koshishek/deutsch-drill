@@ -1,0 +1,308 @@
+/* ══════════════════════════════════════
+   Page layout
+   ══════════════════════════════════════ */
+
+.layout {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--dd-surface-page);
+}
+
+/* ── Header ── */
+
+.layout-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--dd-surface-section);
+  border-bottom: 1px solid var(--dd-border);
+}
+
+.layout-header:has(.header-progress-track) {
+  border-bottom: none;
+}
+
+/* ── Main content ── */
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ══════════════════════════════════════
+   Header bar
+   Full-width status bar.
+   Brand on left, stats + utility on right.
+   ══════════════════════════════════════ */
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+}
+
+/* ── Brand group: logo + name as one clickable unit ── */
+
+.header-brand-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.header-brand-group:hover .header-brand {
+  color: var(--dd-primary);
+}
+
+/* ── Logo (absolute so brand text provides baseline) ── */
+
+.header-logo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.25rem;
+}
+
+/* ── Brand ── */
+
+.header-brand {
+  font-family: var(--dd-font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dd-text);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  transition: color 150ms;
+}
+
+/* ── Left zone: brand + context (flow mode) ── */
+
+.header-bar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* ── Right zone: stats + utility ── */
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Stats group: clusters stats with tighter spacing ── */
+
+.header-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ── Separator between stats and icons ── */
+
+.header-separator {
+  width: 1px;
+  height: 1.5rem;
+  background: var(--dd-border-strong);
+  flex-shrink: 0;
+}
+
+/* ── Icon button group ── */
+
+.header-icon-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Stats: label + value inline ── */
+
+.header-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--dd-font-mono);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--dd-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.header-stat-label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--dd-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Context text (deck title in flow mode) ── */
+
+.header-context {
+  font-family: var(--dd-font-mono);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--dd-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* ── Icon buttons — shared base ── */
+
+.header-theme-toggle,
+.header-close-btn,
+.header-info-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dd-text-subtle);
+  padding: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 150ms;
+  text-decoration: none;
+}
+
+.header-theme-toggle:hover,
+.header-info-link:hover {
+  color: var(--dd-primary);
+}
+
+.header-close-btn:hover {
+  color: var(--dd-error);
+}
+
+.header-info-link svg {
+  display: block;
+}
+
+/* ── Ko-fi button ── */
+
+.header-kofi-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dd-text-subtle);
+  padding: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 150ms;
+}
+
+.header-kofi-btn:hover {
+  color: var(--dd-primary);
+}
+
+.header-kofi-btn svg {
+  display: block;
+}
+
+/* ── Ko-fi overlay ── */
+
+.kofi-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--dd-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.kofi-panel {
+  position: relative;
+  background: var(--dd-surface-card);
+  border: 1px solid var(--dd-border);
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 25rem;
+}
+
+.kofi-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  z-index: 1;
+  background: none;
+  border: none;
+  color: var(--dd-text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kofi-close:hover {
+  color: var(--dd-primary);
+}
+
+.kofi-iframe {
+  width: 100%;
+  height: 712px;
+  border: none;
+}
+
+.kofi-profile-link {
+  text-align: center;
+  padding: 0.75rem;
+  border-top: 1px solid var(--dd-border);
+}
+
+.kofi-profile-link a {
+  font-family: var(--dd-font-mono);
+  font-size: 0.75rem;
+  color: var(--dd-text-muted);
+  transition: color 150ms;
+}
+
+.kofi-profile-link a:hover {
+  color: var(--dd-primary);
+}
+
+.header-theme-toggle svg,
+.header-close-btn svg {
+  display: block;
+}
+
+/* ── Progress bar (flow mode) ── */
+
+.header-progress-track {
+  height: 2px;
+  background: var(--dd-border);
+}
+
+.header-progress-fill {
+  height: 100%;
+  background: var(--dd-primary);
+  transition: width 300ms ease-out;
+}

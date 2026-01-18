@@ -1,0 +1,57 @@
+import { useState, lazy, Suspense } from "react";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import { Layout } from "./components/Layout";
+import { Dashboard } from "./components/Dashboard";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useHashRouter } from "./hooks/useHashRouter";
+import { theme, resolver } from "./theme";
+import type { Deck, GrammarLesson } from "./types";
+
+const FlowScreen = lazy(() => import("./components/FlowScreen").then(m => ({ default: m.FlowScreen })));
+const HowGermanWorks = lazy(() => import("./components/HowGermanWorks").then(m => ({ default: m.HowGermanWorks })));
+
+export default function App() {
+  const { view, navigate } = useHashRouter();
+  const [stats, setStats] = useState<{ mastered: string } | undefined>();
+
+  const handleHome = () => navigate({ type: "dashboard" });
+  const handleSelectDeck = (deck: Deck) => navigate({ type: "flow", sources: [deck] });
+  const handleSelectLesson = (lesson: GrammarLesson) =>
+    navigate({ type: "flow", sources: [lesson] });
+  const handleStartFlow = (sources: Array<Deck | GrammarLesson>) =>
+    navigate({ type: "flow", sources });
+
+  return (
+    <MantineProvider theme={theme} defaultColorScheme="dark" cssVariablesResolver={resolver}>
+      <ErrorBoundary>
+      {view.type === "dashboard" && (
+        <Layout stats={stats}>
+          <Dashboard
+            onSelectDeck={handleSelectDeck}
+            onSelectLesson={handleSelectLesson}
+            onStartFlow={handleStartFlow}
+            onStatsChange={setStats}
+          />
+        </Layout>
+      )}
+      {view.type === "how-german-works" && (
+        <Layout stats={stats} onHome={handleHome}>
+          <Suspense>
+            <HowGermanWorks />
+          </Suspense>
+        </Layout>
+      )}
+      {view.type === "flow" && (
+        <Suspense>
+          <FlowScreen
+            key={view.sources.map(s => s.id).join(",")}
+            sources={view.sources}
+            onExit={handleHome}
+          />
+        </Suspense>
+      )}
+      </ErrorBoundary>
+    </MantineProvider>
+  );
+}
