@@ -329,19 +329,6 @@ const dativeExercises: GrammarExercise[] = [
 // =============================================================================
 
 export const grammarLessons: GrammarLesson[] = [
-  // Basic conjugation
-  {
-    id: "sein-haben",
-    name: "sein & haben",
-    description: "The two most important irregular verbs - memorize these conjugations:",
-    exercises: generateConjugationExercises(seinHabenVerbs, "sh"),
-  },
-  {
-    id: "regular-verbs",
-    name: "Regular Verbs",
-    description: "Regular verbs follow standard endings based on the pronoun:",
-    exercises: generateConjugationExercises(regularVerbs, "reg"),
-  },
   // Case exercises
   {
     id: "accusative-articles",
@@ -354,6 +341,19 @@ export const grammarLessons: GrammarLesson[] = [
     name: "Dative Case",
     description: "Fill in the correct article (der→dem, die→der, das→dem)",
     exercises: dativeExercises,
+  },
+  // Conjugation
+  {
+    id: "sein-haben",
+    name: "sein & haben",
+    description: "The two most important irregular verbs - memorize these conjugations:",
+    exercises: generateConjugationExercises(seinHabenVerbs, "sh"),
+  },
+  {
+    id: "regular-verbs",
+    name: "Regular Verbs",
+    description: "Regular verbs follow standard endings based on the pronoun:",
+    exercises: generateConjugationExercises(regularVerbs, "reg"),
   },
 ];
 

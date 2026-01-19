@@ -732,16 +732,31 @@ export function FillBlankScreen({
                     {sentencePart}
                   </span>
 
-                  <DrillInput
-                    ref={inputRef}
-                    value={displayValue}
-                    onChange={(e) => handleInputChange(e.target.value)}
-                    placeholder="..."
-                    status={status}
-                    size="lg"
-                    readOnly={status !== "idle"}
-                    style={{ flex: "1 1 0%", maxWidth: "50%" }}
-                  />
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: "30%" }}>
+                    <DrillInput
+                      ref={inputRef}
+                      value={displayValue}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                      placeholder="..."
+                      status={status}
+                      size="lg"
+                      readOnly={status !== "idle"}
+                    />
+                    {/* Transformation hint */}
+                    <span
+                      style={{
+                        marginTop: "var(--space-2)",
+                        fontSize: "var(--text-sm)",
+                        color: "var(--color-neon-cyan)",
+                        fontFamily: "var(--font-mono, monospace)",
+                        letterSpacing: "0.05em",
+                        opacity: 0.8,
+                        textShadow: "0 0 8px rgba(45, 226, 230, 0.5)",
+                      }}
+                    >
+                      {germanHint} → ?
+                    </span>
+                  </div>
 
                   <span
                     style={{
