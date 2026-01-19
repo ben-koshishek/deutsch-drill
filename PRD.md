@@ -52,6 +52,14 @@ A minimalist drilling app that:
 | US10 | The prompt reads as a natural sentence: "ich ______" | Pronoun and input on same line, reading left-to-right |
 | US11 | All common pronouns are practiced | ich, du, er/sie/es, wir, ihr, sie (formal Sie) |
 
+### Grammar Practice (Cases)
+
+| ID | Story | Acceptance Criteria |
+|----|-------|---------------------|
+| US12 | I see a sentence with blank → I type the correct article | "Ich sehe ___ Mann." → "den" |
+| US13 | Case exercises show inline sentence | Sentence + input + noun on same line |
+| US14 | Accusative and dative cases are practiced | der→den, die→die, das→das, der→dem, die→der |
+
 ---
 
 ## UX Principles
@@ -74,7 +82,8 @@ A minimalist drilling app that:
 ### 4. Progress Visibility
 - Always show: X / Y mastered
 - Progress bar shows percentage complete
-- Streak dots (3 dots) show progress toward mastering current item
+- Streak dots (3 dots) show progress toward mastering current word
+- Circle counter shows how many times deck has been completed
 
 ### 5. Minimal Cognitive Load
 - One task at a time
@@ -89,18 +98,22 @@ A minimalist drilling app that:
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Vocabulary drilling | ✅ Done | 7 decks, ~100 words |
-| Grammar drilling (conjugation) | ✅ Done | 8 lessons, 156 exercises |
+| Vocabulary drilling | ✅ Done | 12 decks, ~150 words |
+| Grammar drilling (conjugation) | ✅ Done | sein/haben, regular verbs |
+| Grammar drilling (cases) | ✅ Done | Accusative & dative articles |
 | Spaced repetition algorithm | ✅ Done | Basic spacing with wrong-answer priority |
 | Progress persistence | ✅ Done | IndexedDB via Dexie |
+| Tab persistence | ✅ Done | Remembers vocabulary/grammar tab on refresh |
 | Light/dark theme | ✅ Done | Synthwave dark theme |
+| Circle completion system | ✅ Done | Infinite replay with circle counter |
+| Reset progress button | ✅ Done | Resets current circle, keeps circle count |
+| Grammar badges | ✅ Done | Case/number/formality for pronouns |
 | Mobile responsive | ⚠️ Partial | Needs testing |
 
 ### Future Considerations
 
 | Feature | Priority | Notes |
 |---------|----------|-------|
-| Reset progress button | High | Per-deck and global reset |
 | Audio pronunciation | Medium | Text-to-speech or recordings |
 | More vocabulary decks | Medium | Expand to 500+ words |
 | More grammar lessons | Medium | Genitive case, two-way prepositions, adjective endings |
@@ -147,23 +160,17 @@ A minimalist drilling app that:
 
 | Lesson | Exercise Count | Content |
 |--------|----------------|---------|
-| sein & haben | 12 | The two most important German verbs |
-| Regular Verbs | 42 | kommen, gehen, machen, wohnen, spielen, lernen, trinken |
-| Stem-Changing (e→i) | 36 | essen, lesen, sehen, sprechen, nehmen, geben |
-| Stem-Changing (a→ä) | 12 | schlafen, fahren |
-| Modal Verbs | 24 | können, müssen, wollen, wissen |
-| -ieren & -ten Verbs | 6 | arbeiten |
-| Accusative Articles | 12 | der→den, ein→einen practice |
-| Dative Prepositions | 12 | mit, von, bei, zu, aus + dative articles |
+| sein & haben | 12 | Irregular conjugations (bin, bist, ist, habe, hast, hat) |
+| Regular Verbs | 42 | Standard -e, -st, -t, -en endings |
+| Accusative Case | 12 | der→den, die→die, das→das, ein→einen |
+| Dative Case | 12 | der→dem, die→der, das→dem with prepositions |
 
 ---
 
 ## Known Issues
 
 1. **Mobile responsiveness** - Layout needs testing on small screens
-2. **No reset UI** - Cannot reset progress without clearing browser data
-3. **Limited content** - Could expand vocabulary decks
-4. **No audio** - Pronunciation support missing
+2. **No audio** - Pronunciation support missing
 
 ---
 
@@ -172,9 +179,10 @@ A minimalist drilling app that:
 | Term | Definition |
 |------|------------|
 | **Deck** | Collection of vocabulary words grouped by theme |
-| **Word** | German/English pair with optional example sentence |
+| **Word** | German/English pair with optional example sentence and grammar metadata |
 | **Lesson** | Collection of grammar exercises |
 | **Exercise** | Single grammar prompt (e.g., conjugate "haben" for "ich") |
 | **Mastery** | 3 consecutive correct answers for an item |
 | **Streak** | Current count of consecutive correct answers (0-3) |
+| **Circle** | One complete pass through all words in a deck |
 | **Direction** | DE→EN (translate to English) or EN→DE (translate to German) |

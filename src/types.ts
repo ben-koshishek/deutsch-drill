@@ -1,9 +1,21 @@
+// Grammatical metadata for pronouns and other words
+export type GrammaticalCase = 'nominative' | 'accusative' | 'dative' | 'genitive';
+export type GrammaticalNumber = 'singular' | 'plural';
+export type Formality = 'formal' | 'informal';
+
+export interface WordMeta {
+  case?: GrammaticalCase;
+  number?: GrammaticalNumber;
+  formality?: Formality;
+}
+
 export interface Word {
   id: string;
   german: string;
   english: string;
   example?: string;            // German example sentence
   exampleTranslation?: string; // English translation of the example
+  meta?: WordMeta;             // Grammatical metadata for badges
 }
 
 export type DeckCategory = 'sentence-structure' | 'descriptive-words' | 'miscellaneous';

@@ -16,23 +16,33 @@
 ```
 src/
 ├── components/
-│   ├── Header.tsx           # App header with logo + theme toggle
-│   ├── Dashboard.tsx        # Deck/lesson selection with tabs
-│   ├── DrillScreen.tsx      # Vocabulary drilling UI
-│   └── FillBlankScreen.tsx  # Grammar conjugation UI
+│   ├── Header.tsx                # App header with logo + theme toggle
+│   ├── Dashboard.tsx             # Deck/lesson selection with tabs (persisted)
+│   ├── DrillScreen.tsx           # Vocabulary drilling UI + circle tracking
+│   ├── FillBlankScreen.tsx       # Grammar UI (conjugation + case exercises)
+│   ├── CircleCompletionScreen.tsx # Celebration screen after completing a circle
+│   └── ui/
+│       ├── GrammarBadges.tsx     # Case/number/formality badges
+│       ├── StreakDots.tsx        # Per-word streak indicator (0-3)
+│       ├── CircleBadge.tsx       # Circle counter badge
+│       ├── ResetConfirmModal.tsx # Reset confirmation dialog
+│       ├── DeckCard.tsx          # Dashboard deck card
+│       ├── DrillInput.tsx        # Styled input for drills
+│       ├── ExampleBox.tsx        # Example sentence display
+│       └── ProgressBar.tsx       # Progress bar component
 ├── hooks/
-│   ├── useDrill.ts          # Vocabulary drill state + spacing algorithm
-│   └── useFillBlank.ts      # Grammar drill state
+│   ├── useDrill.ts               # Vocabulary drill state + spacing algorithm
+│   └── useFillBlank.ts           # Grammar drill state
 ├── context/
-│   └── ThemeContext.tsx     # Light/dark theme state
+│   └── ThemeContext.tsx          # Light/dark theme state
 ├── data/
-│   ├── decks.ts             # Vocabulary decks (static data)
-│   └── grammar.ts           # Conjugation exercises (static data)
-├── db.ts                    # IndexedDB persistence layer
-├── types.ts                 # TypeScript interfaces
-├── index.css                # Global styles + theme variables
-├── main.tsx                 # App entry point
-└── App.tsx                  # View router
+│   ├── decks.ts                  # Vocabulary decks (static data)
+│   └── grammar.ts                # Conjugation exercises (static data)
+├── db.ts                         # IndexedDB persistence layer
+├── types.ts                      # TypeScript interfaces
+├── index.css                     # Global styles + theme variables
+├── main.tsx                      # App entry point
+└── App.tsx                       # View router
 ```
 
 ---
@@ -40,19 +50,32 @@ src/
 ## Core Data Types
 
 ```typescript
+// Grammatical metadata for pronouns/words
+type GrammaticalCase = 'nominative' | 'accusative' | 'dative' | 'genitive';
+type GrammaticalNumber = 'singular' | 'plural';
+type Formality = 'formal' | 'informal';
+
+interface WordMeta {
+  case?: GrammaticalCase;
+  number?: GrammaticalNumber;
+  formality?: Formality;
+}
+
 // Vocabulary
 interface Word {
   id: string;
-  german: string;
+  german: string;              // e.g., "der Tisch" (with article for nouns)
   english: string;
-  example?: string;
+  example?: string;            // German example sentence
+  exampleTranslation?: string; // English translation of example
+  meta?: WordMeta;             // Grammatical metadata (for badges)
 }
 
 interface Deck {
   id: string;
   name: string;
   description: string;
-  category: 'essentials' | 'building-blocks' | 'basics';
+  category: 'sentence-structure' | 'descriptive-words' | 'miscellaneous';
   exerciseType: 'translation' | 'fill-blank' | 'conjugation';
   words: Word[];
 }
@@ -62,9 +85,11 @@ type DrillDirection = 'de_to_en' | 'en_to_de';
 // Grammar
 interface GrammarExercise {
   id: string;
-  sentence: string;  // "Ich ___ nach Hause."
-  answer: string;    // "gehe"
-  hint?: string;     // "gehen" (infinitive)
+  sentence: string;  // Two formats supported:
+                     // Conjugation: "ich ___ [sein|to be]"
+                     // Case: "Ich sehe ___ [der Mann|the man]"
+  answer: string;    // "bin" or "den"
+  hint?: string;     // Optional hint
 }
 
 interface GrammarLesson {
@@ -179,8 +204,8 @@ Using Dexie.js wrapper for IndexedDB:
 
 ```typescript
 // Database: "deutschdrill"
-// Table: "progress"
 
+// Table: "progress" - tracks streak per word/direction
 interface Progress {
   id?: number;                    // Auto-increment primary key
   deckId: string;                 // Deck or lesson ID
@@ -188,8 +213,15 @@ interface Progress {
   direction: 'de_to_en' | 'en_to_de';  // Direction (vocab only)
   streak: number;                 // 0-3 consecutive correct
 }
-
 // Index: [deckId+wordId+direction] for fast lookups
+
+// Table: "circles" - tracks completed circles per deck
+interface CircleCount {
+  id?: number;                    // Auto-increment primary key
+  deckId: string;                 // Deck ID
+  circles: number;                // Number of completed circles
+}
+// Index: deckId for fast lookups
 ```
 
 ### API
@@ -204,8 +236,17 @@ setProgress(deckId, wordId, direction, streak): Promise<void>
 // Get all progress for a deck (for dashboard)
 getDeckProgress(deckId): Promise<Map<string, number>>
 
-// Reset all progress for a deck
+// Reset progress for a deck (keeps circle count)
 resetDeckProgress(deckId): Promise<void>
+
+// Get circle count for a deck
+getCircleCount(deckId): Promise<number>
+
+// Increment circle count (returns new count)
+incrementCircle(deckId): Promise<number>
+
+// Reset circles for a deck
+resetCircles(deckId): Promise<void>
 ```
 
 ---
@@ -283,22 +324,38 @@ interface ThemeContextType {
 ### Dashboard.tsx
 
 - Fetches progress for all decks/lessons on mount
+- Two tabs: Vocabulary and Grammar (tab selection persisted to localStorage)
 - Groups vocabulary decks by category
-- Shows completion percentage per deck
-- Category-based color coding (pink/cyan/purple)
+- Shows completion percentage and circle count per deck
+- Category-based color coding (pink/cyan/purple/yellow)
+- Keyboard shortcuts: 1 = Vocabulary tab, 2 = Grammar tab
 
 ### DrillScreen.tsx
 
-- Uses `useDrill(deck)` hook
+- Uses `useDrill(deck, resetKey)` hook
 - Auto-focuses input on task change
 - Three states: `idle` → `wrong`/`correct` → (next task)
 - Shows example sentence for DE→EN direction
+- Displays GrammarBadges for words with meta (case/number/formality)
+- Shows StreakDots for current word's streak progress
+- Tracks circle completion and shows CircleCompletionScreen
+- Reset button restarts current circle (keeps circle count)
 
 ### FillBlankScreen.tsx
 
 - Uses `useFillBlank(lesson)` hook
-- Parses sentence format: `"pronoun ___ (infinitive)"`
-- Inline layout: pronoun + input box
+- Handles two exercise types:
+  - **Conjugation**: `"pronoun ___ [infinitive|english]"` → verb hint above, pronoun + input inline
+  - **Case**: `"sentence ___ [article|english]"` → full sentence with inline input
+- Collapsible info panel with conjugation tables or case rules
+- Hint mode toggle (English/German/Both) persisted to localStorage
+- Tab selection persisted to localStorage
+
+### CircleCompletionScreen.tsx
+
+- Arcade-style celebration screen
+- Shows completed circle number
+- Options to continue (start next circle) or exit to dashboard
 
 ---
 

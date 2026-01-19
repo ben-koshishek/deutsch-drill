@@ -1,16 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { Deck, Word, DrillDirection } from "../types";
 import { useDrill } from "../hooks/useDrill";
+import { getCircleCount, incrementCircle, resetDeckProgress } from "../db";
+import { CircleCompletionScreen } from "./CircleCompletionScreen";
 import { ExampleBox } from "./ui/ExampleBox";
-import { HistoryDots } from "./ui/HistoryDots";
+import { GrammarBadges } from "./ui/GrammarBadges";
+import { StreakDots } from "./ui/StreakDots";
 import { DrillInput } from "./ui/DrillInput";
 import { ProgressBar } from "./ui/ProgressBar";
-import { FeedbackText } from "./ui/FeedbackText";
+import { CircleBadge } from "./ui/CircleBadge";
+import { ResetConfirmModal } from "./ui/ResetConfirmModal";
 
 interface DrillScreenProps {
   deck: Deck;
   onExit: () => void;
-  onComplete: () => void;
+  onComplete?: () => void; // Optional - completion handled internally now
 }
 
 export interface SessionEndStats {
@@ -34,9 +38,10 @@ function isAnswerCorrect(userAnswer: string, expectedAnswer: string): boolean {
   return alternatives.some((alt) => alt === normalizedUser);
 }
 
-export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
+export function DrillScreen({ deck, onExit }: DrillScreenProps) {
+  const [drillKey, setDrillKey] = useState(0); // Key to force re-mount useDrill
   const { currentTask, submitAnswer, isFinished, completedCount, totalCount } =
-    useDrill(deck);
+    useDrill(deck, drillKey);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const prevTaskKeyRef = useRef<string | null>(null);
@@ -55,11 +60,24 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
     status: "idle",
   });
 
-  // Track rolling answer history across all words (for HistoryDots)
-  const [answerHistory, setAnswerHistory] = useState<(boolean | null)[]>([]);
-
   // Track prompt key for animation reset
   const [promptKey, setPromptKey] = useState(0);
+
+  // Auto-advance flag for correct answers
+  const [shouldAutoAdvance, setShouldAutoAdvance] = useState(false);
+
+  // Circle tracking
+  const [circleCount, setCircleCount] = useState(0);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [completedCircle, setCompletedCircle] = useState(0);
+
+  // Reset modal
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  // Load circle count on mount
+  useEffect(() => {
+    getCircleCount(deck.id).then(setCircleCount);
+  }, [deck.id]);
 
   const input = formState.taskKey === taskKey ? formState.input : "";
   const status = formState.taskKey === taskKey ? formState.status : "idle";
@@ -72,13 +90,50 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
     }
   }, [currentTask, taskKey]);
 
+  // Handle circle completion
   useEffect(() => {
-    if (isFinished) {
-      onComplete();
+    if (isFinished && !showCompletion) {
+      // Increment circle and show completion screen
+      incrementCircle(deck.id).then((newCount) => {
+        setCompletedCircle(newCount);
+        setCircleCount(newCount);
+        setShowCompletion(true);
+      });
     }
-  }, [isFinished, onComplete]);
+  }, [isFinished, showCompletion, deck.id]);
 
-  // Keyboard shortcut: Space to continue after answer
+  // Start next circle
+  const handleContinue = useCallback(async () => {
+    // Reset progress to start fresh
+    await resetDeckProgress(deck.id);
+    setShowCompletion(false);
+    prevTaskKeyRef.current = null;
+    setFormState({ taskKey: null, input: "", status: "idle" });
+    // Force re-mount of useDrill by changing key
+    setDrillKey((k) => k + 1);
+  }, [deck.id]);
+
+  // Reset current circle progress (keeps circle count)
+  const handleReset = useCallback(async () => {
+    await resetDeckProgress(deck.id);
+    setShowResetModal(false);
+    prevTaskKeyRef.current = null;
+    setFormState({ taskKey: null, input: "", status: "idle" });
+    setDrillKey((k) => k + 1);
+  }, [deck.id]);
+
+  // Auto-advance after brief delay on correct answers
+  useEffect(() => {
+    if (shouldAutoAdvance) {
+      const timer = setTimeout(() => {
+        submitAnswer(true);
+        setShouldAutoAdvance(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAutoAdvance, submitAnswer]);
+
+  // Keyboard shortcuts: Space to continue, Backspace to go back
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === " " && status !== "idle") {
@@ -88,12 +143,32 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
         } else if (status === "correct") {
           submitAnswer(true);
         }
+      } else if (e.key === "Backspace") {
+        // Go back if input is empty or answer is shown
+        const input = inputRef.current;
+        const inputEmpty = !input || input.value === "";
+        if (inputEmpty || status !== "idle") {
+          e.preventDefault();
+          onExit();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [status, submitAnswer]);
+  }, [status, submitAnswer, onExit]);
+
+  // Show completion screen
+  if (showCompletion) {
+    return (
+      <CircleCompletionScreen
+        circleNumber={completedCircle}
+        deckName={deck.name}
+        onContinue={handleContinue}
+        onExit={onExit}
+      />
+    );
+  }
 
   if (!currentTask) {
     return null;
@@ -127,8 +202,11 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
       input,
       status: correct ? "correct" : "wrong",
     });
-    // Track answer in history
-    setAnswerHistory((prev) => [...prev, correct]);
+
+    if (correct) {
+      // Trigger auto-advance after brief delay
+      setShouldAutoAdvance(true);
+    }
   };
 
   const displayValue =
@@ -163,6 +241,15 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
         }}
       />
 
+      {/* Reset confirmation modal */}
+      {showResetModal && (
+        <ResetConfirmModal
+          deckName={deck.name}
+          onConfirm={handleReset}
+          onCancel={() => setShowResetModal(false)}
+        />
+      )}
+
       {/* Header */}
       <header
         style={{
@@ -174,42 +261,83 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
           zIndex: 1,
         }}
       >
-        <button
-          onClick={onExit}
-          style={{
-            color: "var(--color-text-muted)",
-            fontSize: "var(--text-md)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "var(--space-2) var(--space-3)",
-            fontFamily: "inherit",
-            borderRadius: "var(--radius-md)",
-            transition: "all var(--transition-base)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--color-bg-secondary)";
-            e.currentTarget.style.color = "var(--color-text)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "none";
-            e.currentTarget.style.color = "var(--color-text-muted)";
-          }}
-        >
-          ← Back
-        </button>
-        <span
-          style={{
-            color: "var(--color-text-muted)",
-            fontSize: "var(--text-md)",
-            fontWeight: 600,
-            padding: "var(--space-2) var(--space-4)",
-            background: "var(--color-bg-secondary)",
-            borderRadius: "var(--radius-md)",
-          }}
-        >
-          {completedCount} / {totalCount}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+          <button
+            onClick={onExit}
+            style={{
+              color: "var(--color-text-muted)",
+              fontSize: "var(--text-md)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "var(--space-2) var(--space-3)",
+              fontFamily: "inherit",
+              borderRadius: "var(--radius-md)",
+              transition: "all var(--transition-base)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--color-bg-secondary)";
+              e.currentTarget.style.color = "var(--color-text)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.color = "var(--color-text-muted)";
+            }}
+          >
+            ← Back
+          </button>
+          {/* Circle badge */}
+          <CircleBadge circle={circleCount + 1} size="sm" />
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+          {/* Reset button */}
+          <button
+            onClick={() => setShowResetModal(true)}
+            title="Reset progress"
+            style={{
+              color: "var(--color-text-subtle)",
+              fontSize: "var(--text-sm)",
+              background: "none",
+              border: "1px solid transparent",
+              cursor: "pointer",
+              padding: "var(--space-2)",
+              fontFamily: "inherit",
+              borderRadius: "var(--radius-md)",
+              transition: "all var(--transition-base)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255, 77, 109, 0.1)";
+              e.currentTarget.style.borderColor = "rgba(255, 77, 109, 0.3)";
+              e.currentTarget.style.color = "var(--color-error)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.borderColor = "transparent";
+              e.currentTarget.style.color = "var(--color-text-subtle)";
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+          </button>
+          <span
+            style={{
+              color: "var(--color-text-muted)",
+              fontSize: "var(--text-md)",
+              fontWeight: 600,
+              padding: "var(--space-2) var(--space-4)",
+              background: "var(--color-bg-secondary)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            {completedCount} / {totalCount}
+          </span>
+        </div>
       </header>
 
       {/* Progress */}
@@ -240,27 +368,34 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
           {/* Top section - prompt and example */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             {/* The word - pink color with glow and entrance animation */}
-            <h2
+            <div
               key={promptKey}
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(var(--text-3xl), 8vw, var(--text-4xl))",
-                fontWeight: 800,
-                color: "var(--color-prompt)",
-                lineHeight: 1.3,
-                margin: 0,
-                marginBlockEnd: "var(--space-10)",
                 textAlign: "center",
-                textShadow: `
-                  0 0 20px var(--color-primary-glow),
-                  0 0 40px rgba(246, 1, 157, 0.3),
-                  0 0 60px rgba(246, 1, 157, 0.15)
-                `,
+                marginBlockEnd: "var(--space-10)",
                 animation: "promptEnter 0.5s ease-out",
               }}
             >
-              {prompt}
-            </h2>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(var(--text-3xl), 8vw, var(--text-4xl))",
+                  fontWeight: 800,
+                  color: "var(--color-prompt)",
+                  lineHeight: 1.3,
+                  margin: 0,
+                  textShadow: `
+                    0 0 20px var(--color-primary-glow),
+                    0 0 40px rgba(246, 1, 157, 0.3),
+                    0 0 60px rgba(246, 1, 157, 0.15)
+                  `,
+                }}
+              >
+                {prompt}
+              </h2>
+              {/* Grammar badges - show contextual hints */}
+              {word.meta && <GrammarBadges meta={word.meta} size="md" />}
+            </div>
 
             {/* Example - show German for de_to_en, English translation for en_to_de */}
             <div
@@ -268,6 +403,7 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
               style={{
                 minHeight: "4rem",
                 textAlign: "center",
+                marginTop: "var(--space-8)",
               }}
             >
               {direction === "de_to_en" && word.example && (
@@ -294,7 +430,7 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
               />
             </div>
 
-            {/* Feedback row - dots left, feedback text right */}
+            {/* Feedback row - streak dots and feedback text */}
             <div
               style={{
                 display: "flex",
@@ -302,11 +438,38 @@ export function DrillScreen({ deck, onExit, onComplete }: DrillScreenProps) {
                 alignItems: "center",
               }}
             >
-              {/* History dots */}
-              <HistoryDots history={answerHistory} />
+              {/* Streak dots - show updated streak based on current answer */}
+              {(() => {
+                const baseStreak = currentTask.streak;
+                const displayStreak = status === "correct"
+                  ? Math.min(baseStreak + 1, 3)
+                  : status === "wrong"
+                    ? 0
+                    : baseStreak;
+                return <StreakDots current={displayStreak} size="lg" showLabel />;
+              })()}
 
-              {/* Feedback message */}
-              <FeedbackText status={status} size="md" />
+              {/* Feedback message - streak aware */}
+              <span
+                style={{
+                  fontWeight: 500,
+                  fontSize: "var(--text-md)",
+                  color: status === "correct"
+                    ? "var(--color-success)"
+                    : status === "wrong"
+                      ? "var(--color-error)"
+                      : "var(--color-text-muted)",
+                }}
+              >
+                {status === "idle" && "Press Enter"}
+                {status === "wrong" && "Incorrect — streak reset"}
+                {status === "correct" && (() => {
+                  const newStreak = currentTask.streak + 1;
+                  if (newStreak >= 3) return "MASTERED!";
+                  const remaining = 3 - newStreak;
+                  return `Correct! ${remaining} more to master`;
+                })()}
+              </span>
             </div>
           </div>
         </form>

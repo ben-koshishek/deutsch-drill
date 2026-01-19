@@ -10,20 +10,24 @@ export interface DrillTask {
   streak: number;
 }
 
-export function useDrill(deck: Deck) {
+export function useDrill(deck: Deck, resetKey: number = 0) {
   const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map());
   const [currentTask, setCurrentTask] = useState<DrillTask | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [wrongQueue, setWrongQueue] = useState<string[]>([]); // keys of recently wrong tasks
   const [recentlyCorrect, setRecentlyCorrect] = useState<string[]>([]); // keys to avoid (spacing)
 
-  // Load progress from DB
+  // Load progress from DB (re-runs when resetKey changes)
   useEffect(() => {
+    setIsLoading(true);
+    setCurrentTask(null);
+    setWrongQueue([]);
+    setRecentlyCorrect([]);
     getDeckProgress(deck.id).then(map => {
       setProgressMap(map);
       setIsLoading(false);
     });
-  }, [deck.id]);
+  }, [deck.id, resetKey]);
 
   // All tasks (word × direction)
   const allTasks = useMemo(() => {

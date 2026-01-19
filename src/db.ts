@@ -9,13 +9,24 @@ interface Progress {
   streak: number;
 }
 
+interface CircleCount {
+  id?: number;
+  deckId: string;
+  circles: number;
+}
+
 class DrillDatabase extends Dexie {
   progress!: Table<Progress>;
+  circles!: Table<CircleCount>;
 
   constructor() {
     super('deutschdrill');
     this.version(1).stores({
       progress: '++id, [deckId+wordId+direction]'
+    });
+    this.version(2).stores({
+      progress: '++id, [deckId+wordId+direction]',
+      circles: '++id, deckId'
     });
   }
 }
@@ -63,4 +74,35 @@ export async function getDeckProgress(
 
 export async function resetDeckProgress(deckId: string): Promise<void> {
   await db.progress.where({ deckId }).delete();
+}
+
+// Circle tracking functions
+export async function getCircleCount(deckId: string): Promise<number> {
+  const record = await db.circles.where({ deckId }).first();
+  return record?.circles ?? 0;
+}
+
+export async function incrementCircle(deckId: string): Promise<number> {
+  const existing = await db.circles.where({ deckId }).first();
+  const newCount = (existing?.circles ?? 0) + 1;
+
+  if (existing) {
+    await db.circles.update(existing.id!, { circles: newCount });
+  } else {
+    await db.circles.add({ deckId, circles: newCount });
+  }
+
+  return newCount;
+}
+
+export async function resetCircles(deckId: string): Promise<void> {
+  await db.circles.where({ deckId }).delete();
+}
+
+// Full reset: progress + circles
+export async function resetDeckFull(deckId: string): Promise<void> {
+  await Promise.all([
+    db.progress.where({ deckId }).delete(),
+    db.circles.where({ deckId }).delete()
+  ]);
 }

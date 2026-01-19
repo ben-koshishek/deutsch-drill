@@ -8,6 +8,7 @@ export interface DeckCardProps {
   progress: number;
   accentColor: string;
   isComplete?: boolean;
+  circleCount?: number;
   onClick: () => void;
   style?: React.CSSProperties;
 }
@@ -42,9 +43,11 @@ export function DeckCard({
   progress,
   accentColor,
   isComplete = false,
+  circleCount = 0,
   onClick,
   style,
 }: DeckCardProps) {
+  const hasCircles = circleCount > 0;
   const [isHovered, setIsHovered] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -53,43 +56,55 @@ export function DeckCard({
   const goldColor = "#f9c54e";
   const goldGlow = isDark ? "rgba(249, 197, 78, 0.6)" : "rgba(249, 197, 78, 0.4)";
 
-  // Theme-aware alpha: full intensity on dark, 35% on light
-  const getAlpha = (baseAlpha: number) => isDark ? baseAlpha : baseAlpha * 0.35;
-
-  // Glow intensity scales with progress, adjusted for theme
-  const glowIntensity = progress > 0 ? getAlpha(0.15 + (progress / 100) * 0.2) : 0;
-  const glowColor = `${accentColor}${Math.round(glowIntensity * 255).toString(16).padStart(2, '0')}`;
-
-  // Helper to convert alpha to hex
-  const toHex = (alpha: number) => Math.round(alpha * 255).toString(16).padStart(2, '0');
-
   // Completed cards get a special "trophy case" treatment
   const completedBorderColor = isDark ? goldColor : "var(--color-success)";
 
+  // RGB values for accent colors
+  const getAccentRGB = () => {
+    if (accentColor === '#f6019d') return '246,1,157';
+    if (accentColor === '#2de2e6') return '45,226,230';
+    if (accentColor === '#9d00ff') return '157,0,255';
+    if (accentColor === '#f9c54e') return '249,197,78';
+    return '246,1,157';
+  };
+  const accentRGB = getAccentRGB();
+
   const cardStyle: React.CSSProperties = {
-    cursor: isComplete ? "default" : "pointer",
+    cursor: "pointer", // Always clickable - can replay circles
     background: isComplete
       ? isDark
-        ? `linear-gradient(135deg, rgba(249, 197, 78, 0.08) 0%, var(--color-card-bg) 50%, rgba(249, 197, 78, 0.05) 100%)`
+        ? `linear-gradient(145deg, rgba(249, 197, 78, 0.12) 0%, var(--color-card-bg) 40%, rgba(249, 197, 78, 0.06) 100%)`
         : `linear-gradient(135deg, rgba(22, 163, 74, 0.06) 0%, var(--color-card-bg) 50%, rgba(22, 163, 74, 0.03) 100%)`
-      : "var(--color-card-bg)",
+      : isDark
+        ? `linear-gradient(145deg, rgba(255,255,255,0.03) 0%, var(--color-card-bg) 20%, rgba(${accentRGB}, 0.06) 100%)`
+        : "var(--color-card-bg)",
     border: isComplete
       ? `2px solid ${completedBorderColor}`
-      : "1px solid var(--color-border)",
+      : `1px solid ${isDark ? `rgba(${accentRGB}, 0.25)` : 'var(--color-border)'}`,
     borderTop: isComplete ? `3px solid ${completedBorderColor}` : `3px solid ${accentColor}`,
-    borderRadius: "var(--radius-md)",
+    borderRadius: "var(--radius-lg)",
     padding: "var(--space-6)",
     transition: "all var(--transition-base)",
-    transform: isHovered && !isComplete ? "translateY(-4px)" : "translateY(0)",
+    transform: isHovered ? "translateY(-6px) scale(1.02)" : "translateY(0) scale(1)",
     boxShadow: isComplete
       ? isDark
-        ? `0 0 25px ${goldGlow}, inset 0 0 30px rgba(249, 197, 78, 0.05)`
+        ? `0 0 25px ${goldGlow}, inset 0 0 30px rgba(249, 197, 78, 0.05), inset 0 1px 0 rgba(255,255,255,0.08)`
         : `0 4px 12px rgba(22, 163, 74, 0.15)`
       : isHovered
-        ? `0 8px 30px ${glowColor}, 0 0 15px ${accentColor}${toHex(getAlpha(0.13))}`
-        : progress > 0
-          ? `0 2px 10px ${glowColor}`
-          : "none",
+        ? `
+          0 20px 50px rgba(0,0,0,0.4),
+          0 0 30px rgba(${accentRGB}, 0.3),
+          inset 0 1px 0 rgba(255,255,255,0.1),
+          inset 0 -1px 0 rgba(0,0,0,0.2)
+        `
+        : isDark
+          ? `
+            0 4px 20px rgba(0,0,0,0.3),
+            0 0 15px rgba(${accentRGB}, 0.15),
+            inset 0 1px 0 rgba(255,255,255,0.06),
+            inset 0 -1px 0 rgba(0,0,0,0.1)
+          `
+          : `0 2px 8px rgba(0,0,0,0.08)`,
     position: "relative",
     overflow: "hidden",
     opacity: isComplete && isHovered ? 0.95 : 1,
@@ -98,30 +113,40 @@ export function DeckCard({
 
   // Progress text logic
   const getProgressText = () => {
-    if (isComplete) return "MASTERED";
+    if (hasCircles) return `CIRCLE ${circleCount}`;
+    if (isComplete) return "COMPLETE";
     if (progress === 0) return "Start learning";
     return `${progress}% mastered`;
   };
 
   const getProgressTextColor = () => {
-    if (isComplete) return isDark ? goldColor : "var(--color-success)";
+    if (hasCircles || isComplete) return isDark ? goldColor : "var(--color-success)";
     if (progress === 0) return "var(--color-text-muted)";
     return accentColor;
   };
 
-  const handleClick = () => {
-    if (!isComplete) {
-      onClick();
-    }
-  };
-
   return (
     <article
-      onClick={handleClick}
+      onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={cardStyle}
     >
+      {/* Top highlight edge for depth */}
+      {isDark && !isComplete && (
+        <div
+          style={{
+            position: "absolute",
+            top: 3,
+            left: 0,
+            right: 0,
+            height: 1,
+            background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.08) 80%, transparent 100%)`,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
       {/* Diagonal shimmer overlay for completed cards */}
       {isComplete && (
         <div
@@ -148,6 +173,19 @@ export function DeckCard({
         />
       )}
 
+      {/* Full border glow on hover */}
+      {isHovered && !isComplete && isDark && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "inherit",
+            boxShadow: `inset 0 0 20px rgba(${accentRGB}, 0.2), inset 0 0 40px rgba(${accentRGB}, 0.1)`,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
       {/* Header */}
       <div
         style={{
@@ -169,7 +207,33 @@ export function DeckCard({
         >
           {title}
         </h3>
-        {isComplete && (
+        {hasCircles && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: isDark ? "rgba(157, 0, 255, 0.2)" : "rgba(157, 0, 255, 0.1)",
+              border: "1px solid rgba(157, 0, 255, 0.4)",
+              borderRadius: "var(--radius-sm)",
+              padding: "2px 8px",
+              boxShadow: isDark ? "0 0 8px rgba(157, 0, 255, 0.3)" : "none",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "10px",
+                letterSpacing: "0.05em",
+                color: "var(--color-neon-purple)",
+                textShadow: isDark ? "0 0 6px rgba(157, 0, 255, 0.5)" : "none",
+              }}
+            >
+              ◉ {circleCount}
+            </span>
+          </div>
+        )}
+        {isComplete && !hasCircles && (
           <div
             style={{
               display: "flex",
@@ -228,7 +292,7 @@ export function DeckCard({
               borderRadius: "var(--radius-lg)",
               overflow: "hidden",
               "--color-primary": accentColor,
-              boxShadow: progress > 0 ? `0 0 ${8 + (progress / 10)}px ${accentColor}${toHex(getAlpha(0.27))}` : "none",
+              boxShadow: progress > 0 ? `0 0 ${8 + (progress / 10)}px rgba(${accentRGB}, ${isDark ? 0.3 : 0.15})` : "none",
             } as React.CSSProperties}
           />
         )}

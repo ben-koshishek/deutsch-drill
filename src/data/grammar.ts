@@ -287,161 +287,41 @@ function generateConjugationExercises(
 
 const accusativeExercises: GrammarExercise[] = [
   // Masculine (der → den)
-  {
-    id: "acc_1",
-    sentence: "Ich sehe ___ Mann. [the man - accusative]",
-    answer: "den",
-    hint: "der → den (masculine accusative)",
-  },
-  {
-    id: "acc_2",
-    sentence: "Sie kauft ___ Apfel. [the apple - accusative]",
-    answer: "den",
-    hint: "der → den (masculine accusative)",
-  },
-  {
-    id: "acc_3",
-    sentence: "Wir haben ___ Hund. [the dog - accusative]",
-    answer: "den",
-    hint: "der → den (masculine accusative)",
-  },
-  {
-    id: "acc_4",
-    sentence: "Er liest ___ Brief. [the letter - accusative]",
-    answer: "den",
-    hint: "der → den (masculine accusative)",
-  },
-  {
-    id: "acc_5",
-    sentence: "Ich trinke ___ Kaffee. [the coffee - accusative]",
-    answer: "den",
-    hint: "der → den (masculine accusative)",
-  },
-  // Feminine (die → die, no change)
-  {
-    id: "acc_6",
-    sentence: "Ich sehe ___ Frau. [the woman - accusative]",
-    answer: "die",
-    hint: "die → die (feminine stays the same)",
-  },
-  {
-    id: "acc_7",
-    sentence: "Er kauft ___ Zeitung. [the newspaper - accusative]",
-    answer: "die",
-    hint: "die → die (feminine stays the same)",
-  },
-  // Neuter (das → das, no change)
-  {
-    id: "acc_8",
-    sentence: "Sie liest ___ Buch. [the book - accusative]",
-    answer: "das",
-    hint: "das → das (neuter stays the same)",
-  },
-  {
-    id: "acc_9",
-    sentence: "Wir essen ___ Brot. [the bread - accusative]",
-    answer: "das",
-    hint: "das → das (neuter stays the same)",
-  },
-  // Indefinite articles (ein → einen for masculine)
-  {
-    id: "acc_10",
-    sentence: "Ich habe ___ Bruder. [a brother - accusative]",
-    answer: "einen",
-    hint: "ein → einen (masculine indefinite accusative)",
-  },
-  {
-    id: "acc_11",
-    sentence: "Sie sucht ___ Job. [a job - accusative]",
-    answer: "einen",
-    hint: "ein → einen (masculine indefinite accusative)",
-  },
-  {
-    id: "acc_12",
-    sentence: "Er braucht ___ Computer. [a computer - accusative]",
-    answer: "einen",
-    hint: "ein → einen (masculine indefinite accusative)",
-  },
+  { id: "acc_1", sentence: "Ich sehe ___ [der Mann|the man]", answer: "den", hint: "der → den" },
+  { id: "acc_2", sentence: "Sie kauft ___ [der Apfel|the apple]", answer: "den", hint: "der → den" },
+  { id: "acc_3", sentence: "Wir haben ___ [der Hund|the dog]", answer: "den", hint: "der → den" },
+  { id: "acc_4", sentence: "Er liest ___ [der Brief|the letter]", answer: "den", hint: "der → den" },
+  { id: "acc_5", sentence: "Ich trinke ___ [der Kaffee|the coffee]", answer: "den", hint: "der → den" },
+  // Feminine (die → die)
+  { id: "acc_6", sentence: "Ich sehe ___ [die Frau|the woman]", answer: "die", hint: "die → die" },
+  { id: "acc_7", sentence: "Er kauft ___ [die Zeitung|the newspaper]", answer: "die", hint: "die → die" },
+  // Neuter (das → das)
+  { id: "acc_8", sentence: "Sie liest ___ [das Buch|the book]", answer: "das", hint: "das → das" },
+  { id: "acc_9", sentence: "Wir essen ___ [das Brot|the bread]", answer: "das", hint: "das → das" },
+  // Indefinite (ein → einen)
+  { id: "acc_10", sentence: "Ich habe ___ [ein Bruder|a brother]", answer: "einen", hint: "ein → einen" },
+  { id: "acc_11", sentence: "Sie sucht ___ [ein Job|a job]", answer: "einen", hint: "ein → einen" },
+  { id: "acc_12", sentence: "Er braucht ___ [ein Computer|a computer]", answer: "einen", hint: "ein → einen" },
 ];
 
 const dativeExercises: GrammarExercise[] = [
   // mit (with) - always dative
-  {
-    id: "dat_1",
-    sentence: "Ich fahre mit ___ Bus. [the bus - dative]",
-    answer: "dem",
-    hint: "mit + dative: der → dem",
-  },
-  {
-    id: "dat_2",
-    sentence: "Sie spricht mit ___ Mann. [the man - dative]",
-    answer: "dem",
-    hint: "mit + dative: der → dem",
-  },
-  {
-    id: "dat_3",
-    sentence: "Wir gehen mit ___ Frau. [the woman - dative]",
-    answer: "der",
-    hint: "mit + dative: die → der",
-  },
-  {
-    id: "dat_4",
-    sentence: "Er spielt mit ___ Kind. [the child - dative]",
-    answer: "dem",
-    hint: "mit + dative: das → dem",
-  },
+  { id: "dat_1", sentence: "Ich fahre mit ___ [der Bus|the bus]", answer: "dem", hint: "der → dem" },
+  { id: "dat_2", sentence: "Sie spricht mit ___ [der Mann|the man]", answer: "dem", hint: "der → dem" },
+  { id: "dat_3", sentence: "Wir gehen mit ___ [die Frau|the woman]", answer: "der", hint: "die → der" },
+  { id: "dat_4", sentence: "Er spielt mit ___ [das Kind|the child]", answer: "dem", hint: "das → dem" },
   // von (from) - always dative
-  {
-    id: "dat_5",
-    sentence: "Das Buch ist von ___ Lehrer. [the teacher - dative]",
-    answer: "dem",
-    hint: "von + dative: der → dem",
-  },
-  {
-    id: "dat_6",
-    sentence: "Ich komme von ___ Arbeit. [the work - dative]",
-    answer: "der",
-    hint: "von + dative: die → der",
-  },
+  { id: "dat_5", sentence: "Das Buch ist von ___ [der Lehrer|the teacher]", answer: "dem", hint: "der → dem" },
+  { id: "dat_6", sentence: "Ich komme von ___ [die Arbeit|the work]", answer: "der", hint: "die → der" },
   // bei (at/near) - always dative
-  {
-    id: "dat_7",
-    sentence: "Ich wohne bei ___ Familie. [the family - dative]",
-    answer: "der",
-    hint: "bei + dative: die → der",
-  },
-  {
-    id: "dat_8",
-    sentence: "Er arbeitet bei ___ Firma. [the company - dative]",
-    answer: "der",
-    hint: "bei + dative: die → der",
-  },
+  { id: "dat_7", sentence: "Ich wohne bei ___ [die Familie|the family]", answer: "der", hint: "die → der" },
+  { id: "dat_8", sentence: "Er arbeitet bei ___ [die Firma|the company]", answer: "der", hint: "die → der" },
   // zu (to) - always dative
-  {
-    id: "dat_9",
-    sentence: "Ich gehe zu ___ Arzt. [the doctor - dative]",
-    answer: "dem",
-    hint: "zu + dative: der → dem",
-  },
-  {
-    id: "dat_10",
-    sentence: "Wir fahren zu ___ Schule. [the school - dative]",
-    answer: "der",
-    hint: "zu + dative: die → der",
-  },
+  { id: "dat_9", sentence: "Ich gehe zu ___ [der Arzt|the doctor]", answer: "dem", hint: "der → dem" },
+  { id: "dat_10", sentence: "Wir fahren zu ___ [die Schule|the school]", answer: "der", hint: "die → der" },
   // aus (from/out of) - always dative
-  {
-    id: "dat_11",
-    sentence: "Er kommt aus ___ Haus. [the house - dative]",
-    answer: "dem",
-    hint: "aus + dative: das → dem",
-  },
-  {
-    id: "dat_12",
-    sentence: "Sie kommt aus ___ Stadt. [the city - dative]",
-    answer: "der",
-    hint: "aus + dative: die → der",
-  },
+  { id: "dat_11", sentence: "Er kommt aus ___ [das Haus|the house]", answer: "dem", hint: "das → dem" },
+  { id: "dat_12", sentence: "Sie kommt aus ___ [die Stadt|the city]", answer: "der", hint: "die → der" },
 ];
 
 // =============================================================================
@@ -449,54 +329,30 @@ const dativeExercises: GrammarExercise[] = [
 // =============================================================================
 
 export const grammarLessons: GrammarLesson[] = [
-  // Conjugation lessons
+  // Basic conjugation
   {
     id: "sein-haben",
     name: "sein & haben",
-    description: "The two most important German verbs",
+    description: "The two most important irregular verbs - memorize these conjugations:",
     exercises: generateConjugationExercises(seinHabenVerbs, "sh"),
   },
   {
     id: "regular-verbs",
     name: "Regular Verbs",
-    description: "Common verbs with standard conjugation patterns",
+    description: "Regular verbs follow standard endings based on the pronoun:",
     exercises: generateConjugationExercises(regularVerbs, "reg"),
   },
-  {
-    id: "stem-changing-ei",
-    name: "Stem-Changing (e→i)",
-    description: "Verbs where e changes to i in du/er forms",
-    exercises: generateConjugationExercises(stemChangingEIVerbs, "ei"),
-  },
-  {
-    id: "stem-changing-aä",
-    name: "Stem-Changing (a→ä)",
-    description: "Verbs where a changes to ä in du/er forms",
-    exercises: generateConjugationExercises(stemChangingAÄVerbs, "aä"),
-  },
-  {
-    id: "modal-verbs",
-    name: "Modal Verbs",
-    description: "können, müssen, wollen, wissen",
-    exercises: generateConjugationExercises(modalVerbs, "mod"),
-  },
-  {
-    id: "ieren-ten-verbs",
-    name: "-ieren & -ten Verbs",
-    description: "Verbs with special stem endings",
-    exercises: generateConjugationExercises(ierenTenVerbs, "it"),
-  },
-  // Case/article lessons
+  // Case exercises
   {
     id: "accusative-articles",
-    name: "Accusative Articles",
-    description: "der→den and ein→einen in accusative case",
+    name: "Accusative Case",
+    description: "Fill in the correct article (der→den, die→die, das→das)",
     exercises: accusativeExercises,
   },
   {
     id: "dative-prepositions",
-    name: "Dative Prepositions",
-    description: "mit, von, bei, zu, aus + dative articles",
+    name: "Dative Case",
+    description: "Fill in the correct article (der→dem, die→der, das→dem)",
     exercises: dativeExercises,
   },
 ];

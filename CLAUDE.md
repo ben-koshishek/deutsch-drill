@@ -26,14 +26,19 @@ pnpm preview  # Preview production build
 
 | Path | Purpose |
 |------|---------|
-| `src/components/DrillScreen.tsx` | Vocabulary drilling UI |
-| `src/components/FillBlankScreen.tsx` | Grammar conjugation UI |
-| `src/components/Dashboard.tsx` | Deck/lesson selection |
+| `src/components/DrillScreen.tsx` | Vocabulary drilling UI + circle tracking |
+| `src/components/FillBlankScreen.tsx` | Grammar UI (conjugation + case exercises) |
+| `src/components/Dashboard.tsx` | Deck/lesson selection with tab persistence |
+| `src/components/CircleCompletionScreen.tsx` | Celebration screen after completing a circle |
+| `src/components/ui/GrammarBadges.tsx` | Case/number/formality badges for pronouns |
+| `src/components/ui/StreakDots.tsx` | Per-word streak indicator (0-3 dots) |
+| `src/components/ui/CircleBadge.tsx` | Circle counter badge in header |
+| `src/components/ui/ResetConfirmModal.tsx` | Reset confirmation dialog |
 | `src/hooks/useDrill.ts` | Drill state + spacing algorithm |
 | `src/hooks/useFillBlank.ts` | Grammar drill state |
-| `src/db.ts` | IndexedDB persistence |
+| `src/db.ts` | IndexedDB persistence (progress + circles) |
 | `src/data/decks.ts` | Vocabulary content |
-| `src/data/grammar.ts` | Grammar exercises |
+| `src/data/grammar.ts` | Grammar exercises (conjugation + cases) |
 | `src/index.css` | Theme variables + global styles |
 
 ## Coding Guidelines
@@ -60,6 +65,16 @@ isAnswerCorrect(userAnswer, expectedAnswer)
 
 // Grammar: exact match (lowercase, trimmed)
 normalize(input) === normalize(answer)
+```
+
+### Grammar Exercise Formats
+
+```typescript
+// Conjugation: "pronoun ___ [infinitive|english]"
+"ich ___ [sein|to be]"  // answer: "bin"
+
+// Case exercises: "sentence ___ [article|english]"
+"Ich sehe ___ [der Mann|the man]"  // answer: "den"
 ```
 
 ### UX Rules

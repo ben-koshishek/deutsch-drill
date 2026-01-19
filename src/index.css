@@ -459,6 +459,26 @@ h3 {
   }
 }
 
+/* Mastery celebration pulse */
+@keyframes masteryPulse {
+  0% {
+    background: rgba(249, 197, 78, 0.1);
+    box-shadow: 0 0 0 0 rgba(249, 197, 78, 0.4);
+  }
+  25% {
+    background: rgba(249, 197, 78, 0.25);
+    box-shadow: 0 0 20px 5px rgba(249, 197, 78, 0.5);
+  }
+  50% {
+    background: rgba(249, 197, 78, 0.15);
+    box-shadow: 0 0 30px 10px rgba(249, 197, 78, 0.3);
+  }
+  100% {
+    background: rgba(249, 197, 78, 0.1);
+    box-shadow: 0 0 0 0 rgba(249, 197, 78, 0);
+  }
+}
+
 /* Floating/hovering effect for example box */
 @keyframes float {
   0%, 100% {

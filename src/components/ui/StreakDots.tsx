@@ -1,40 +1,120 @@
 interface StreakDotsProps {
   current: number;
   total?: number;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
+  showLabel?: boolean;
+  isMastered?: boolean;
 }
 
-export function StreakDots({ current, total = 3, size = "md" }: StreakDotsProps) {
+export function StreakDots({
+  current,
+  total = 3,
+  size = "md",
+  showLabel = false,
+  isMastered = false,
+}: StreakDotsProps) {
   const sizeStyles = {
     sm: {
       dot: "0.75rem",
       gap: "var(--space-2)",
       glow: "6px",
+      fontSize: "var(--text-xs)",
     },
     md: {
-      dot: "0.875rem",
+      dot: "1rem",
       gap: "var(--space-3)",
       glow: "10px",
+      fontSize: "var(--text-sm)",
+    },
+    lg: {
+      dot: "1.25rem",
+      gap: "var(--space-3)",
+      glow: "12px",
+      fontSize: "var(--text-base)",
     },
   };
 
-  const { dot, gap, glow } = sizeStyles[size];
+  const { dot, gap, glow, fontSize } = sizeStyles[size];
+  const mastered = isMastered || current >= total;
 
   return (
-    <div style={{ display: "flex", gap, justifyContent: "center" }}>
-      {Array.from({ length: total }).map((_, i) => (
-        <div
-          key={i}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "var(--space-3)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap,
+          padding: "var(--space-2)",
+          borderRadius: "var(--radius-lg)",
+          background: mastered ? "rgba(249, 197, 78, 0.1)" : "transparent",
+          animation: mastered ? "masteryPulse 1.5s ease-in-out" : "none",
+          transition: "background var(--transition-base)",
+        }}
+      >
+        {Array.from({ length: total }).map((_, i) => {
+          const filled = i < current;
+          const isStarred = mastered;
+
+          return (
+            <div
+              key={i}
+              style={{
+                width: dot,
+                height: dot,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: `calc(${dot} * 0.7)`,
+                background: isStarred
+                  ? "var(--color-neon-yellow)"
+                  : filled
+                    ? "var(--color-streak)"
+                    : "transparent",
+                boxShadow: isStarred
+                  ? `0 0 ${glow} var(--color-neon-yellow), 0 0 calc(${glow} * 2) rgba(249, 197, 78, 0.4)`
+                  : filled
+                    ? `0 0 ${glow} var(--color-streak)`
+                    : "none",
+                transition: "all var(--transition-base)",
+                animation: isStarred ? "dotPop 0.3s ease-out" : "none",
+                animationDelay: isStarred ? `${i * 100}ms` : "0ms",
+                border: isStarred
+                  ? "none"
+                  : filled
+                    ? "none"
+                    : "2px solid var(--color-text-subtle)",
+              }}
+            >
+              {isStarred && (
+                <span style={{ lineHeight: 1, marginTop: "-1px" }}>★</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {showLabel && (
+        <span
           style={{
-            width: dot,
-            height: dot,
-            borderRadius: "50%",
-            background: i < current ? "var(--color-streak)" : "var(--color-border)",
-            boxShadow: i < current ? `0 0 ${glow} var(--color-streak)` : "none",
-            transition: "background var(--transition-base), box-shadow var(--transition-base)",
+            fontSize,
+            color: mastered
+              ? "var(--color-neon-yellow)"
+              : current > 0
+                ? "var(--color-neon-cyan)"
+                : "var(--color-text-subtle)",
+            fontWeight: 700,
+            fontVariantNumeric: "tabular-nums",
+            transition: "all var(--transition-base)",
           }}
-        />
-      ))}
+        >
+          {mastered ? "MASTERED" : `${current}/${total}`}
+        </span>
+      )}
     </div>
   );
 }

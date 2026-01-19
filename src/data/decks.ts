@@ -8,21 +8,33 @@ export const decks: Deck[] = [
     category: 'sentence-structure',
     exerciseType: 'translation',
     words: [
-      { id: 'ich', german: 'ich', english: 'I', example: 'Ich bin hier.', exampleTranslation: 'I am here.' },
-      { id: 'mich', german: 'mich', english: 'me (accusative)', example: 'Er sieht mich.', exampleTranslation: 'He sees me.' },
-      { id: 'mir', german: 'mir', english: 'me (dative)', example: 'Gib mir das.', exampleTranslation: 'Give me that.' },
-      { id: 'du', german: 'du', english: 'you (informal)', example: 'Du bist nett.', exampleTranslation: 'You are nice.' },
-      { id: 'dich', german: 'dich', english: 'you (accusative)', example: 'Ich liebe dich.', exampleTranslation: 'I love you.' },
-      { id: 'dir', german: 'dir', english: 'you (dative)', example: 'Ich helfe dir.', exampleTranslation: 'I help you.' },
-      { id: 'er', german: 'er', english: 'he', example: 'Er arbeitet viel.', exampleTranslation: 'He works a lot.' },
-      { id: 'ihn', german: 'ihn', english: 'him (accusative)', example: 'Ich kenne ihn.', exampleTranslation: 'I know him.' },
-      { id: 'ihm', german: 'ihm', english: 'him (dative)', example: 'Ich gebe ihm das Buch.', exampleTranslation: 'I give him the book.' },
-      { id: 'sie-she', german: 'sie', english: 'she', example: 'Sie singt schön.', exampleTranslation: 'She sings beautifully.' },
-      { id: 'wir', german: 'wir', english: 'we', example: 'Wir gehen zusammen.', exampleTranslation: 'We go together.' },
-      { id: 'uns', german: 'uns', english: 'us', example: 'Er hilft uns.', exampleTranslation: 'He helps us.' },
-      { id: 'ihr', german: 'ihr', english: 'you all (informal)', example: 'Ihr seid willkommen.', exampleTranslation: 'You all are welcome.' },
-      { id: 'sie-they', german: 'sie', english: 'they', example: 'Sie kommen morgen.', exampleTranslation: 'They are coming tomorrow.' },
-      { id: 'Sie', german: 'Sie', english: 'you (formal)', example: 'Wie heißen Sie?', exampleTranslation: 'What is your name?' },
+      // First person singular
+      { id: 'ich', german: 'ich', english: 'I', example: 'Ich bin hier.', exampleTranslation: 'I am here.', meta: { number: 'singular', case: 'nominative' } },
+      { id: 'mich', german: 'mich', english: 'me', example: 'Er sieht mich.', exampleTranslation: 'He sees me.', meta: { number: 'singular', case: 'accusative' } },
+      { id: 'mir', german: 'mir', english: 'me', example: 'Gib mir das.', exampleTranslation: 'Give me that.', meta: { number: 'singular', case: 'dative' } },
+      // Second person informal singular
+      { id: 'du', german: 'du', english: 'you', example: 'Du bist nett.', exampleTranslation: 'You are nice.', meta: { formality: 'informal', number: 'singular', case: 'nominative' } },
+      { id: 'dich', german: 'dich', english: 'you', example: 'Ich liebe dich.', exampleTranslation: 'I love you.', meta: { formality: 'informal', number: 'singular', case: 'accusative' } },
+      { id: 'dir', german: 'dir', english: 'you', example: 'Ich helfe dir.', exampleTranslation: 'I help you.', meta: { formality: 'informal', number: 'singular', case: 'dative' } },
+      // Third person singular masculine
+      { id: 'er', german: 'er', english: 'he', example: 'Er arbeitet viel.', exampleTranslation: 'He works a lot.', meta: { number: 'singular', case: 'nominative' } },
+      { id: 'ihn', german: 'ihn', english: 'him', example: 'Ich kenne ihn.', exampleTranslation: 'I know him.', meta: { number: 'singular', case: 'accusative' } },
+      { id: 'ihm', german: 'ihm', english: 'him', example: 'Ich gebe ihm das Buch.', exampleTranslation: 'I give him the book.', meta: { number: 'singular', case: 'dative' } },
+      // Third person singular feminine
+      { id: 'sie-she', german: 'sie', english: 'she / her', example: 'Sie singt schön.', exampleTranslation: 'She sings beautifully.', meta: { number: 'singular', case: 'nominative' } },
+      { id: 'ihr-her', german: 'ihr', english: 'her', example: 'Ich gebe ihr das Buch.', exampleTranslation: 'I give her the book.', meta: { number: 'singular', case: 'dative' } },
+      // First person plural
+      { id: 'wir', german: 'wir', english: 'we', example: 'Wir gehen zusammen.', exampleTranslation: 'We go together.', meta: { number: 'plural', case: 'nominative' } },
+      { id: 'uns', german: 'uns', english: 'us', example: 'Er hilft uns.', exampleTranslation: 'He helps us.', meta: { number: 'plural', case: 'accusative' } },
+      // Second person informal plural
+      { id: 'ihr', german: 'ihr', english: 'you all', example: 'Ihr seid willkommen.', exampleTranslation: 'You all are welcome.', meta: { formality: 'informal', number: 'plural', case: 'nominative' } },
+      { id: 'euch', german: 'euch', english: 'you all', example: 'Ich sehe euch.', exampleTranslation: 'I see you all.', meta: { formality: 'informal', number: 'plural', case: 'accusative' } },
+      // Third person plural
+      { id: 'sie-they', german: 'sie', english: 'they / them', example: 'Sie kommen morgen.', exampleTranslation: 'They are coming tomorrow.', meta: { number: 'plural', case: 'nominative' } },
+      { id: 'ihnen', german: 'ihnen', english: 'them', example: 'Ich helfe ihnen.', exampleTranslation: 'I help them.', meta: { number: 'plural', case: 'dative' } },
+      // Second person formal (works for both singular & plural)
+      { id: 'Sie', german: 'Sie', english: 'you / they', example: 'Wie heißen Sie?', exampleTranslation: 'What is your name?', meta: { formality: 'formal', case: 'nominative' } },
+      { id: 'Ihnen', german: 'Ihnen', english: 'you', example: 'Ich danke Ihnen.', exampleTranslation: 'I thank you.', meta: { formality: 'formal', case: 'dative' } },
     ]
   },
   {
@@ -204,17 +216,44 @@ export const decks: Deck[] = [
     category: 'miscellaneous',
     exerciseType: 'translation',
     words: [
-      { id: 'montag', german: 'Montag', english: 'Monday', example: 'Am Montag arbeite ich.', exampleTranslation: 'On Monday I work.' },
-      { id: 'dienstag', german: 'Dienstag', english: 'Tuesday', example: 'Dienstag ist gut.', exampleTranslation: 'Tuesday is good.' },
-      { id: 'mittwoch', german: 'Mittwoch', english: 'Wednesday', example: 'Mittwoch ist Mitte der Woche.', exampleTranslation: 'Wednesday is the middle of the week.' },
-      { id: 'donnerstag', german: 'Donnerstag', english: 'Thursday', example: 'Am Donnerstag gehe ich.', exampleTranslation: 'On Thursday I am going.' },
-      { id: 'freitag', german: 'Freitag', english: 'Friday', example: 'Freitag ist schön.', exampleTranslation: 'Friday is nice.' },
-      { id: 'samstag', german: 'Samstag', english: 'Saturday', example: 'Am Samstag schlafe ich lange.', exampleTranslation: 'On Saturday I sleep in.' },
-      { id: 'sonntag', german: 'Sonntag', english: 'Sunday', example: 'Sonntag ist frei.', exampleTranslation: 'Sunday is free.' },
-      { id: 'januar', german: 'Januar', english: 'January', example: 'Im Januar ist es kalt.', exampleTranslation: 'In January it is cold.' },
-      { id: 'februar', german: 'Februar', english: 'February', example: 'Februar ist kurz.', exampleTranslation: 'February is short.' },
-      { id: 'maerz', german: 'März', english: 'March', example: 'Im März wird es wärmer.', exampleTranslation: 'In March it gets warmer.' },
-      { id: 'dezember', german: 'Dezember', english: 'December', example: 'Dezember ist Weihnachten.', exampleTranslation: 'December is Christmas.' },
+      { id: 'montag', german: 'der Montag', english: 'Monday', example: 'Am Montag arbeite ich.', exampleTranslation: 'On Monday I work.' },
+      { id: 'dienstag', german: 'der Dienstag', english: 'Tuesday', example: 'Dienstag ist gut.', exampleTranslation: 'Tuesday is good.' },
+      { id: 'mittwoch', german: 'der Mittwoch', english: 'Wednesday', example: 'Mittwoch ist Mitte der Woche.', exampleTranslation: 'Wednesday is the middle of the week.' },
+      { id: 'donnerstag', german: 'der Donnerstag', english: 'Thursday', example: 'Am Donnerstag gehe ich.', exampleTranslation: 'On Thursday I am going.' },
+      { id: 'freitag', german: 'der Freitag', english: 'Friday', example: 'Freitag ist schön.', exampleTranslation: 'Friday is nice.' },
+      { id: 'samstag', german: 'der Samstag', english: 'Saturday', example: 'Am Samstag schlafe ich lange.', exampleTranslation: 'On Saturday I sleep in.' },
+      { id: 'sonntag', german: 'der Sonntag', english: 'Sunday', example: 'Sonntag ist frei.', exampleTranslation: 'Sunday is free.' },
+      { id: 'januar', german: 'der Januar', english: 'January', example: 'Im Januar ist es kalt.', exampleTranslation: 'In January it is cold.' },
+      { id: 'februar', german: 'der Februar', english: 'February', example: 'Februar ist kurz.', exampleTranslation: 'February is short.' },
+      { id: 'maerz', german: 'der März', english: 'March', example: 'Im März wird es wärmer.', exampleTranslation: 'In March it gets warmer.' },
+      { id: 'dezember', german: 'der Dezember', english: 'December', example: 'Dezember ist Weihnachten.', exampleTranslation: 'December is Christmas.' },
+    ]
+  },
+  {
+    id: 'common-nouns',
+    name: 'Common Nouns',
+    description: 'Everyday nouns with their genders',
+    category: 'miscellaneous',
+    exerciseType: 'translation',
+    words: [
+      // Masculine (der)
+      { id: 'mann', german: 'der Mann', english: 'man', example: 'Der Mann liest.', exampleTranslation: 'The man reads.' },
+      { id: 'tisch', german: 'der Tisch', english: 'table', example: 'Der Tisch ist groß.', exampleTranslation: 'The table is big.' },
+      { id: 'stuhl', german: 'der Stuhl', english: 'chair', example: 'Der Stuhl ist alt.', exampleTranslation: 'The chair is old.' },
+      { id: 'hund', german: 'der Hund', english: 'dog', example: 'Der Hund bellt.', exampleTranslation: 'The dog barks.' },
+      { id: 'apfel', german: 'der Apfel', english: 'apple', example: 'Der Apfel ist rot.', exampleTranslation: 'The apple is red.' },
+      // Feminine (die)
+      { id: 'frau', german: 'die Frau', english: 'woman', example: 'Die Frau singt.', exampleTranslation: 'The woman sings.' },
+      { id: 'katze', german: 'die Katze', english: 'cat', example: 'Die Katze schläft.', exampleTranslation: 'The cat sleeps.' },
+      { id: 'blume', german: 'die Blume', english: 'flower', example: 'Die Blume ist schön.', exampleTranslation: 'The flower is beautiful.' },
+      { id: 'stadt', german: 'die Stadt', english: 'city', example: 'Die Stadt ist groß.', exampleTranslation: 'The city is big.' },
+      { id: 'zeit', german: 'die Zeit', english: 'time', example: 'Die Zeit vergeht.', exampleTranslation: 'Time passes.' },
+      // Neuter (das)
+      { id: 'kind', german: 'das Kind', english: 'child', example: 'Das Kind spielt.', exampleTranslation: 'The child plays.' },
+      { id: 'buch', german: 'das Buch', english: 'book', example: 'Das Buch ist interessant.', exampleTranslation: 'The book is interesting.' },
+      { id: 'haus', german: 'das Haus', english: 'house', example: 'Das Haus ist weiß.', exampleTranslation: 'The house is white.' },
+      { id: 'wasser', german: 'das Wasser', english: 'water', example: 'Das Wasser ist kalt.', exampleTranslation: 'The water is cold.' },
+      { id: 'auto', german: 'das Auto', english: 'car', example: 'Das Auto ist schnell.', exampleTranslation: 'The car is fast.' },
     ]
   },
 ];
