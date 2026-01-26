@@ -1,0 +1,146 @@
+/* ===== DECK CARD ===== */
+
+.deck-card {
+  --accent-color: var(--color-neon-pink);
+
+  position: relative;
+  padding: var(--space-6);
+  padding-bottom: var(--space-12);
+  aspect-ratio: 16 / 9;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-card);
+  border: 2px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.deck-card--dark {
+  background: linear-gradient(
+    145deg,
+    rgba(25, 20, 50, 0.95) 0%,
+    rgba(15, 12, 35, 0.98) 100%
+  );
+  border: 2px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
+  box-shadow:
+    0 0 15px color-mix(in srgb, var(--accent-color) 10%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.deck-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent-color);
+}
+
+.deck-card--dark:hover {
+  border-color: var(--accent-color);
+  box-shadow:
+    0 0 35px color-mix(in srgb, var(--accent-color) 40%, transparent),
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Corner accents */
+.deck-card--dark::before,
+.deck-card--dark::after {
+  content: '';
+  position: absolute;
+  width: var(--space-4);
+  height: var(--space-4);
+  border-color: var(--accent-color);
+  border-style: solid;
+  opacity: 0.6;
+  transition: opacity var(--transition-base), filter var(--transition-base);
+}
+
+.deck-card--dark::before {
+  top: var(--space-2);
+  left: var(--space-2);
+  border-width: 2px 0 0 2px;
+}
+
+.deck-card--dark::after {
+  bottom: var(--space-2);
+  right: var(--space-2);
+  border-width: 0 2px 2px 0;
+}
+
+.deck-card--dark:hover::before,
+.deck-card--dark:hover::after {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px var(--accent-color));
+}
+
+/* Title */
+.deck-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+}
+
+.deck-card--dark .deck-card__title {
+  color: var(--accent-color);
+  text-shadow: 0 0 25px color-mix(in srgb, var(--accent-color) 50%, transparent);
+}
+
+/* Subtitle - bottom left */
+.deck-card__subtitle {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Best time - bottom right */
+.deck-card__time {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-neon-cyan);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.deck-card--dark .deck-card__time {
+  text-shadow: 0 0 15px var(--color-neon-cyan-glow);
+}
+
+/* Empty time placeholder */
+.deck-card__time--empty {
+  color: var(--color-text-subtle);
+  opacity: 0.4;
+}
+
+.deck-card--dark .deck-card__time--empty {
+  text-shadow: none;
+}
+
+/* Practiced card indicator */
+.deck-card--practiced.deck-card--dark {
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--accent-color) 15%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.deck-card--practiced.deck-card--dark .deck-card__title {
+  text-shadow: 0 0 30px color-mix(in srgb, var(--accent-color) 60%, transparent);
+}

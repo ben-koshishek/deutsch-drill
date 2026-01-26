@@ -2,7 +2,7 @@ import { forwardRef, useState } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const drillInputStyles = cva(
-  "drill-input text-center font-medium rounded-lg border-2 outline-none transition-all",
+  "drill-input",
   {
     variants: {
       status: {

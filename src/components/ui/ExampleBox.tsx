@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 const exampleBoxStyles = cva(
-  "italic rounded-lg border inline-block",
+  "",
   {
     variants: {
       size: {

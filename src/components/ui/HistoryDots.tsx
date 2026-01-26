@@ -40,7 +40,7 @@ export function HistoryDots({ history, total = 5, size = "lg" }: HistoryDotsProp
   return (
     <div
       style={{
-        display: "flex",
+        display: 'flex',
         gap,
         padding: "var(--space-2)",
         borderRadius: "var(--radius-lg)",

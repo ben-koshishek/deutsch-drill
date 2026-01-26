@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-const progressBarStyles = cva("w-full", {
+const progressBarStyles = cva("", {
   variants: {
     size: {
       xs: "",
@@ -36,9 +36,9 @@ export function ProgressBar({
   showGlow = true,
 }: ProgressBarProps) {
   const sizeStyles = {
-    xs: { height: "3px" },
-    sm: { height: "5px" },
-    md: { height: "10px" },
+    xs: { height: "0.1875rem" },
+    sm: { height: "0.3125rem" },
+    md: { height: "0.625rem" },
   };
 
   const colorConfig = {
@@ -86,8 +86,8 @@ export function ProgressBar({
     right: 0,
     top: "50%",
     transform: "translateY(-50%)",
-    width: "8px",
-    height: "8px",
+    width: "0.5rem",
+    height: "0.5rem",
     borderRadius: "50%",
     background: fill,
     boxShadow: `0 0 10px ${fill}, 0 0 20px ${glow}`,

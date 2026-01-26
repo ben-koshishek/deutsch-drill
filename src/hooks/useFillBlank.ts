@@ -10,7 +10,7 @@ export interface FillBlankTask {
   history: boolean[]; // Last attempts: true = correct, false = wrong
 }
 
-export function useFillBlank(lesson: GrammarLesson) {
+export function useFillBlank(lesson: GrammarLesson, key: number = 0) {
   const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map());
   const [historyMap, setHistoryMap] = useState<Map<string, boolean[]>>(new Map());
   const [currentTask, setCurrentTask] = useState<FillBlankTask | null>(null);
@@ -19,12 +19,19 @@ export function useFillBlank(lesson: GrammarLesson) {
   const [recentlyCorrect, setRecentlyCorrect] = useState<string[]>([]);
 
   // Load progress from DB (reuse deck progress with lesson id as deck id)
+  // Re-runs when key changes for fresh start
   useEffect(() => {
+    setProgressMap(new Map());
+    setHistoryMap(new Map());
+    setCurrentTask(null);
+    setWrongQueue([]);
+    setRecentlyCorrect([]);
+    setIsLoading(true);
     getDeckProgress(lesson.id).then(map => {
       setProgressMap(map);
       setIsLoading(false);
     });
-  }, [lesson.id]);
+  }, [lesson.id, key]);
 
   // All tasks
   const allTasks = useMemo(() => {

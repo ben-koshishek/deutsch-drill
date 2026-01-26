@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
-import { Header } from "./components/Header";
+import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/Dashboard";
 import { DrillScreen } from "./components/DrillScreen";
 import { FillBlankScreen } from "./components/FillBlankScreen";
@@ -57,6 +57,8 @@ type View =
 
 export default function App() {
   const [view, setView] = useState<View>({ type: "dashboard" });
+  const [activeTab, setActiveTab] = useState<"vocabulary" | "grammar">("vocabulary");
+  const [stats, setStats] = useState<{ practiced: string; mastered: string } | undefined>();
 
   const handleHome = () => setView({ type: "dashboard" });
   const handleSelectDeck = (deck: Deck) => setView({ type: "drill", deck });
@@ -65,33 +67,35 @@ export default function App() {
 
   return (
     <MantineProvider theme={theme}>
-      <div className="min-h-screen bg-[var(--color-bg)]" style={{ background: "var(--color-bg)" }}>
-        <Header onHome={handleHome} />
-        <main style={{ background: "var(--color-bg)" }}>
-          {view.type === "dashboard" && (
-            <Dashboard
-              onSelectDeck={handleSelectDeck}
-              onSelectLesson={handleSelectLesson}
-            />
-          )}
-          {view.type === "drill" && (
-            <DrillScreen
-              key={view.deck.id}
-              deck={view.deck}
-              onExit={handleHome}
-              onComplete={handleHome}
-            />
-          )}
-          {view.type === "grammar" && (
-            <FillBlankScreen
-              key={view.lesson.id}
-              lesson={view.lesson}
-              onExit={handleHome}
-              onComplete={handleHome}
-            />
-          )}
-        </main>
-      </div>
+      {view.type === "dashboard" && (
+        <Layout
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          showTabs
+          stats={stats}
+        >
+          <Dashboard
+            onSelectDeck={handleSelectDeck}
+            onSelectLesson={handleSelectLesson}
+            activeTab={activeTab}
+            onStatsChange={setStats}
+          />
+        </Layout>
+      )}
+      {view.type === "drill" && (
+        <DrillScreen
+          key={view.deck.id}
+          deck={view.deck}
+          onExit={handleHome}
+        />
+      )}
+      {view.type === "grammar" && (
+        <FillBlankScreen
+          key={view.lesson.id}
+          lesson={view.lesson}
+          onExit={handleHome}
+        />
+      )}
     </MantineProvider>
   );
 }

@@ -40,14 +40,14 @@ export function StreakDots({
   return (
     <div
       style={{
-        display: "flex",
+        display: 'flex',
         alignItems: "center",
         gap: "var(--space-3)",
       }}
     >
       <div
         style={{
-          display: "flex",
+          display: 'flex',
           gap,
           padding: "var(--space-2)",
           borderRadius: "var(--radius-lg)",
@@ -67,7 +67,7 @@ export function StreakDots({
                 width: dot,
                 height: dot,
                 borderRadius: "50%",
-                display: "flex",
+                display: 'flex',
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: `calc(${dot} * 0.7)`,

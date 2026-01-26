@@ -2,9 +2,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Collapse, Menu, Table } from "@mantine/core";
 import type { GrammarLesson } from "../types";
 import { useFillBlank } from "../hooks/useFillBlank";
+import { getBestTime, updateBestTime, resetDeckProgress, type UpdateBestTimeResult } from "../db";
+import { useTimer } from "../hooks/useTimer";
+import { TimeCompletionScreen } from "./TimeCompletionScreen";
 import { StreakDots } from "./ui/StreakDots";
 import { DrillInput } from "./ui/DrillInput";
 import { ProgressBar } from "./ui/ProgressBar";
+import { LiveTimer } from "./ui/LiveTimer";
+import { tableStyles } from "../styles/tableStyles";
+import { Layout } from "./Layout";
+import "./FillBlankScreen.css";
 
 type HintMode = "english" | "german" | "both";
 const HINT_MODES: HintMode[] = ["english", "german", "both"];
@@ -24,11 +31,16 @@ function getStoredInfoCollapsed(): boolean {
 interface FillBlankScreenProps {
   lesson: GrammarLesson;
   onExit: () => void;
-  onComplete: () => void;
 }
 
 function normalize(str: string): string {
-  return str.toLowerCase().trim();
+  return str
+    .toLowerCase()
+    .replace(/ä/g, "a")
+    .replace(/ö/g, "o")
+    .replace(/ü/g, "u")
+    .replace(/ß/g, "ss")
+    .trim();
 }
 
 // Regular verb endings
@@ -54,16 +66,26 @@ const SEIN_HABEN = [
 export function FillBlankScreen({
   lesson,
   onExit,
-  onComplete,
 }: FillBlankScreenProps) {
+  const [drillKey, setDrillKey] = useState(0);
   const { currentTask, submitAnswer, isFinished, completedCount, totalCount } =
-    useFillBlank(lesson);
+    useFillBlank(lesson, drillKey);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const prevTaskKeyRef = useRef<string | null>(null);
   const [showDescription, setShowDescription] = useState(() => !getStoredInfoCollapsed());
   const [hintMode, setHintMode] = useState<HintMode>(getStoredHintMode);
-  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
+
+  const timer = useTimer();
+  const [timerStarted, setTimerStarted] = useState(false);
+  const [bestTimeMs, setBestTimeMs] = useState<number | null>(null);
+
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [completionResult, setCompletionResult] = useState<UpdateBestTimeResult | null>(null);
+
+  useEffect(() => {
+    getBestTime(lesson.id).then(setBestTimeMs);
+  }, [lesson.id]);
 
   const taskKey = currentTask?.exercise.id ?? null;
 
@@ -77,10 +99,7 @@ export function FillBlankScreen({
     status: "idle",
   });
 
-  // Track prompt key for animation reset
   const [promptKey, setPromptKey] = useState(0);
-
-  // Auto-advance flag for correct answers
   const [shouldAutoAdvance, setShouldAutoAdvance] = useState(false);
 
   const input = formState.taskKey === taskKey ? formState.input : "";
@@ -95,19 +114,35 @@ export function FillBlankScreen({
   }, [currentTask, taskKey]);
 
   useEffect(() => {
-    if (isFinished) {
-      onComplete();
+    if (isFinished && !showCompletion && timerStarted) {
+      const finalTime = timer.stop();
+      updateBestTime(lesson.id, finalTime).then((result) => {
+        setCompletionResult(result);
+        if (result.isNewBest) {
+          setBestTimeMs(result.currentTime);
+        }
+        setShowCompletion(true);
+      });
     }
-  }, [isFinished, onComplete]);
+  }, [isFinished, showCompletion, lesson.id, timerStarted, timer]);
 
-  // Auto-advance after brief delay on correct answers
+  const handleTryAgain = useCallback(async () => {
+    await resetDeckProgress(lesson.id);
+    setShowCompletion(false);
+    setCompletionResult(null);
+    setTimerStarted(false);
+    timer.reset();
+    prevTaskKeyRef.current = null;
+    setDrillKey((k) => k + 1);
+  }, [lesson.id, timer]);
+
   useEffect(() => {
     if (shouldAutoAdvance) {
-      const timer = setTimeout(() => {
+      const t = setTimeout(() => {
         submitAnswer(true);
         setShouldAutoAdvance(false);
       }, 400);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(t);
     }
   }, [shouldAutoAdvance, submitAnswer]);
 
@@ -119,16 +154,13 @@ export function FillBlankScreen({
     localStorage.setItem("grammar-hint-mode", nextMode);
   }, [hintMode]);
 
-  // Keyboard shortcuts: "1" to cycle hint mode, Space to submit, Backspace to go back
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // "1" key cycles hint mode
       if (e.key === "1" && !e.metaKey && !e.ctrlKey && !e.altKey) {
         cycleHintMode();
         return;
       }
 
-      // Space key submits when status is not idle (continuing after answer)
       if (e.key === " " && status !== "idle") {
         e.preventDefault();
         if (status === "wrong") {
@@ -137,9 +169,8 @@ export function FillBlankScreen({
           submitAnswer(true);
         }
       } else if (e.key === "Backspace") {
-        // Go back if input is empty or answer is shown
-        const input = inputRef.current;
-        const inputEmpty = !input || input.value === "";
+        const inp = inputRef.current;
+        const inputEmpty = !inp || inp.value === "";
         if (inputEmpty || status !== "idle") {
           e.preventDefault();
           onExit();
@@ -151,8 +182,29 @@ export function FillBlankScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [cycleHintMode, status, submitAnswer, onExit]);
 
+  if (showCompletion && completionResult) {
+    return (
+      <TimeCompletionScreen
+        finalTimeMs={completionResult.currentTime}
+        isNewBest={completionResult.isNewBest}
+        previousBestMs={completionResult.previousBest}
+        itemName={lesson.name}
+        onTryAgain={handleTryAgain}
+        onExit={onExit}
+      />
+    );
+  }
+
   if (!currentTask) {
-    return null;
+    return (
+      <Layout
+        headerLeft={<button className="fill__back-btn" onClick={onExit}>← Back</button>}
+        headerCenter={<span className="fill__title">{lesson.name}</span>}
+        headerRight={<span className="fill__counter">Loading...</span>}
+      >
+        <div className="fill__loading">Loading...</div>
+      </Layout>
+    );
   }
 
   const { exercise } = currentTask;
@@ -161,15 +213,19 @@ export function FillBlankScreen({
   // Try conjugation format: "pronoun ___ [infinitive|english]"
   const conjugationMatch = exercise.sentence.match(/^([a-züöäß]+) ___ \[([^\|]+)\|([^\]]+)\]$/i);
 
+  // Try gender format: "___ [category|examples]" (blank at start)
+  const genderMatch = exercise.sentence.match(/^___ \[([^\|]+)\|([^\]]+)\]$/i);
+
   // Try case format: "sentence words ___ [article|english]"
   const caseMatch = exercise.sentence.match(/^(.+) ___ \[([^\|]+)\|([^\]]+)\]$/i);
 
   const isConjugation = conjugationMatch !== null;
+  const isGender = genderMatch !== null;
   const match = conjugationMatch ?? caseMatch;
 
   const sentencePart = match?.[1] ?? "";
-  const germanHint = match?.[2] ?? "";
-  const englishHint = match?.[3] ?? "";
+  const germanHint = isGender ? genderMatch[1] : (match?.[2] ?? "");
+  const englishHint = isGender ? genderMatch[2] : (match?.[3] ?? "");
 
   // Extract just the noun from "der Brief" -> "Brief"
   const nounOnly = germanHint.replace(/^(der|die|das|ein|eine)\s+/i, "");
@@ -208,6 +264,11 @@ export function FillBlankScreen({
       return;
     }
 
+    if (!timerStarted) {
+      timer.start();
+      setTimerStarted(true);
+    }
+
     const correct = normalize(input) === normalize(exercise.answer);
     setFormState({
       taskKey,
@@ -216,7 +277,6 @@ export function FillBlankScreen({
     });
 
     if (correct) {
-      // Trigger auto-advance after brief delay
       setShouldAutoAdvance(true);
     }
   };
@@ -225,417 +285,167 @@ export function FillBlankScreen({
     status === "idle" ? input : status === "correct" ? input : exercise.answer;
 
   return (
-    <main
-      style={{
-        position: "fixed",
-        top: 70,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--color-bg)",
-        overflow: "hidden",
-        zIndex: 40,
-      }}
+    <Layout
+      headerLeft={
+        <div className="fill__header-left">
+          <button className="fill__back-btn" onClick={onExit}>← Back</button>
+          {timerStarted && (
+            <LiveTimer elapsedMs={timer.elapsedMs} bestTimeMs={bestTimeMs} size="sm" />
+          )}
+        </div>
+      }
+      headerCenter={
+        <span className="fill__title">{lesson.name}</span>
+      }
+      headerRight={
+        <span className="fill__counter">{completedCount} / {totalCount}</span>
+      }
     >
-      {/* Atmospheric background gradient */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `
-            radial-gradient(ellipse 80% 50% at 50% 30%, var(--color-atmosphere-yellow) 0%, transparent 50%),
-            radial-gradient(ellipse 60% 40% at 80% 70%, var(--color-atmosphere-pink) 0%, transparent 50%),
-            radial-gradient(ellipse 40% 30% at 10% 50%, var(--color-atmosphere-cyan) 0%, transparent 50%)
-          `,
-          pointerEvents: "none",
-        }}
-      />
+      <div className="fill__content">
+        <ProgressBar value={progress} size="sm" color="primary" />
 
-      {/* Header */}
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "var(--space-4) var(--space-8)",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <button
-          onClick={onExit}
-          style={{
-            color: "var(--color-text-muted)",
-            fontSize: "var(--text-md)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "var(--space-2) var(--space-3)",
-            fontFamily: "inherit",
-            borderRadius: "var(--radius-md)",
-            transition: "all var(--transition-base)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--color-bg-secondary)";
-            e.currentTarget.style.color = "var(--color-text)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "none";
-            e.currentTarget.style.color = "var(--color-text-muted)";
-          }}
-        >
-          ← Back
-        </button>
-        <span
-          style={{
-            color: "var(--color-text-muted)",
-            fontSize: "var(--text-md)",
-            fontWeight: 600,
-            padding: "var(--space-2) var(--space-4)",
-            background: "var(--color-bg-secondary)",
-            borderRadius: "var(--radius-md)",
-          }}
-        >
-          {completedCount} / {totalCount}
-        </span>
-      </header>
-
-      {/* Progress bar */}
-      <ProgressBar value={progress} size="sm" color="primary" />
-
-      {/* Lesson header section - clickable */}
-      <section
-        style={{
-          borderBottom: "1px solid var(--color-border)",
-          background: isHeaderHovered
-            ? "linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%)"
-            : "var(--color-bg-secondary)",
-          transition: "background var(--transition-base)",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <button
-          onClick={toggleDescription}
-          onMouseEnter={() => setIsHeaderHovered(true)}
-          onMouseLeave={() => setIsHeaderHovered(false)}
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "var(--space-4) var(--space-8)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-            <span
-              style={{
-                width: 4,
-                height: "var(--space-6)",
-                background: "var(--color-neon-yellow)",
-                borderRadius: 2,
-                boxShadow: "0 0 8px rgba(249, 197, 78, 0.5)",
-              }}
-            />
-            <h2
-              style={{
-                color: "var(--color-text)",
-                fontSize: "var(--text-xl)",
-                fontWeight: 700,
-                margin: 0,
-                textAlign: "left",
-              }}
-            >
-              {lesson.name}
-            </h2>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-2)",
-              color: "var(--color-text-muted)",
-              fontSize: "var(--text-sm)",
-            }}
-          >
-            <span>{showDescription ? "Hide" : "Show"} info</span>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{
-                transform: showDescription ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform var(--transition-slow)",
-              }}
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
-
-        <Collapse in={showDescription}>
-          <div
-            style={{
-              padding: "0 var(--space-8) var(--space-6)",
-            }}
-          >
-            <div
-              style={{
-                padding: "var(--space-4) var(--space-5)",
-                background: "var(--color-bg-secondary)",
-                borderRadius: "var(--radius-lg)",
-                border: "1px solid var(--color-border)",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-
-              {isConjugation ? (
-                <div style={{ position: "relative" }}>
-                  <p
-                    style={{
-                      color: "var(--color-text-muted)",
-                      fontSize: "var(--text-md)",
-                      marginBottom: "var(--space-4)",
-                      marginTop: 0,
-                    }}
-                  >
-                    {lesson.description}
-                  </p>
-
-                  {/* sein & haben conjugation tables - 2 columns */}
-                  {lesson.id === "sein-haben" && (
-                    <div style={{ display: "inline-flex", gap: "var(--space-6)", marginBottom: "var(--space-4)" }}>
-                      <Table withRowBorders={false}>
-                        <Table.Thead>
-                          <Table.Tr>
-                            <Table.Th style={{ color: "var(--color-text-muted)", padding: "var(--space-2)", fontSize: "var(--text-lg)" }}></Table.Th>
-                            <Table.Th style={{ color: "var(--color-neon-cyan)", fontWeight: 600, textAlign: "center", padding: "var(--space-2)", fontSize: "var(--text-lg)" }}>sein</Table.Th>
-                            <Table.Th style={{ color: "var(--color-neon-yellow)", fontWeight: 600, textAlign: "center", padding: "var(--space-2)", fontSize: "var(--text-lg)" }}>haben</Table.Th>
-                          </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                          {SEIN_HABEN.slice(0, 3).map(({ pronoun, sein, haben }) => (
-                            <Table.Tr key={pronoun}>
-                              <Table.Td style={{ color: "var(--color-primary)", fontWeight: 600, padding: "var(--space-2)", fontSize: "var(--text-lg)" }}>{pronoun}</Table.Td>
-                              <Table.Td style={{ textAlign: "center", padding: "var(--space-2)" }}>
-                                <span style={{ color: "var(--color-neon-cyan)", fontWeight: 700, background: "rgba(45, 226, 230, 0.15)", padding: "4px 12px", borderRadius: "var(--radius-sm)", fontSize: "var(--text-lg)" }}>{sein}</span>
-                              </Table.Td>
-                              <Table.Td style={{ textAlign: "center", padding: "var(--space-2)" }}>
-                                <span style={{ color: "var(--color-neon-yellow)", fontWeight: 700, background: "rgba(249, 197, 78, 0.15)", padding: "4px 12px", borderRadius: "var(--radius-sm)", fontSize: "var(--text-lg)" }}>{haben}</span>
-                              </Table.Td>
-                            </Table.Tr>
-                          ))}
-                        </Table.Tbody>
-                      </Table>
-                      <Table withRowBorders={false}>
-                        <Table.Thead>
-                          <Table.Tr>
-                            <Table.Th style={{ color: "var(--color-text-muted)", padding: "var(--space-2)", fontSize: "var(--text-lg)" }}></Table.Th>
-                            <Table.Th style={{ color: "var(--color-neon-cyan)", fontWeight: 600, textAlign: "center", padding: "var(--space-2)", fontSize: "var(--text-lg)" }}>sein</Table.Th>
-                            <Table.Th style={{ color: "var(--color-neon-yellow)", fontWeight: 600, textAlign: "center", padding: "var(--space-2)", fontSize: "var(--text-lg)" }}>haben</Table.Th>
-                          </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                          {SEIN_HABEN.slice(3, 6).map(({ pronoun, sein, haben }) => (
-                            <Table.Tr key={pronoun}>
-                              <Table.Td style={{ color: "var(--color-primary)", fontWeight: 600, padding: "var(--space-2)", fontSize: "var(--text-lg)" }}>{pronoun}</Table.Td>
-                              <Table.Td style={{ textAlign: "center", padding: "var(--space-2)" }}>
-                                <span style={{ color: "var(--color-neon-cyan)", fontWeight: 700, background: "rgba(45, 226, 230, 0.15)", padding: "4px 12px", borderRadius: "var(--radius-sm)", fontSize: "var(--text-lg)" }}>{sein}</span>
-                              </Table.Td>
-                              <Table.Td style={{ textAlign: "center", padding: "var(--space-2)" }}>
-                                <span style={{ color: "var(--color-neon-yellow)", fontWeight: 700, background: "rgba(249, 197, 78, 0.15)", padding: "4px 12px", borderRadius: "var(--radius-sm)", fontSize: "var(--text-lg)" }}>{haben}</span>
-                              </Table.Td>
-                            </Table.Tr>
-                          ))}
-                        </Table.Tbody>
-                      </Table>
-                    </div>
-                  )}
-
-                  {/* Regular verb endings tables - 2 columns */}
-                  {lesson.id === "regular-verbs" && (
-                    <div style={{ display: "inline-flex", gap: "var(--space-6)", marginBottom: "var(--space-4)" }}>
-                      <Table withRowBorders={false}>
-                        <Table.Tbody>
-                          {REGULAR_ENDINGS.slice(0, 3).map(({ pronoun, ending }) => (
-                            <Table.Tr key={pronoun}>
-                              <Table.Td style={{ color: "var(--color-primary)", fontWeight: 600, padding: "var(--space-2)", fontSize: "var(--text-lg)", whiteSpace: "nowrap" }}>{pronoun}</Table.Td>
-                              <Table.Td style={{ textAlign: "center", padding: "var(--space-2)", whiteSpace: "nowrap" }}>
-                                <span style={{ color: "var(--color-neon-cyan)", fontWeight: 700, background: "rgba(45, 226, 230, 0.15)", padding: "4px 12px", borderRadius: "var(--radius-sm)", fontSize: "var(--text-lg)" }}>{ending}</span>
-                              </Table.Td>
-                            </Table.Tr>
-                          ))}
-                        </Table.Tbody>
-                      </Table>
-                      <Table withRowBorders={false}>
-                        <Table.Tbody>
-                          {REGULAR_ENDINGS.slice(3, 6).map(({ pronoun, ending }) => (
-                            <Table.Tr key={pronoun}>
-                              <Table.Td style={{ color: "var(--color-primary)", fontWeight: 600, padding: "var(--space-2)", fontSize: "var(--text-lg)", whiteSpace: "nowrap" }}>{pronoun}</Table.Td>
-                              <Table.Td style={{ textAlign: "center", padding: "var(--space-2)", whiteSpace: "nowrap" }}>
-                                <span style={{ color: "var(--color-neon-cyan)", fontWeight: 700, background: "rgba(45, 226, 230, 0.15)", padding: "4px 12px", borderRadius: "var(--radius-sm)", fontSize: "var(--text-lg)" }}>{ending}</span>
-                              </Table.Td>
-                            </Table.Tr>
-                          ))}
-                        </Table.Tbody>
-                      </Table>
-                    </div>
-                  )}
-
-                  {/* Footer note */}
-                  <div
-                    style={{
-                      paddingTop: "var(--space-3)",
-                      borderTop: "1px solid var(--color-border)",
-                    }}
-                  >
-                    <p
-                      style={{
-                        color: "var(--color-text-muted)",
-                        fontSize: "var(--text-sm)",
-                        margin: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "var(--space-2)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "var(--color-neon-purple)",
-                          boxShadow: "0 0 8px var(--color-neon-purple)",
-                        }}
-                      />
-                      Get 3 correct in a row to master.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ position: "relative" }}>
-                  <p
-                    style={{
-                      color: "var(--color-text-muted)",
-                      fontSize: "var(--text-sm)",
-                      marginBottom: "var(--space-3)",
-                      marginTop: 0,
-                    }}
-                  >
-                    {lesson.description}
-                  </p>
-
-                  <div
-                    style={{
-                      paddingTop: "var(--space-3)",
-                      borderTop: "1px solid var(--color-border)",
-                    }}
-                  >
-                    <p
-                      style={{
-                        color: "var(--color-text-subtle)",
-                        fontSize: "var(--text-base)",
-                        margin: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "var(--space-2)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "var(--color-neon-purple)",
-                          boxShadow: "0 0 6px var(--color-neon-purple)",
-                        }}
-                      />
-                      Get 3 correct in a row to master each item.
-                    </p>
-                  </div>
-                </div>
-              )}
+        {/* Lesson info section - collapsible */}
+        <section className="fill__lesson-section">
+          <button onClick={toggleDescription} className="fill__lesson-toggle">
+            <div className="fill__lesson-title-wrapper">
+              <span className="fill__lesson-accent" />
+              <h2 className="fill__lesson-title">{lesson.name}</h2>
             </div>
-          </div>
-        </Collapse>
-      </section>
-
-      {/* Main exercise area - spread vertically */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          padding: "0 var(--space-8)",
-          maxWidth: "56rem",
-          margin: "0 auto",
-          width: "100%",
-          minHeight: 0,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* Top section - verb hint (only for conjugation) */}
-          {isConjugation && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <div
-                key={promptKey}
-                style={{
-                  textAlign: "center",
-                  animation: "promptEnter 0.5s ease-out",
-                }}
+            <div className="fill__lesson-toggle-hint">
+              <span>{showDescription ? "Hide" : "Show"} info</span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`fill__lesson-chevron ${showDescription ? "fill__lesson-chevron--open" : ""}`}
               >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </button>
+
+          <Collapse in={showDescription}>
+            <div className="fill__lesson-content">
+              <div className="fill__lesson-card">
+                {isConjugation ? (
+                  <>
+                    <p className="fill__lesson-desc">{lesson.description}</p>
+
+                    {lesson.id === "sein-haben" && (
+                      <div style={tableStyles.tableContainer}>
+                        <Table withRowBorders={false}>
+                          <Table.Thead>
+                            <Table.Tr>
+                              <Table.Th style={tableStyles.thMuted}></Table.Th>
+                              <Table.Th style={tableStyles.thCyan}>sein</Table.Th>
+                              <Table.Th style={tableStyles.thYellow}>haben</Table.Th>
+                            </Table.Tr>
+                          </Table.Thead>
+                          <Table.Tbody>
+                            {SEIN_HABEN.slice(0, 3).map(({ pronoun, sein, haben }) => (
+                              <Table.Tr key={pronoun}>
+                                <Table.Td style={tableStyles.tdPronoun}>{pronoun}</Table.Td>
+                                <Table.Td style={tableStyles.tdCenter}>
+                                  <span style={tableStyles.badgeCyan}>{sein}</span>
+                                </Table.Td>
+                                <Table.Td style={tableStyles.tdCenter}>
+                                  <span style={tableStyles.badgeYellow}>{haben}</span>
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                        <Table withRowBorders={false}>
+                          <Table.Thead>
+                            <Table.Tr>
+                              <Table.Th style={tableStyles.thMuted}></Table.Th>
+                              <Table.Th style={tableStyles.thCyan}>sein</Table.Th>
+                              <Table.Th style={tableStyles.thYellow}>haben</Table.Th>
+                            </Table.Tr>
+                          </Table.Thead>
+                          <Table.Tbody>
+                            {SEIN_HABEN.slice(3, 6).map(({ pronoun, sein, haben }) => (
+                              <Table.Tr key={pronoun}>
+                                <Table.Td style={tableStyles.tdPronoun}>{pronoun}</Table.Td>
+                                <Table.Td style={tableStyles.tdCenter}>
+                                  <span style={tableStyles.badgeCyan}>{sein}</span>
+                                </Table.Td>
+                                <Table.Td style={tableStyles.tdCenter}>
+                                  <span style={tableStyles.badgeYellow}>{haben}</span>
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                      </div>
+                    )}
+
+                    {lesson.id === "regular-verbs" && (
+                      <div style={tableStyles.tableContainer}>
+                        <Table withRowBorders={false}>
+                          <Table.Tbody>
+                            {REGULAR_ENDINGS.slice(0, 3).map(({ pronoun, ending }) => (
+                              <Table.Tr key={pronoun}>
+                                <Table.Td style={tableStyles.tdPronounNoWrap}>{pronoun}</Table.Td>
+                                <Table.Td style={tableStyles.tdCenterNoWrap}>
+                                  <span style={tableStyles.badgeCyan}>{ending}</span>
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                        <Table withRowBorders={false}>
+                          <Table.Tbody>
+                            {REGULAR_ENDINGS.slice(3, 6).map(({ pronoun, ending }) => (
+                              <Table.Tr key={pronoun}>
+                                <Table.Td style={tableStyles.tdPronounNoWrap}>{pronoun}</Table.Td>
+                                <Table.Td style={tableStyles.tdCenterNoWrap}>
+                                  <span style={tableStyles.badgeCyan}>{ending}</span>
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                      </div>
+                    )}
+
+                    <div className="fill__lesson-footer">
+                      <p className="fill__lesson-footer-text">
+                        <span className="fill__lesson-dot" />
+                        Get 3 correct in a row to master.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="fill__lesson-desc">{lesson.description}</p>
+                    <div className="fill__lesson-footer">
+                      <p className="fill__lesson-footer-text">
+                        <span className="fill__lesson-dot" />
+                        Get 3 correct in a row to master each item.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </Collapse>
+        </section>
+
+        <form onSubmit={handleSubmit} className="fill__form">
+          {/* Prompt section */}
+          <div className="fill__prompt-section">
+            {/* Conjugation hint */}
+            {isConjugation && (
+              <div key={promptKey} className="fill__prompt-container fill__hint-container">
                 <Menu shadow="md" width={220} position="bottom">
                   <Menu.Target>
-                    <button
-                      type="button"
-                      style={{
-                        color: "var(--color-primary)",
-                        fontSize: "var(--text-4xl)",
-                        fontWeight: 700,
-                        fontFamily: "var(--font-display)",
-                        cursor: "pointer",
-                        padding: "var(--space-3) var(--space-6)",
-                        borderRadius: "var(--radius-lg)",
-                        transition: "all var(--transition-base)",
-                        background: "transparent",
-                        border: "none",
-                        textShadow: `
-                          0 0 20px var(--color-primary-glow),
-                          0 0 40px rgba(246, 1, 157, 0.3)
-                        `,
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "var(--color-primary-glow)";
-                        e.currentTarget.style.transform = "scale(1.02)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.transform = "scale(1)";
-                      }}
-                    >
+                    <button type="button" className="fill__hint-btn">
                       {displayHint}
                     </button>
                   </Menu.Target>
@@ -677,62 +487,40 @@ export function FillBlankScreen({
                     ))}
                   </Menu.Dropdown>
                 </Menu>
-                <p
-                  style={{
-                    color: "var(--color-text-subtle)",
-                    fontSize: "var(--text-xs)",
-                    marginTop: "var(--space-3)",
-                    marginBottom: 0,
-                    opacity: 0,
-                    animation: "fadeIn 0.3s ease-out 0.3s forwards",
-                  }}
-                >
-                  Click or press <kbd style={{
-                    background: "var(--color-bg-secondary)",
-                    padding: "2px 6px",
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--color-border)",
-                    fontSize: "var(--text-xs)",
-                  }}>1</kbd> to change hint
+                <p className="fill__hint-note">
+                  Click or press <kbd className="fill__hint-kbd">1</kbd> to change hint
                 </p>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Case exercises - single line sentence */}
-          {!isConjugation && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <div
-                key={promptKey}
-                style={{
-                  animation: "promptEnter 0.5s ease-out",
-                  width: "100%",
-                }}
-              >
-                {/* Single line: sentence + input + noun */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "var(--space-5)",
-                    width: "100%",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "var(--text-4xl)",
-                      fontWeight: 800,
-                      color: "var(--color-text)",
-                      fontFamily: "var(--font-display)",
-                      lineHeight: 1.2,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {sentencePart}
-                  </span>
+            {/* Gender exercises */}
+            {isGender && (
+              <div key={promptKey} className="fill__prompt-container fill__gender-container">
+                <h3 className="fill__gender-category">{germanHint}</h3>
+                <p className="fill__gender-examples">{englishHint}</p>
+                <div className="fill__gender-input-wrapper">
+                  <DrillInput
+                    ref={inputRef}
+                    value={displayValue}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder="der / die / das"
+                    status={status}
+                    size="lg"
+                    readOnly={status !== "idle"}
+                  />
+                  {exercise.hint && (
+                    <span className="fill__gender-hint">{exercise.hint}</span>
+                  )}
+                </div>
+              </div>
+            )}
 
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: "30%" }}>
+            {/* Case exercises */}
+            {!isConjugation && !isGender && (
+              <div key={promptKey} className="fill__prompt-container fill__case-container">
+                <div className="fill__case-row">
+                  <span className="fill__case-text">{sentencePart}</span>
+                  <div className="fill__case-input-wrapper">
                     <DrillInput
                       ref={inputRef}
                       value={displayValue}
@@ -742,74 +530,21 @@ export function FillBlankScreen({
                       size="lg"
                       readOnly={status !== "idle"}
                     />
-                    {/* Transformation hint */}
-                    <span
-                      style={{
-                        marginTop: "var(--space-2)",
-                        fontSize: "var(--text-sm)",
-                        color: "var(--color-neon-cyan)",
-                        fontFamily: "var(--font-mono, monospace)",
-                        letterSpacing: "0.05em",
-                        opacity: 0.8,
-                        textShadow: "0 0 8px rgba(45, 226, 230, 0.5)",
-                      }}
-                    >
-                      {germanHint} → ?
-                    </span>
+                    <span className="fill__case-transform">{germanHint} → ?</span>
                   </div>
-
-                  <span
-                    style={{
-                      fontSize: "var(--text-4xl)",
-                      fontWeight: 800,
-                      color: "var(--color-text)",
-                      fontFamily: "var(--font-display)",
-                      lineHeight: 1.2,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {nounOnly}.
-                  </span>
+                  <span className="fill__case-text">{nounOnly}.</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Bottom section - card and feedback */}
-          <div style={{ paddingBottom: "10vh" }}>
-            {/* Conjugation card (only for conjugation exercises) */}
+          {/* Input section */}
+          <div className="fill__input-section">
+            {/* Conjugation card */}
             {isConjugation && (
-              <article
-                style={{
-                  background: "linear-gradient(135deg, var(--color-card-bg) 0%, rgba(246, 1, 157, 0.02) 100%)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-xl)",
-                  padding: "var(--space-10)",
-                  marginBottom: "var(--space-8)",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "var(--space-8)",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "var(--text-5xl)",
-                      fontWeight: 800,
-                      color: "var(--color-text)",
-                      fontFamily: "var(--font-display)",
-                      lineHeight: 1,
-                      textShadow: "0 2px 10px rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    {sentencePart}
-                  </span>
-
+              <article className="fill__conjugation-card">
+                <div className="fill__conjugation-row">
+                  <span className="fill__conjugation-pronoun">{sentencePart}</span>
                   <DrillInput
                     ref={inputRef}
                     value={displayValue}
@@ -824,15 +559,8 @@ export function FillBlankScreen({
               </article>
             )}
 
-            {/* Feedback row - streak dots and feedback text */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              {/* Streak dots - show updated streak based on current answer */}
+            {/* Feedback row */}
+            <div className="fill__feedback-row">
               {(() => {
                 const baseStreak = currentTask.streak;
                 const displayStreak = status === "correct"
@@ -843,31 +571,19 @@ export function FillBlankScreen({
                 return <StreakDots current={displayStreak} size="lg" showLabel />;
               })()}
 
-              {/* Feedback message - streak aware */}
-              <span
-                style={{
-                  fontWeight: 500,
-                  fontSize: "var(--text-md)",
-                  color: status === "correct"
-                    ? "var(--color-success)"
-                    : status === "wrong"
-                      ? "var(--color-error)"
-                      : "var(--color-text-muted)",
-                }}
-              >
+              <span className={`fill__feedback fill__feedback--${status}`}>
                 {status === "idle" && "Press Enter"}
                 {status === "wrong" && "Incorrect — streak reset"}
                 {status === "correct" && (() => {
                   const newStreak = currentTask.streak + 1;
                   if (newStreak >= 3) return "MASTERED!";
-                  const remaining = 3 - newStreak;
-                  return `Correct! ${remaining} more to master`;
+                  return `Correct! ${3 - newStreak} more to master`;
                 })()}
               </span>
             </div>
           </div>
         </form>
       </div>
-    </main>
+    </Layout>
   );
 }

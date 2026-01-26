@@ -17,7 +17,7 @@ export function ResetConfirmModal({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(10, 10, 18, 0.9)',
+        background: 'var(--color-modal-overlay)',
         backdropFilter: 'blur(8px)',
         zIndex: 200,
         animation: 'fadeIn 0.2s ease-out',
@@ -31,7 +31,7 @@ export function ResetConfirmModal({
           border: '1px solid var(--color-error)',
           borderRadius: 'var(--radius-xl)',
           padding: 'var(--space-8)',
-          maxWidth: '400px',
+          maxWidth: '25rem',
           width: '90%',
           boxShadow: `
             0 0 40px rgba(255, 77, 109, 0.2),
@@ -44,8 +44,8 @@ export function ResetConfirmModal({
         {/* Warning icon */}
         <div
           style={{
-            width: '48px',
-            height: '48px',
+            width: 'var(--space-12)',
+            height: 'var(--space-12)',
             margin: '0 auto var(--space-5)',
             borderRadius: '50%',
             background: 'rgba(255, 77, 109, 0.15)',
@@ -53,7 +53,7 @@ export function ResetConfirmModal({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '24px',
+            fontSize: 'var(--text-xl)',
             boxShadow: '0 0 20px rgba(255, 77, 109, 0.3)',
           }}
         >
@@ -64,7 +64,7 @@ export function ResetConfirmModal({
         <h3
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '14px',
+            fontSize: 'var(--text-sm)',
             letterSpacing: '0.1em',
             color: 'var(--color-error)',
             textAlign: 'center',
@@ -86,8 +86,8 @@ export function ResetConfirmModal({
             lineHeight: 1.5,
           }}
         >
-          This will restart the current circle for <strong style={{ color: 'var(--color-text)' }}>{deckName}</strong>.
-          Your completed circles will be kept.
+          This will restart your current attempt for <strong style={{ color: 'var(--color-text)' }}>{deckName}</strong>.
+          Your best time will be kept.
         </p>
 
         {/* Warning badge */}
@@ -104,7 +104,7 @@ export function ResetConfirmModal({
           <span
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '10px',
+              fontSize: '0.625rem',
               letterSpacing: '0.1em',
               color: 'var(--color-error)',
             }}
@@ -151,7 +151,7 @@ export function ResetConfirmModal({
             style={{
               flex: 1,
               fontFamily: 'var(--font-display)',
-              fontSize: '12px',
+              fontSize: 'var(--text-xs)',
               letterSpacing: '0.05em',
               padding: 'var(--space-3) var(--space-4)',
               background: 'linear-gradient(180deg, rgba(255, 77, 109, 0.3) 0%, rgba(255, 77, 109, 0.15) 100%)',

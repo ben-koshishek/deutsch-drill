@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-const feedbackTextStyles = cva("font-medium", {
+const feedbackTextStyles = cva("", {
   variants: {
     status: {
       idle: "",

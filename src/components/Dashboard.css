@@ -1,0 +1,111 @@
+/* ===== DASHBOARD SPECIFIC STYLES ===== */
+
+/* ===== STATS PANEL ===== */
+.dashboard__stats {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px var(--color-inset-shadow);
+}
+
+[data-theme="dark"] .dashboard__stats {
+  background: rgba(15, 15, 30, 0.9);
+  border: 1px solid rgba(246, 1, 157, 0.3);
+  box-shadow: 0 0 30px var(--color-neon-pink-glow);
+  backdrop-filter: blur(10px);
+}
+
+.dashboard__stat-value {
+  font-size: var(--text-xl);
+  font-family: var(--font-body);
+}
+
+.dashboard__stat-value--cyan {
+  color: var(--color-neon-cyan);
+}
+
+.dashboard__stat-value--pink {
+  color: var(--color-neon-pink);
+}
+
+[data-theme="dark"] .dashboard__stat-value--cyan {
+  text-shadow: 0 0 15px var(--color-neon-cyan-glow);
+}
+
+[data-theme="dark"] .dashboard__stat-value--pink {
+  text-shadow: 0 0 15px var(--color-neon-pink-glow);
+}
+
+.dashboard__stat-divider {
+  width: 1px;
+  height: var(--space-6);
+  background: var(--color-border);
+}
+
+/* ===== SECTION TITLES ===== */
+.dashboard__section-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.dashboard__section-title--pink {
+  color: var(--color-neon-pink);
+}
+
+.dashboard__section-title--yellow {
+  color: var(--color-neon-yellow);
+}
+
+[data-theme="dark"] .dashboard__section-title--pink {
+  text-shadow: 0 0 20px var(--color-neon-pink-glow);
+}
+
+[data-theme="dark"] .dashboard__section-title--yellow {
+  text-shadow: 0 0 20px rgba(249, 197, 78, 0.5);
+}
+
+/* ===== CARD GRID ===== */
+.dashboard__card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ===== CATEGORY HEADERS ===== */
+.dashboard__category-header {
+  padding: var(--space-3) 0;
+  margin-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border);
+  position: relative;
+}
+
+[data-theme="dark"] .dashboard__category-header::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--color-neon-pink);
+  box-shadow: 0 0 10px var(--color-neon-pink-glow);
+}
+
+
+.dashboard__category-title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.dashboard__category-description {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.dashboard__category-count {
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+}
