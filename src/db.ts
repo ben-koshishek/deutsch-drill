@@ -9,15 +9,16 @@ interface Progress {
   streak: number;
 }
 
-interface BestTime {
+interface LastRun {
   id?: number;
   deckId: string;
   timeMs: number;
+  mistakes: number;
 }
 
 class DrillDatabase extends Dexie {
   progress!: Table<Progress>;
-  bestTimes!: Table<BestTime>;
+  lastRuns!: Table<LastRun>;
 
   constructor() {
     super('deutschdrill');
@@ -33,6 +34,34 @@ class DrillDatabase extends Dexie {
       progress: '++id, [deckId+wordId+direction]',
       bestTimes: '++id, deckId',
       circles: null // Delete the circles table
+    });
+    // Version 4: add mistakes field to bestTimes (no schema change needed, just data)
+    this.version(4).stores({
+      progress: '++id, [deckId+wordId+direction]',
+      bestTimes: '++id, deckId'
+    }).upgrade(tx => {
+      // Add mistakes: 0 to existing records
+      return tx.table('bestTimes').toCollection().modify(record => {
+        if (record.mistakes === undefined) {
+          record.mistakes = 0;
+        }
+      });
+    });
+    // Version 5: rename bestTimes to lastRuns (stores most recent run, not best)
+    this.version(5).stores({
+      progress: '++id, [deckId+wordId+direction]',
+      lastRuns: '++id, deckId',
+      bestTimes: null // Delete the old table
+    }).upgrade(async tx => {
+      // Migrate data from bestTimes to lastRuns
+      const oldRecords = await tx.table('bestTimes').toArray();
+      for (const record of oldRecords) {
+        await tx.table('lastRuns').add({
+          deckId: record.deckId,
+          timeMs: record.timeMs,
+          mistakes: record.mistakes ?? 0
+        });
+      }
     });
   }
 }
@@ -82,60 +111,69 @@ export async function resetDeckProgress(deckId: string): Promise<void> {
   await db.progress.where({ deckId }).delete();
 }
 
-// Best time tracking functions
-export async function getBestTime(deckId: string): Promise<number | null> {
-  const record = await db.bestTimes.where({ deckId }).first();
-  return record?.timeMs ?? null;
+// Last run tracking functions
+export interface LastRunRecord {
+  timeMs: number;
+  mistakes: number;
 }
 
-export interface UpdateBestTimeResult {
-  isNewBest: boolean;
-  previousBest: number | null;
+export async function getLastRun(deckId: string): Promise<LastRunRecord | null> {
+  const record = await db.lastRuns.where({ deckId }).first();
+  if (!record) return null;
+  return { timeMs: record.timeMs, mistakes: record.mistakes ?? 0 };
+}
+
+export interface UpdateLastRunResult {
+  isPerfect: boolean;
+  previousTime: number | null;
+  previousMistakes: number | null;
   currentTime: number;
+  currentMistakes: number;
 }
 
-export async function updateBestTime(
+export async function updateLastRun(
   deckId: string,
-  timeMs: number
-): Promise<UpdateBestTimeResult> {
-  const existing = await db.bestTimes.where({ deckId }).first();
-  const previousBest = existing?.timeMs ?? null;
-  const isNewBest = previousBest === null || timeMs < previousBest;
+  timeMs: number,
+  mistakes: number
+): Promise<UpdateLastRunResult> {
+  const existing = await db.lastRuns.where({ deckId }).first();
+  const previousTime = existing?.timeMs ?? null;
+  const previousMistakes = existing?.mistakes ?? null;
+  const isPerfect = mistakes === 0;
 
-  if (isNewBest) {
-    if (existing) {
-      await db.bestTimes.update(existing.id!, { timeMs });
-    } else {
-      await db.bestTimes.add({ deckId, timeMs });
-    }
+  // Always save the most recent run
+  if (existing) {
+    await db.lastRuns.update(existing.id!, { timeMs, mistakes });
+  } else {
+    await db.lastRuns.add({ deckId, timeMs, mistakes });
   }
 
-  return { isNewBest, previousBest, currentTime: timeMs };
+  return { isPerfect, previousTime, previousMistakes, currentTime: timeMs, currentMistakes: mistakes };
 }
 
-export async function resetBestTime(deckId: string): Promise<void> {
-  await db.bestTimes.where({ deckId }).delete();
+export async function resetLastRun(deckId: string): Promise<void> {
+  await db.lastRuns.where({ deckId }).delete();
 }
 
-// Full reset: progress + best time
+// Full reset: progress + last run
 export async function resetDeckFull(deckId: string): Promise<void> {
   await Promise.all([
     db.progress.where({ deckId }).delete(),
-    db.bestTimes.where({ deckId }).delete()
+    db.lastRuns.where({ deckId }).delete()
   ]);
 }
 
-// Batch query: Get progress and best times for multiple decks in fewer queries
+// Batch query: Get progress and last runs for multiple decks in fewer queries
 export interface BatchDeckStats {
   progress: Map<string, Map<string, number>>; // deckId -> (wordId_direction -> streak)
-  bestTimes: Map<string, number | null>;       // deckId -> timeMs
+  lastRuns: Map<string, LastRunRecord | null>;  // deckId -> { timeMs, mistakes }
 }
 
 export async function getBatchDeckStats(deckIds: string[]): Promise<BatchDeckStats> {
-  // Fetch all progress and best times in parallel
-  const [allProgress, allBestTimes] = await Promise.all([
+  // Fetch all progress and last runs in parallel
+  const [allProgress, allLastRuns] = await Promise.all([
     db.progress.where('deckId').anyOf(deckIds).toArray(),
-    db.bestTimes.where('deckId').anyOf(deckIds).toArray()
+    db.lastRuns.where('deckId').anyOf(deckIds).toArray()
   ]);
 
   // Organize progress by deckId
@@ -150,14 +188,14 @@ export async function getBatchDeckStats(deckIds: string[]): Promise<BatchDeckSta
     }
   }
 
-  // Organize best times by deckId
-  const bestTimesMap = new Map<string, number | null>();
+  // Organize last runs by deckId
+  const lastRunsMap = new Map<string, LastRunRecord | null>();
   for (const deckId of deckIds) {
-    bestTimesMap.set(deckId, null);
+    lastRunsMap.set(deckId, null);
   }
-  for (const record of allBestTimes) {
-    bestTimesMap.set(record.deckId, record.timeMs);
+  for (const record of allLastRuns) {
+    lastRunsMap.set(record.deckId, { timeMs: record.timeMs, mistakes: record.mistakes ?? 0 });
   }
 
-  return { progress: progressMap, bestTimes: bestTimesMap };
+  return { progress: progressMap, lastRuns: lastRunsMap };
 }

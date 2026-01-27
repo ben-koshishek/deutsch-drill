@@ -61,7 +61,7 @@ export function ProgressBar({
 
   const trackStyle: React.CSSProperties = {
     width: "100%",
-    background: "var(--color-bg-secondary)",
+    background: clampedValue > 0 ? "var(--color-bg-secondary)" : "transparent",
     borderRadius: 0,
     overflow: "hidden",
     position: "relative",

@@ -2,10 +2,11 @@ import { formatTime } from '@/utils/formatTime';
 
 interface BestTimeBadgeProps {
   timeMs: number;
+  mistakes?: number;
   size?: 'sm' | 'md';
 }
 
-export function BestTimeBadge({ timeMs, size = 'md' }: BestTimeBadgeProps) {
+export function BestTimeBadge({ timeMs, mistakes, size = 'md' }: BestTimeBadgeProps) {
   const sizes = {
     sm: {
       fontSize: 'var(--text-xs)',
@@ -20,6 +21,8 @@ export function BestTimeBadge({ timeMs, size = 'md' }: BestTimeBadgeProps) {
   };
 
   const { fontSize, padding, iconSize } = sizes[size];
+  const showMistakes = mistakes !== undefined;
+  const isPerfect = mistakes === 0;
 
   return (
     <div
@@ -31,19 +34,30 @@ export function BestTimeBadge({ timeMs, size = 'md' }: BestTimeBadgeProps) {
         fontSize,
         letterSpacing: '0.02em',
         padding,
-        background: 'linear-gradient(180deg, rgba(45, 226, 230, 0.2) 0%, rgba(45, 226, 230, 0.1) 100%)',
-        border: '1px solid rgba(45, 226, 230, 0.5)',
+        background: 'linear-gradient(180deg, color-mix(in srgb, var(--color-time) 20%, transparent) 0%, color-mix(in srgb, var(--color-time) 10%, transparent) 100%)',
+        border: '1px solid color-mix(in srgb, var(--color-time) 50%, transparent)',
         borderRadius: 'var(--radius-md)',
-        color: 'var(--color-neon-cyan)',
-        boxShadow: `
-          0 0 10px rgba(45, 226, 230, 0.2),
-          inset 0 0 10px rgba(45, 226, 230, 0.1)
-        `,
-        textShadow: '0 0 8px rgba(45, 226, 230, 0.5)',
+        color: 'var(--color-time)',
+        boxShadow: '0 0 10px var(--color-time-glow), inset 0 0 10px color-mix(in srgb, var(--color-time) 10%, transparent)',
+        textShadow: '0 0 8px var(--color-time-glow)',
       }}
     >
       <span style={{ fontSize: iconSize }}>⏱</span>
       <span style={{ fontWeight: 600 }}>{formatTime(timeMs)}</span>
+      {showMistakes && (
+        <>
+          <span style={{ opacity: 0.5 }}>·</span>
+          <span
+            style={{
+              color: isPerfect ? 'var(--color-success)' : 'var(--color-error)',
+              textShadow: isPerfect ? '0 0 6px var(--color-success-glow)' : '0 0 6px var(--color-error-glow)',
+              fontWeight: 600,
+            }}
+          >
+            {isPerfect ? '✓' : `✗${mistakes}`}
+          </span>
+        </>
+      )}
     </div>
   );
 }

@@ -69,8 +69,8 @@
 .dashboard__card-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-6);
-  max-width: 900px;
+  gap: var(--space-5);
+  max-width: 800px;
   margin: 0 auto;
 }
 

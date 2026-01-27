@@ -8,7 +8,8 @@ export interface DeckCardProps {
   progress: number;
   accentColor: string;
   isComplete?: boolean;
-  bestTimeMs?: number | null;
+  lastRunTimeMs?: number | null;
+  lastRunMistakes?: number | null;
   onClick: () => void;
   style?: React.CSSProperties;
 }
@@ -17,18 +18,21 @@ export function DeckCard({
   title,
   subtitle,
   accentColor,
-  bestTimeMs = null,
+  lastRunTimeMs = null,
+  lastRunMistakes = null,
   onClick,
   style,
 }: DeckCardProps) {
-  const hasBestTime = bestTimeMs !== null;
+  const hasLastRun = lastRunTimeMs !== null;
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const isPerfect = lastRunMistakes === 0;
 
   const classNames = [
     "deck-card",
     isDark && "deck-card--dark",
-    hasBestTime && "deck-card--practiced",
+    hasLastRun && "deck-card--practiced",
+    isPerfect && hasLastRun && "deck-card--mastered",
   ]
     .filter(Boolean)
     .join(" ");
@@ -43,10 +47,22 @@ export function DeckCard({
       } as React.CSSProperties}
     >
       <h3 className="deck-card__title">{title}</h3>
-      <span className="deck-card__subtitle">{subtitle}</span>
-      {hasBestTime && (
-        <div className="deck-card__time">{formatTime(bestTimeMs)}</div>
-      )}
+
+      {/* Bottom stats bar */}
+      <div className="deck-card__footer">
+        <span className="deck-card__subtitle">{subtitle}</span>
+
+        {hasLastRun && (
+          <div className={`deck-card__result ${isPerfect ? 'deck-card__result--perfect' : ''}`}>
+            <span className="deck-card__result-time">{formatTime(lastRunTimeMs)}</span>
+            {!isPerfect && lastRunMistakes !== null && (
+              <span className="deck-card__result-status">
+                {lastRunMistakes}×
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </article>
   );
 }

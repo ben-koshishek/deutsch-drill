@@ -1,14 +1,25 @@
 /* ===== DESIGN SYSTEM - DUAL THEME (LIGHT + SYNTHWAVE DARK) ===== */
 :root {
-  /* Neon accent colors (shared) */
+  /* ===== NEON ACCENT PALETTE (shared across themes) ===== */
+  /* Primary: Brand color, prompts, things to translate */
   --color-neon-pink: #f6019d;
   --color-neon-pink-glow: rgba(246, 1, 157, 0.6);
+
+  /* Secondary: Context, examples, hints, time displays */
   --color-neon-cyan: #2de2e6;
   --color-neon-cyan-glow: rgba(45, 226, 230, 0.6);
+
+  /* Tertiary: Mastery, stars, celebrations */
+  --color-neon-yellow: #f9c54e;
+  --color-neon-yellow-glow: rgba(249, 197, 78, 0.6);
+
+  /* Accent: Decorative elements, scrollbars */
   --color-neon-purple: #9d00ff;
   --color-neon-purple-glow: rgba(157, 0, 255, 0.5);
-  --color-neon-blue: #035ee8;
-  --color-neon-yellow: #f9c54e;
+
+  /* Reserved: High-contrast neon blue for future use */
+  --color-neon-blue: #00d4ff;
+  --color-neon-blue-glow: rgba(0, 212, 255, 0.6);
 
   /* Typography - Font families */
   --font-display: 'Press Start 2P', 'Courier New', monospace;
@@ -91,9 +102,13 @@
   --color-error: #dc2626;
   --color-error-glow: rgba(220, 38, 38, 0.25);
 
-  /* Semantic content colors */
+  /* ===== SEMANTIC CONTENT COLORS ===== */
   --color-prompt: var(--color-primary);      /* Source/thing to translate - pink */
-  --color-context: var(--color-secondary);   /* Examples, hints, context - cyan */
+  --color-context: var(--color-secondary);   /* Examples, hints - cyan */
+  --color-time: var(--color-neon-cyan);      /* Timer displays - cyan */
+  --color-time-glow: var(--color-neon-cyan-glow);
+  --color-mastery: var(--color-neon-yellow); /* Mastery, stars - yellow */
+  --color-mastery-glow: var(--color-neon-yellow-glow);
 
   /* Legacy aliases */
   --color-accent: var(--color-primary);
@@ -144,11 +159,11 @@
   --border: #d4d4d4;
   --input: #ffffff;
   --ring: #f6019d;
-  --chart-1: #f6019d;
-  --chart-2: #2de2e6;
-  --chart-3: #9d00ff;
-  --chart-4: #f9c54e;
-  --chart-5: #035ee8;
+  --chart-1: var(--color-neon-pink);
+  --chart-2: var(--color-neon-cyan);
+  --chart-3: var(--color-neon-purple);
+  --chart-4: var(--color-neon-yellow);
+  --chart-5: var(--color-neon-blue);
 }
 
 /* === DARK THEME (Synthwave/Blade Runner) === */
@@ -185,9 +200,13 @@
   --color-error: #ff4d6d;
   --color-error-glow: rgba(255, 77, 109, 0.3);
 
-  /* Semantic content colors */
+  /* ===== SEMANTIC CONTENT COLORS ===== */
   --color-prompt: var(--color-primary);      /* Source/thing to translate - pink */
-  --color-context: var(--color-secondary);   /* Examples, hints, context - cyan */
+  --color-context: var(--color-secondary);   /* Examples, hints - cyan */
+  --color-time: var(--color-neon-cyan);      /* Timer displays - cyan */
+  --color-time-glow: var(--color-neon-cyan-glow);
+  --color-mastery: var(--color-neon-yellow); /* Mastery, stars - yellow */
+  --color-mastery-glow: var(--color-neon-yellow-glow);
 
   /* Legacy aliases */
   --color-accent: var(--color-primary);
@@ -467,20 +486,20 @@ h3 {
 /* Mastery celebration pulse */
 @keyframes masteryPulse {
   0% {
-    background: rgba(249, 197, 78, 0.1);
-    box-shadow: 0 0 0 0 rgba(249, 197, 78, 0.4);
+    background: color-mix(in srgb, var(--color-mastery) 10%, transparent);
+    box-shadow: 0 0 0 0 var(--color-mastery-glow);
   }
   25% {
-    background: rgba(249, 197, 78, 0.25);
-    box-shadow: 0 0 20px 5px rgba(249, 197, 78, 0.5);
+    background: color-mix(in srgb, var(--color-mastery) 25%, transparent);
+    box-shadow: 0 0 20px 5px var(--color-mastery-glow);
   }
   50% {
-    background: rgba(249, 197, 78, 0.15);
-    box-shadow: 0 0 30px 10px rgba(249, 197, 78, 0.3);
+    background: color-mix(in srgb, var(--color-mastery) 15%, transparent);
+    box-shadow: 0 0 30px 10px color-mix(in srgb, var(--color-mastery) 30%, transparent);
   }
   100% {
-    background: rgba(249, 197, 78, 0.1);
-    box-shadow: 0 0 0 0 rgba(249, 197, 78, 0);
+    background: color-mix(in srgb, var(--color-mastery) 10%, transparent);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 

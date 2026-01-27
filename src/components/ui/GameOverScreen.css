@@ -1,0 +1,118 @@
+/* ===== GAME OVER SCREEN ===== */
+.game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--space-8);
+  text-align: center;
+  animation: gameOverFadeIn 0.5s ease-out;
+}
+
+@keyframes gameOverFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.game-over__hearts {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.game-over__heart {
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.15);
+  animation: heartFadeOut 0.6s ease-out;
+}
+
+@keyframes heartFadeOut {
+  0% {
+    color: var(--color-error);
+    transform: scale(1.2);
+  }
+  100% {
+    color: rgba(255, 255, 255, 0.15);
+    transform: scale(1);
+  }
+}
+
+.game-over__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--color-error);
+  margin: 0 0 var(--space-3);
+}
+
+[data-theme="dark"] .game-over__title {
+  text-shadow:
+    0 0 20px var(--color-error),
+    0 0 40px var(--color-error-glow);
+}
+
+.game-over__text {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-8);
+}
+
+.game-over__buttons {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.game-over__btn {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.game-over__btn--primary {
+  background: linear-gradient(
+    180deg,
+    rgba(246, 1, 157, 0.3) 0%,
+    rgba(246, 1, 157, 0.15) 100%
+  );
+  border: 2px solid var(--color-neon-pink);
+  color: var(--color-neon-pink);
+}
+
+[data-theme="dark"] .game-over__btn--primary {
+  box-shadow: 0 0 20px var(--color-neon-pink-glow);
+  text-shadow: 0 0 10px var(--color-neon-pink);
+}
+
+.game-over__btn--primary:hover {
+  background: rgba(246, 1, 157, 0.4);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .game-over__btn--primary:hover {
+  box-shadow: 0 0 30px var(--color-neon-pink-glow);
+}
+
+.game-over__btn--secondary {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.game-over__btn--secondary:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}

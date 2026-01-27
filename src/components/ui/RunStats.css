@@ -1,0 +1,139 @@
+/* ===== RUN STATS - SYNTHWAVE HUD DISPLAY ===== */
+
+.run-stats {
+  display: flex;
+  align-items: stretch;
+  height: 44px;
+  font-family: var(--font-mono);
+  background: linear-gradient(
+    135deg,
+    rgba(13, 13, 26, 0.95) 0%,
+    rgba(20, 10, 40, 0.9) 100%
+  );
+  border: 1px solid rgba(45, 226, 230, 0.3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Scanline effect overlay */
+.run-stats::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glow effect */
+[data-theme="dark"] .run-stats {
+  box-shadow:
+    0 0 20px rgba(45, 226, 230, 0.15),
+    inset 0 0 30px rgba(45, 226, 230, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Time section */
+.run-stats__time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  position: relative;
+  z-index: 2;
+}
+
+.run-stats__time-icon {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.run-stats__time-value {
+  font-size: var(--text-md);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  color: var(--color-neon-cyan);
+  min-width: 4em;
+  text-align: right;
+}
+
+[data-theme="dark"] .run-stats__time-value {
+  text-shadow:
+    0 0 10px var(--color-neon-cyan),
+    0 0 20px var(--color-neon-cyan-glow),
+    0 0 40px rgba(45, 226, 230, 0.3);
+}
+
+/* Divider */
+.run-stats__divider {
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 10%,
+    rgba(45, 226, 230, 0.5) 50%,
+    transparent 90%
+  );
+  position: relative;
+  z-index: 2;
+}
+
+/* Lives/Hearts section */
+.run-stats__lives {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 var(--space-4);
+  position: relative;
+  z-index: 2;
+}
+
+.run-stats__heart {
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.run-stats__heart--alive {
+  color: var(--color-error);
+}
+
+[data-theme="dark"] .run-stats__heart--alive {
+  text-shadow:
+    0 0 8px var(--color-error),
+    0 0 16px var(--color-error-glow);
+  filter: drop-shadow(0 0 4px var(--color-error));
+}
+
+.run-stats__heart--dead {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+/* Pulse animation when losing a heart */
+@keyframes heartBreak {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.run-stats__heart--dead {
+  animation: heartBreak 0.4s ease-out;
+}

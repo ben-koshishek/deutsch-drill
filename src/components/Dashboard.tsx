@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { decks } from "../data/decks";
 import { grammarLessons } from "../data/grammar";
-import { getBatchDeckStats } from "../db";
+import { getBatchDeckStats, type LastRunRecord } from "../db";
 import type { Deck, GrammarLesson } from "../types";
 import { DeckCard } from "./ui/DeckCard";
 import "./Dashboard.css";
@@ -10,19 +10,19 @@ interface DashboardProps {
   onSelectDeck: (deck: Deck) => void;
   onSelectLesson: (lesson: GrammarLesson) => void;
   activeTab: "vocabulary" | "grammar";
-  onStatsChange?: (stats: { practiced: string; mastered: string }) => void;
+  onStatsChange?: (stats: { practiced: string; mastered: string; wordsLearned: string }) => void;
 }
 
 const MASTERY_THRESHOLD = 3;
 
 export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChange }: DashboardProps) {
   const [deckProgress, setDeckProgress] = useState<
-    Map<string, { completed: number; total: number }>
+    Map<string, { completed: number; total: number; wordsLearned: number }>
   >(new Map());
   const [lessonProgress, setLessonProgress] = useState<
     Map<string, { completed: number; total: number }>
   >(new Map());
-  const [bestTimesMap, setBestTimesMap] = useState<Map<string, number | null>>(new Map());
+  const [lastRunsMap, setLastRunsMap] = useState<Map<string, LastRunRecord | null>>(new Map());
 
   useEffect(() => {
     async function loadProgress() {
@@ -31,9 +31,9 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
         ...grammarLessons.map(l => l.id)
       ];
 
-      const { progress: progressData, bestTimes: timesData } = await getBatchDeckStats(allIds);
+      const { progress: progressData, lastRuns: runsData } = await getBatchDeckStats(allIds);
 
-      const deckData = new Map<string, { completed: number; total: number }>();
+      const deckData = new Map<string, { completed: number; total: number; wordsLearned: number }>();
       for (const deck of decks) {
         const progress = progressData.get(deck.id) ?? new Map();
         const total = deck.words.length * 2;
@@ -41,7 +41,16 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
         for (const streak of progress.values()) {
           if (streak >= MASTERY_THRESHOLD) completed++;
         }
-        deckData.set(deck.id, { completed, total });
+        // Count words learned (both directions mastered)
+        let wordsLearned = 0;
+        for (const word of deck.words) {
+          const deToEn = progress.get(`${word.id}_de_to_en`) ?? 0;
+          const enToDe = progress.get(`${word.id}_en_to_de`) ?? 0;
+          if (deToEn >= MASTERY_THRESHOLD && enToDe >= MASTERY_THRESHOLD) {
+            wordsLearned++;
+          }
+        }
+        deckData.set(deck.id, { completed, total, wordsLearned });
       }
       setDeckProgress(deckData);
 
@@ -56,7 +65,7 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
         lessonData.set(lesson.id, { completed, total });
       }
       setLessonProgress(lessonData);
-      setBestTimesMap(timesData);
+      setLastRunsMap(runsData);
     }
     loadProgress();
   }, []);
@@ -66,26 +75,28 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
     let practicedDecks = 0;
     let totalWords = 0;
     let masteredWords = 0;
+    let wordsLearned = 0;
 
     for (const deck of decks) {
       totalDecks++;
       const progress = deckProgress.get(deck.id);
-      const bestTime = bestTimesMap.get(deck.id);
+      const lastRunRecord = lastRunsMap.get(deck.id);
 
-      if (bestTime !== null && bestTime !== undefined) {
+      if (lastRunRecord !== null && lastRunRecord !== undefined) {
         practicedDecks++;
       }
 
       if (progress) {
         masteredWords += progress.completed;
         totalWords += progress.total;
+        wordsLearned += progress.wordsLearned;
       } else {
         totalWords += deck.words.length * 2;
       }
     }
 
-    return { totalDecks, practicedDecks, totalWords, masteredWords };
-  }, [deckProgress, bestTimesMap]);
+    return { totalDecks, practicedDecks, totalWords, masteredWords, wordsLearned };
+  }, [deckProgress, lastRunsMap]);
 
   const masteredPercent = overallStats.totalWords > 0
     ? Math.round((overallStats.masteredWords / overallStats.totalWords) * 100)
@@ -95,6 +106,7 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
     onStatsChange?.({
       practiced: `${overallStats.practicedDecks}/${overallStats.totalDecks}`,
       mastered: `${masteredPercent}%`,
+      wordsLearned: `${overallStats.wordsLearned}`,
     });
   }, [overallStats, masteredPercent, onStatsChange]);
 
@@ -108,7 +120,7 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
             const total = progress?.total ?? deck.words.length * 2;
             const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
             const isComplete = completed === total && total > 0;
-            const bestTime = bestTimesMap.get(deck.id) ?? null;
+            const lastRunRecord = lastRunsMap.get(deck.id) ?? null;
             const animationDelay = `${deckIndex * 50}ms`;
 
             return (
@@ -119,7 +131,8 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
                 progress={percent}
                 accentColor="#f6019d"
                 isComplete={isComplete}
-                bestTimeMs={bestTime}
+                lastRunTimeMs={lastRunRecord?.timeMs ?? null}
+                lastRunMistakes={lastRunRecord ? (lastRunRecord.mistakes ?? 0) : null}
                 onClick={() => onSelectDeck(deck)}
                 style={{
                   opacity: 0,
@@ -139,7 +152,7 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
             const total = progress?.total ?? lesson.exercises.length;
             const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
             const isComplete = completed === total && total > 0;
-            const bestTime = bestTimesMap.get(lesson.id) ?? null;
+            const lastRunRecord = lastRunsMap.get(lesson.id) ?? null;
             const animationDelay = `${lessonIndex * 50}ms`;
 
             return (
@@ -150,7 +163,8 @@ export function Dashboard({ onSelectDeck, onSelectLesson, activeTab, onStatsChan
                 progress={percent}
                 accentColor="#f9c54e"
                 isComplete={isComplete}
-                bestTimeMs={bestTime}
+                lastRunTimeMs={lastRunRecord?.timeMs ?? null}
+                lastRunMistakes={lastRunRecord ? (lastRunRecord.mistakes ?? 0) : null}
                 onClick={() => onSelectLesson(lesson)}
                 style={{
                   opacity: 0,

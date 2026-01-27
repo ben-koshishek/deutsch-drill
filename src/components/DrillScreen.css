@@ -1,68 +1,201 @@
-/* ===== DRILL SCREEN ===== */
+/* ===== DRILL SCREEN - SYNTHWAVE HEADER ===== */
 
 .drill__header-left,
 .drill__header-right {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  height: 44px;
 }
 
+/* ===== BACK BUTTON - Proper button style ===== */
 .drill__back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
   font-family: var(--font-body);
   font-size: var(--text-md);
-  color: var(--color-text-muted);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-2) var(--space-3);
+  font-weight: 600;
+  height: 44px;
+  padding: 0 var(--space-4);
+  color: var(--color-neon-cyan);
+  background: linear-gradient(
+    135deg,
+    rgba(13, 13, 26, 0.9) 0%,
+    rgba(20, 10, 40, 0.85) 100%
+  );
+  border: 1px solid rgba(45, 226, 230, 0.3);
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.drill__back-btn::before {
+  content: "‹";
+  font-size: 1.2em;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.25s ease;
 }
 
 .drill__back-btn:hover {
-  color: var(--color-text);
-  background: var(--color-bg-secondary);
+  border-color: rgba(45, 226, 230, 0.6);
+  background: rgba(45, 226, 230, 0.15);
 }
 
+.drill__back-btn:hover::before {
+  transform: translateX(-2px);
+}
+
+[data-theme="dark"] .drill__back-btn {
+  text-shadow: 0 0 10px var(--color-neon-cyan-glow);
+  box-shadow:
+    0 0 15px rgba(45, 226, 230, 0.15),
+    inset 0 0 20px rgba(45, 226, 230, 0.05);
+}
+
+[data-theme="dark"] .drill__back-btn:hover {
+  text-shadow: 0 0 15px var(--color-neon-cyan);
+  box-shadow:
+    0 0 25px rgba(45, 226, 230, 0.25),
+    inset 0 0 20px rgba(45, 226, 230, 0.08);
+}
+
+/* ===== TITLE - Prominent neon header ===== */
 .drill__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-display);
   font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--color-text);
-  letter-spacing: 0.05em;
+  position: relative;
+  padding: var(--space-2) var(--space-4);
+  height: 44px;
 }
 
 [data-theme="dark"] .drill__title {
-  color: var(--color-neon-cyan);
-  text-shadow: 0 0 15px var(--color-neon-cyan-glow);
+  color: var(--color-neon-pink);
+  text-shadow:
+    0 0 10px var(--color-neon-pink),
+    0 0 25px var(--color-neon-pink-glow),
+    0 0 50px rgba(246, 1, 157, 0.25);
 }
 
+/* Decorative underline */
+[data-theme="dark"] .drill__title::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-neon-pink) 15%,
+    var(--color-neon-pink) 85%,
+    transparent
+  );
+  box-shadow: 0 0 8px var(--color-neon-pink-glow);
+}
+
+/* ===== RESET BUTTON - Visible neon style ===== */
 .drill__reset-btn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-secondary);
-  color: var(--color-text-muted);
+  border: 1px solid rgba(157, 0, 255, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(13, 13, 26, 0.9) 0%,
+    rgba(20, 10, 40, 0.85) 100%
+  );
+  color: var(--color-neon-purple);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.drill__reset-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
 }
 
 .drill__reset-btn:hover {
   color: var(--color-error);
-  border-color: var(--color-error);
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.15);
 }
 
+[data-theme="dark"] .drill__reset-btn {
+  box-shadow:
+    0 0 15px rgba(157, 0, 255, 0.2),
+    inset 0 0 20px rgba(157, 0, 255, 0.05);
+}
+
+[data-theme="dark"] .drill__reset-btn:hover {
+  box-shadow:
+    0 0 20px rgba(239, 68, 68, 0.3),
+    inset 0 0 20px rgba(239, 68, 68, 0.1);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+}
+
+/* ===== COUNTER - HUD style display ===== */
 .drill__counter {
-  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
   font-size: var(--text-md);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-bg-secondary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  height: 44px;
+  padding: 0 var(--space-4);
+  color: var(--color-neon-yellow);
+  background: linear-gradient(
+    135deg,
+    rgba(13, 13, 26, 0.9) 0%,
+    rgba(20, 10, 40, 0.85) 100%
+  );
+  border: 1px solid rgba(249, 197, 78, 0.3);
   border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Scanline effect */
+.drill__counter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+}
+
+[data-theme="dark"] .drill__counter {
+  text-shadow:
+    0 0 10px var(--color-neon-yellow),
+    0 0 20px var(--color-neon-yellow-glow);
+  box-shadow:
+    0 0 15px rgba(249, 197, 78, 0.15),
+    inset 0 0 20px rgba(249, 197, 78, 0.05);
 }
 
 /* ===== CONTENT ===== */
@@ -101,6 +234,17 @@
 .drill__prompt-container {
   text-align: center;
   animation: promptEnter 0.5s ease-out;
+}
+
+@keyframes promptEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .drill__prompt {

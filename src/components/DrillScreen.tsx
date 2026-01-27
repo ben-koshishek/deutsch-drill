@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Deck, Word, DrillDirection } from "../types";
 import { useDrill } from "../hooks/useDrill";
-import { getBestTime, updateBestTime, resetDeckProgress, type UpdateBestTimeResult } from "../db";
+import { updateLastRun, resetDeckProgress, type UpdateLastRunResult } from "../db";
 import { useTimer } from "../hooks/useTimer";
+import { normalize } from "@/utils/normalize";
+import { MAX_LIVES, AUTO_ADVANCE_DELAY_MS, GAME_OVER_DELAY_MS, MASTERY_THRESHOLD } from "@/constants";
 import { TimeCompletionScreen } from "./TimeCompletionScreen";
 import { ExampleBox } from "./ui/ExampleBox";
 import { WordBadges } from "./ui/WordBadges";
 import { StreakDots } from "./ui/StreakDots";
 import { DrillInput } from "./ui/DrillInput";
 import { ProgressBar } from "./ui/ProgressBar";
-import { LiveTimer } from "./ui/LiveTimer";
+import { RunStats } from "./ui/RunStats";
 import { ResetConfirmModal } from "./ui/ResetConfirmModal";
 import { MeaningsCard } from "./ui/MeaningsCard";
+import { GameOverScreen } from "./ui/GameOverScreen";
 import { Layout } from "./Layout";
 import "./DrillScreen.css";
 
@@ -25,18 +28,6 @@ export interface SessionEndStats {
   correctAnswers: number;
   accuracy: number;
   problemWords: { word: Word; direction: DrillDirection; errorCount: number }[];
-}
-
-function normalize(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/\s*\([^)]*\)/g, "")
-    .replace(/[.,!?;:'"]/g, "")
-    .replace(/ä/g, "a")
-    .replace(/ö/g, "o")
-    .replace(/ü/g, "u")
-    .replace(/ß/g, "ss")
-    .trim();
 }
 
 function isAnswerCorrect(userAnswer: string, expectedAnswer: string, word?: Word): boolean {
@@ -82,16 +73,13 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
 
   const timer = useTimer();
   const [timerStarted, setTimerStarted] = useState(false);
-  const [bestTimeMs, setBestTimeMs] = useState<number | null>(null);
+  const [mistakeCount, setMistakeCount] = useState(0);
 
   const [showCompletion, setShowCompletion] = useState(false);
-  const [completionResult, setCompletionResult] = useState<UpdateBestTimeResult | null>(null);
+  const [completionResult, setCompletionResult] = useState<UpdateLastRunResult | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
-
-  useEffect(() => {
-    getBestTime(deck.id).then(setBestTimeMs);
-  }, [deck.id]);
+  const [showGameOver, setShowGameOver] = useState(false);
 
   const input = formState.taskKey === taskKey ? formState.input : "";
   const status = formState.taskKey === taskKey ? formState.status : "idle";
@@ -108,21 +96,20 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
   useEffect(() => {
     if (isFinished && !showCompletion && timerStarted) {
       const finalTime = timer.stop();
-      updateBestTime(deck.id, finalTime).then((result) => {
+      updateLastRun(deck.id, finalTime, mistakeCount).then((result) => {
         setCompletionResult(result);
-        if (result.isNewBest) {
-          setBestTimeMs(result.currentTime);
-        }
         setShowCompletion(true);
       });
     }
-  }, [isFinished, showCompletion, deck.id, timerStarted, timer]);
+  }, [isFinished, showCompletion, deck.id, timerStarted, timer, mistakeCount]);
 
   const handleTryAgain = useCallback(async () => {
     await resetDeckProgress(deck.id);
     setShowCompletion(false);
+    setShowGameOver(false);
     setCompletionResult(null);
     setTimerStarted(false);
+    setMistakeCount(0);
     timer.reset();
     prevTaskKeyRef.current = null;
     setFormState({ taskKey: null, input: "", status: "idle" });
@@ -133,6 +120,7 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
     await resetDeckProgress(deck.id);
     setShowResetModal(false);
     setTimerStarted(false);
+    setMistakeCount(0);
     timer.reset();
     prevTaskKeyRef.current = null;
     setFormState({ taskKey: null, input: "", status: "idle" });
@@ -151,13 +139,36 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
         submitAnswer(true);
         setShouldAutoAdvance(false);
         setFormState({ taskKey: null, input: "", status: "idle" });
-      }, 400);
+      }, AUTO_ADVANCE_DELAY_MS);
       return () => clearTimeout(t);
     }
   }, [shouldAutoAdvance, submitAnswer]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Esc to blur input (only when modal not showing)
+      if (e.key === "Escape" && !showResetModal) {
+        inputRef.current?.blur();
+        return;
+      }
+
+      // Cmd+Left arrow to go back
+      if (e.key === "ArrowLeft" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        onExit();
+        return;
+      }
+
+      // R key to reset (when not typing in input)
+      if (e.key === "r" || e.key === "R") {
+        const isInputFocused = document.activeElement === inputRef.current;
+        if (!isInputFocused && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          setShowResetModal(true);
+        }
+        return;
+      }
+
       if (e.key === " " && status !== "idle") {
         e.preventDefault();
         if (status === "wrong") {
@@ -178,14 +189,28 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [status, submitAnswer, onExit]);
+  }, [status, submitAnswer, onExit, showResetModal]);
+
+  if (showGameOver) {
+    return (
+      <Layout
+        headerLeft={<button className="drill__back-btn" onClick={onExit}>Back</button>}
+        headerCenter={<span className="drill__title">{deck.name}</span>}
+        headerRight={null}
+      >
+        <GameOverScreen onTryAgain={handleTryAgain} onExit={onExit} />
+      </Layout>
+    );
+  }
 
   if (showCompletion && completionResult) {
     return (
       <TimeCompletionScreen
         finalTimeMs={completionResult.currentTime}
-        isNewBest={completionResult.isNewBest}
-        previousBestMs={completionResult.previousBest}
+        isPerfect={completionResult.isPerfect}
+        previousTimeMs={completionResult.previousTime}
+        mistakeCount={completionResult.currentMistakes}
+        previousMistakes={completionResult.previousMistakes}
         itemName={deck.name}
         onTryAgain={handleTryAgain}
         onExit={onExit}
@@ -196,7 +221,7 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
   if (!currentTask) {
     return (
       <Layout
-        headerLeft={<button className="drill__back-btn" onClick={onExit}>← Back</button>}
+        headerLeft={<button className="drill__back-btn" onClick={onExit}>Back</button>}
         headerCenter={<span className="drill__title">{deck.name}</span>}
         headerRight={<span className="drill__counter">Loading...</span>}
       >
@@ -245,6 +270,13 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
 
     if (correct) {
       setShouldAutoAdvance(true);
+    } else {
+      const newMistakeCount = mistakeCount + 1;
+      setMistakeCount(newMistakeCount);
+      if (newMistakeCount >= MAX_LIVES) {
+        // Delay to show the final wrong answer before game over
+        setTimeout(() => setShowGameOver(true), GAME_OVER_DELAY_MS);
+      }
     }
   };
 
@@ -255,10 +287,8 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
     <Layout
       headerLeft={
         <div className="drill__header-left">
-          <button className="drill__back-btn" onClick={onExit}>← Back</button>
-          {timerStarted && (
-            <LiveTimer elapsedMs={timer.elapsedMs} bestTimeMs={bestTimeMs} size="sm" />
-          )}
+          <button className="drill__back-btn" onClick={onExit}>Back</button>
+          <RunStats elapsedMs={timer.elapsedMs} mistakes={mistakeCount} />
         </div>
       }
       headerCenter={
@@ -360,7 +390,7 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
               {(() => {
                 const baseStreak = currentTask.streak;
                 const displayStreak = status === "correct"
-                  ? Math.min(baseStreak + 1, 3)
+                  ? Math.min(baseStreak + 1, MASTERY_THRESHOLD)
                   : status === "wrong" ? 0 : baseStreak;
                 return <StreakDots current={displayStreak} size="lg" showLabel />;
               })()}
@@ -370,8 +400,8 @@ export function DrillScreen({ deck, onExit }: DrillScreenProps) {
                 {status === "wrong" && "Incorrect — streak reset"}
                 {status === "correct" && (() => {
                   const newStreak = currentTask.streak + 1;
-                  if (newStreak >= 3) return "MASTERED!";
-                  return `Correct! ${3 - newStreak} more to master`;
+                  if (newStreak >= MASTERY_THRESHOLD) return "MASTERED!";
+                  return `Correct! ${MASTERY_THRESHOLD - newStreak} more to master`;
                 })()}
               </span>
             </div>

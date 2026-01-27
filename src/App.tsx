@@ -5,6 +5,7 @@ import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/Dashboard";
 import { DrillScreen } from "./components/DrillScreen";
 import { FillBlankScreen } from "./components/FillBlankScreen";
+import { useHashRouter } from "./hooks/useHashRouter";
 import type { Deck, GrammarLesson } from "./types";
 
 const theme = createTheme({
@@ -50,20 +51,15 @@ const theme = createTheme({
   defaultRadius: "sm",
 });
 
-type View =
-  | { type: "dashboard" }
-  | { type: "drill"; deck: Deck }
-  | { type: "grammar"; lesson: GrammarLesson };
-
 export default function App() {
-  const [view, setView] = useState<View>({ type: "dashboard" });
+  const { view, navigate } = useHashRouter();
   const [activeTab, setActiveTab] = useState<"vocabulary" | "grammar">("vocabulary");
-  const [stats, setStats] = useState<{ practiced: string; mastered: string } | undefined>();
+  const [stats, setStats] = useState<{ practiced: string; mastered: string; wordsLearned: string } | undefined>();
 
-  const handleHome = () => setView({ type: "dashboard" });
-  const handleSelectDeck = (deck: Deck) => setView({ type: "drill", deck });
+  const handleHome = () => navigate({ type: "dashboard" });
+  const handleSelectDeck = (deck: Deck) => navigate({ type: "drill", deck });
   const handleSelectLesson = (lesson: GrammarLesson) =>
-    setView({ type: "grammar", lesson });
+    navigate({ type: "grammar", lesson });
 
   return (
     <MantineProvider theme={theme}>

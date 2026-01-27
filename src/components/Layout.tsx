@@ -1,4 +1,3 @@
-import { Title } from "@mantine/core";
 import { useTheme } from "../context/ThemeContext";
 import type { ReactNode } from "react";
 import "./Layout.css";
@@ -26,7 +25,7 @@ interface LayoutProps {
   activeTab?: "vocabulary" | "grammar";
   onTabChange?: (tab: "vocabulary" | "grammar") => void;
   showTabs?: boolean;
-  stats?: { practiced: string; mastered: string };
+  stats?: { practiced: string; mastered: string; wordsLearned: string };
   // Drill mode
   headerLeft?: ReactNode;
   headerCenter?: ReactNode;
@@ -70,9 +69,6 @@ export function Layout({
               ) : (
                 <>
                   <div className="layout__header-left">
-                    <Title order={4} className="layout__title">
-                      DeutschDrill
-                    </Title>
                     {stats && (
                       <div className="layout__stats">
                         <span className="layout__stat">
@@ -83,6 +79,11 @@ export function Layout({
                         <span className="layout__stat">
                           <span className="layout__stat-value layout__stat-value--pink">{stats.mastered}</span>
                           <span className="layout__stat-label">mastered</span>
+                        </span>
+                        <span className="layout__stat-divider" />
+                        <span className="layout__stat">
+                          <span className="layout__stat-value layout__stat-value--yellow">{stats.wordsLearned}</span>
+                          <span className="layout__stat-label">words learned</span>
                         </span>
                       </div>
                     )}

@@ -3,8 +3,10 @@ import { formatTime } from '@/utils/formatTime';
 
 interface TimeCompletionScreenProps {
   finalTimeMs: number;
-  isNewBest: boolean;
-  previousBestMs: number | null;
+  isPerfect: boolean;
+  previousTimeMs: number | null;
+  mistakeCount: number;
+  previousMistakes: number | null;
   itemName: string;
   onTryAgain: () => void;
   onExit: () => void;
@@ -12,8 +14,10 @@ interface TimeCompletionScreenProps {
 
 export function TimeCompletionScreen({
   finalTimeMs,
-  isNewBest,
-  previousBestMs,
+  isPerfect,
+  previousTimeMs,
+  mistakeCount,
+  previousMistakes,
   itemName,
   onTryAgain,
   onExit,
@@ -30,7 +34,7 @@ export function TimeCompletionScreen({
     };
   }, []);
 
-  const timeDelta = previousBestMs !== null ? finalTimeMs - previousBestMs : null;
+  const timeDelta = previousTimeMs !== null ? finalTimeMs - previousTimeMs : null;
   const deltaFormatted = timeDelta !== null
     ? `${timeDelta > 0 ? '+' : '-'}${formatTime(Math.abs(timeDelta))}`
     : null;
@@ -54,7 +58,7 @@ export function TimeCompletionScreen({
         style={{
           position: 'absolute',
           inset: 0,
-          background: isNewBest
+          background: isPerfect
             ? `
               conic-gradient(
                 from 0deg at 50% 50%,
@@ -101,7 +105,7 @@ export function TimeCompletionScreen({
         style={{
           position: 'absolute',
           inset: 0,
-          background: isNewBest
+          background: isPerfect
             ? `
               radial-gradient(ellipse 60% 50% at 50% 45%, rgba(249, 197, 78, 0.2) 0%, transparent 60%),
               radial-gradient(ellipse 80% 60% at 50% 50%, rgba(45, 226, 230, 0.1) 0%, transparent 70%)
@@ -130,8 +134,8 @@ export function TimeCompletionScreen({
             fontFamily: 'var(--font-display)',
             fontSize: 'clamp(0.875rem, 4vw, 1.25rem)',
             letterSpacing: '0.3em',
-            color: isNewBest ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)',
-            textShadow: isNewBest
+            color: isPerfect ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)',
+            textShadow: isPerfect
               ? `
                 0 0 10px rgba(249, 197, 78, 0.8),
                 0 0 20px rgba(249, 197, 78, 0.6)
@@ -144,7 +148,7 @@ export function TimeCompletionScreen({
             animation: showContent ? 'pulseGlow 2s ease-in-out infinite' : 'none',
           }}
         >
-          {isNewBest ? 'NEW BEST!' : 'COMPLETE'}
+          {isPerfect ? 'PERFECT!' : 'COMPLETE'}
         </div>
 
         {/* Big time display */}
@@ -154,8 +158,8 @@ export function TimeCompletionScreen({
             fontSize: 'clamp(3.75rem, 18vw, 7.5rem)',
             fontWeight: 700,
             lineHeight: 1,
-            color: isNewBest ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)',
-            textShadow: isNewBest
+            color: isPerfect ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)',
+            textShadow: isPerfect
               ? `
                 0 0 20px rgba(249, 197, 78, 0.8),
                 0 0 40px rgba(249, 197, 78, 0.6),
@@ -192,8 +196,37 @@ export function TimeCompletionScreen({
           </div>
         )}
 
-        {/* Previous best (if exists and not new best) */}
-        {previousBestMs !== null && !isNewBest && (
+        {/* Mistakes display */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--space-3)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--text-lg)',
+            marginBottom: 'var(--space-4)',
+          }}
+        >
+          <span
+            style={{
+              color: mistakeCount === 0 ? 'var(--color-success)' : 'var(--color-error)',
+              textShadow: mistakeCount === 0
+                ? '0 0 10px var(--color-success-glow)'
+                : '0 0 10px var(--color-error-glow)',
+            }}
+          >
+            {mistakeCount === 0 ? '✓ Perfect!' : `✗ ${mistakeCount} mistake${mistakeCount === 1 ? '' : 's'}`}
+          </span>
+          {previousMistakes !== null && isPerfect && previousMistakes !== mistakeCount && (
+            <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-md)' }}>
+              (was {previousMistakes})
+            </span>
+          )}
+        </div>
+
+        {/* Previous run (if exists and not perfect) */}
+        {previousTimeMs !== null && !isPerfect && (
           <div
             style={{
               fontFamily: 'var(--font-body)',
@@ -202,7 +235,7 @@ export function TimeCompletionScreen({
               marginBottom: 'var(--space-4)',
             }}
           >
-            Best: {formatTime(previousBestMs)}
+            Previous: {formatTime(previousTimeMs)}
           </div>
         )}
 
@@ -230,13 +263,13 @@ export function TimeCompletionScreen({
           <div
             style={{
               fontSize: 'var(--text-4xl)',
-              animation: isNewBest ? 'trophyBounce 0.5s ease-out' : 'none',
-              filter: isNewBest
+              animation: isPerfect ? 'trophyBounce 0.5s ease-out' : 'none',
+              filter: isPerfect
                 ? 'drop-shadow(0 0 15px rgba(249, 197, 78, 0.8))'
                 : 'drop-shadow(0 0 10px rgba(45, 226, 230, 0.5))',
             }}
           >
-            {isNewBest ? '🏆' : '⏱️'}
+            {isPerfect ? '🏆' : '⏱️'}
           </div>
         </div>
 
@@ -258,14 +291,14 @@ export function TimeCompletionScreen({
               fontSize: 'var(--text-sm)',
               letterSpacing: '0.1em',
               padding: 'var(--space-4) var(--space-8)',
-              background: isNewBest
+              background: isPerfect
                 ? 'linear-gradient(180deg, rgba(249, 197, 78, 0.2) 0%, rgba(249, 197, 78, 0.1) 100%)'
                 : 'linear-gradient(180deg, rgba(45, 226, 230, 0.2) 0%, rgba(45, 226, 230, 0.1) 100%)',
-              border: `2px solid ${isNewBest ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)'}`,
+              border: `2px solid ${isPerfect ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)'}`,
               borderRadius: 'var(--radius-md)',
-              color: isNewBest ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)',
+              color: isPerfect ? 'var(--color-neon-yellow)' : 'var(--color-neon-cyan)',
               cursor: 'pointer',
-              boxShadow: isNewBest
+              boxShadow: isPerfect
                 ? `
                   0 0 20px rgba(249, 197, 78, 0.3),
                   inset 0 0 20px rgba(249, 197, 78, 0.1)
@@ -277,8 +310,8 @@ export function TimeCompletionScreen({
               transition: 'all var(--transition-base)',
             }}
             onMouseEnter={(e) => {
-              const bg = isNewBest ? 'rgba(249, 197, 78, 0.3)' : 'rgba(45, 226, 230, 0.3)';
-              const shadow = isNewBest
+              const bg = isPerfect ? 'rgba(249, 197, 78, 0.3)' : 'rgba(45, 226, 230, 0.3)';
+              const shadow = isPerfect
                 ? '0 0 30px rgba(249, 197, 78, 0.5), inset 0 0 30px rgba(249, 197, 78, 0.2)'
                 : '0 0 30px rgba(45, 226, 230, 0.5), inset 0 0 30px rgba(45, 226, 230, 0.2)';
               e.currentTarget.style.background = bg;
@@ -286,10 +319,10 @@ export function TimeCompletionScreen({
               e.currentTarget.style.transform = 'scale(1.02)';
             }}
             onMouseLeave={(e) => {
-              const bg = isNewBest
+              const bg = isPerfect
                 ? 'linear-gradient(180deg, rgba(249, 197, 78, 0.2) 0%, rgba(249, 197, 78, 0.1) 100%)'
                 : 'linear-gradient(180deg, rgba(45, 226, 230, 0.2) 0%, rgba(45, 226, 230, 0.1) 100%)';
-              const shadow = isNewBest
+              const shadow = isPerfect
                 ? '0 0 20px rgba(249, 197, 78, 0.3), inset 0 0 20px rgba(249, 197, 78, 0.1)'
                 : '0 0 20px rgba(45, 226, 230, 0.3), inset 0 0 20px rgba(45, 226, 230, 0.1)';
               e.currentTarget.style.background = bg;

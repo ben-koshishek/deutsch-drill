@@ -1,286 +1,5 @@
 import type { GrammarLesson, GrammarExercise } from "../types";
 
-// Verb conjugation data
-interface VerbConjugation {
-  infinitive: string;
-  english: string;
-  ich: string;
-  du: string;
-  er: string; // er/sie/es
-  wir: string;
-  ihr: string;
-  sie: string; // sie/Sie
-}
-
-// =============================================================================
-// VERB GROUPS
-// =============================================================================
-
-const seinHabenVerbs: VerbConjugation[] = [
-  {
-    infinitive: "sein",
-    english: "to be",
-    ich: "bin",
-    du: "bist",
-    er: "ist",
-    wir: "sind",
-    ihr: "seid",
-    sie: "sind",
-  },
-  {
-    infinitive: "haben",
-    english: "to have",
-    ich: "habe",
-    du: "hast",
-    er: "hat",
-    wir: "haben",
-    ihr: "habt",
-    sie: "haben",
-  },
-];
-
-const regularVerbs: VerbConjugation[] = [
-  {
-    infinitive: "kommen",
-    english: "to come",
-    ich: "komme",
-    du: "kommst",
-    er: "kommt",
-    wir: "kommen",
-    ihr: "kommt",
-    sie: "kommen",
-  },
-  {
-    infinitive: "gehen",
-    english: "to go",
-    ich: "gehe",
-    du: "gehst",
-    er: "geht",
-    wir: "gehen",
-    ihr: "geht",
-    sie: "gehen",
-  },
-  {
-    infinitive: "machen",
-    english: "to do/make",
-    ich: "mache",
-    du: "machst",
-    er: "macht",
-    wir: "machen",
-    ihr: "macht",
-    sie: "machen",
-  },
-  {
-    infinitive: "wohnen",
-    english: "to live",
-    ich: "wohne",
-    du: "wohnst",
-    er: "wohnt",
-    wir: "wohnen",
-    ihr: "wohnt",
-    sie: "wohnen",
-  },
-  {
-    infinitive: "spielen",
-    english: "to play",
-    ich: "spiele",
-    du: "spielst",
-    er: "spielt",
-    wir: "spielen",
-    ihr: "spielt",
-    sie: "spielen",
-  },
-  {
-    infinitive: "lernen",
-    english: "to learn",
-    ich: "lerne",
-    du: "lernst",
-    er: "lernt",
-    wir: "lernen",
-    ihr: "lernt",
-    sie: "lernen",
-  },
-  {
-    infinitive: "trinken",
-    english: "to drink",
-    ich: "trinke",
-    du: "trinkst",
-    er: "trinkt",
-    wir: "trinken",
-    ihr: "trinkt",
-    sie: "trinken",
-  },
-];
-
-const stemChangingEIVerbs: VerbConjugation[] = [
-  {
-    infinitive: "essen",
-    english: "to eat",
-    ich: "esse",
-    du: "isst",
-    er: "isst",
-    wir: "essen",
-    ihr: "esst",
-    sie: "essen",
-  },
-  {
-    infinitive: "lesen",
-    english: "to read",
-    ich: "lese",
-    du: "liest",
-    er: "liest",
-    wir: "lesen",
-    ihr: "lest",
-    sie: "lesen",
-  },
-  {
-    infinitive: "sehen",
-    english: "to see",
-    ich: "sehe",
-    du: "siehst",
-    er: "sieht",
-    wir: "sehen",
-    ihr: "seht",
-    sie: "sehen",
-  },
-  {
-    infinitive: "sprechen",
-    english: "to speak",
-    ich: "spreche",
-    du: "sprichst",
-    er: "spricht",
-    wir: "sprechen",
-    ihr: "sprecht",
-    sie: "sprechen",
-  },
-  {
-    infinitive: "nehmen",
-    english: "to take",
-    ich: "nehme",
-    du: "nimmst",
-    er: "nimmt",
-    wir: "nehmen",
-    ihr: "nehmt",
-    sie: "nehmen",
-  },
-  {
-    infinitive: "geben",
-    english: "to give",
-    ich: "gebe",
-    du: "gibst",
-    er: "gibt",
-    wir: "geben",
-    ihr: "gebt",
-    sie: "geben",
-  },
-];
-
-const stemChangingAÄVerbs: VerbConjugation[] = [
-  {
-    infinitive: "schlafen",
-    english: "to sleep",
-    ich: "schlafe",
-    du: "schläfst",
-    er: "schläft",
-    wir: "schlafen",
-    ihr: "schlaft",
-    sie: "schlafen",
-  },
-  {
-    infinitive: "fahren",
-    english: "to drive",
-    ich: "fahre",
-    du: "fährst",
-    er: "fährt",
-    wir: "fahren",
-    ihr: "fahrt",
-    sie: "fahren",
-  },
-];
-
-const modalVerbs: VerbConjugation[] = [
-  {
-    infinitive: "können",
-    english: "can",
-    ich: "kann",
-    du: "kannst",
-    er: "kann",
-    wir: "können",
-    ihr: "könnt",
-    sie: "können",
-  },
-  {
-    infinitive: "müssen",
-    english: "must",
-    ich: "muss",
-    du: "musst",
-    er: "muss",
-    wir: "müssen",
-    ihr: "müsst",
-    sie: "müssen",
-  },
-  {
-    infinitive: "wollen",
-    english: "to want",
-    ich: "will",
-    du: "willst",
-    er: "will",
-    wir: "wollen",
-    ihr: "wollt",
-    sie: "wollen",
-  },
-  {
-    infinitive: "wissen",
-    english: "to know",
-    ich: "weiß",
-    du: "weißt",
-    er: "weiß",
-    wir: "wissen",
-    ihr: "wisst",
-    sie: "wissen",
-  },
-];
-
-const ierenTenVerbs: VerbConjugation[] = [
-  {
-    infinitive: "arbeiten",
-    english: "to work",
-    ich: "arbeite",
-    du: "arbeitest",
-    er: "arbeitet",
-    wir: "arbeiten",
-    ihr: "arbeitet",
-    sie: "arbeiten",
-  },
-];
-
-// =============================================================================
-// EXERCISE GENERATION
-// =============================================================================
-
-type Pronoun = "ich" | "du" | "er" | "wir" | "ihr" | "sie";
-const pronouns: Pronoun[] = ["ich", "du", "er", "wir", "ihr", "sie"];
-
-function generateConjugationExercises(
-  verbs: VerbConjugation[],
-  idPrefix: string
-): GrammarExercise[] {
-  const exercises: GrammarExercise[] = [];
-
-  for (const verb of verbs) {
-    for (const pronoun of pronouns) {
-      exercises.push({
-        id: `${idPrefix}_${verb.infinitive}_${pronoun}`,
-        sentence: `${pronoun} ___ [${verb.infinitive}|${verb.english}]`,
-        answer: verb[pronoun],
-        hint: `${verb.infinitive} - ${verb.english}`,
-      });
-    }
-  }
-
-  return exercises;
-}
-
 // =============================================================================
 // DER/DIE/DAS (NOUN GENDER RULES) EXERCISES
 // =============================================================================
@@ -433,46 +152,190 @@ const genderRulesExercises: GrammarExercise[] = [
 ];
 
 // =============================================================================
-// CASE/ARTICLE EXERCISES
+// AKKUSATIV EXERCISES
 // =============================================================================
 
 const accusativeExercises: GrammarExercise[] = [
+  // ===================
+  // DEFINITE ARTICLES
+  // ===================
+
   // Masculine (der → den)
-  { id: "acc_1", sentence: "Ich sehe ___ [der Mann|the man]", answer: "den", hint: "der → den" },
-  { id: "acc_2", sentence: "Sie kauft ___ [der Apfel|the apple]", answer: "den", hint: "der → den" },
-  { id: "acc_3", sentence: "Wir haben ___ [der Hund|the dog]", answer: "den", hint: "der → den" },
-  { id: "acc_4", sentence: "Er liest ___ [der Brief|the letter]", answer: "den", hint: "der → den" },
-  { id: "acc_5", sentence: "Ich trinke ___ [der Kaffee|the coffee]", answer: "den", hint: "der → den" },
+  { id: "akk_def_m_1", sentence: "Ich sehe ___ [der Mann|the man]", answer: "den", hint: "der → den" },
+  { id: "akk_def_m_2", sentence: "Sie kauft ___ [der Apfel|the apple]", answer: "den", hint: "der → den" },
+  { id: "akk_def_m_3", sentence: "Wir haben ___ [der Hund|the dog]", answer: "den", hint: "der → den" },
+  { id: "akk_def_m_4", sentence: "Er sucht ___ [der Schlüssel|the key]", answer: "den", hint: "der → den" },
+  { id: "akk_def_m_5", sentence: "Sie findet ___ [der Fehler|the mistake]", answer: "den", hint: "der → den" },
+  { id: "akk_def_m_6", sentence: "Ich brauche ___ [der Stift|the pen]", answer: "den", hint: "der → den" },
+
   // Feminine (die → die)
-  { id: "acc_6", sentence: "Ich sehe ___ [die Frau|the woman]", answer: "die", hint: "die → die" },
-  { id: "acc_7", sentence: "Er kauft ___ [die Zeitung|the newspaper]", answer: "die", hint: "die → die" },
+  { id: "akk_def_f_1", sentence: "Ich sehe ___ [die Frau|the woman]", answer: "die", hint: "die → die" },
+  { id: "akk_def_f_2", sentence: "Er kauft ___ [die Zeitung|the newspaper]", answer: "die", hint: "die → die" },
+  { id: "akk_def_f_3", sentence: "Wir haben ___ [die Katze|the cat]", answer: "die", hint: "die → die" },
+  { id: "akk_def_f_4", sentence: "Sie sucht ___ [die Tasche|the bag]", answer: "die", hint: "die → die" },
+  { id: "akk_def_f_5", sentence: "Er findet ___ [die Lösung|the solution]", answer: "die", hint: "die → die" },
+  { id: "akk_def_f_6", sentence: "Ich brauche ___ [die Hilfe|the help]", answer: "die", hint: "die → die" },
+
   // Neuter (das → das)
-  { id: "acc_8", sentence: "Sie liest ___ [das Buch|the book]", answer: "das", hint: "das → das" },
-  { id: "acc_9", sentence: "Wir essen ___ [das Brot|the bread]", answer: "das", hint: "das → das" },
-  // Indefinite (ein → einen)
-  { id: "acc_10", sentence: "Ich habe ___ [ein Bruder|a brother]", answer: "einen", hint: "ein → einen" },
-  { id: "acc_11", sentence: "Sie sucht ___ [ein Job|a job]", answer: "einen", hint: "ein → einen" },
-  { id: "acc_12", sentence: "Er braucht ___ [ein Computer|a computer]", answer: "einen", hint: "ein → einen" },
+  { id: "akk_def_n_1", sentence: "Sie liest ___ [das Buch|the book]", answer: "das", hint: "das → das" },
+  { id: "akk_def_n_2", sentence: "Wir kaufen ___ [das Auto|the car]", answer: "das", hint: "das → das" },
+  { id: "akk_def_n_3", sentence: "Er hat ___ [das Kind|the child]", answer: "das", hint: "das → das" },
+  { id: "akk_def_n_4", sentence: "Ich suche ___ [das Handy|the phone]", answer: "das", hint: "das → das" },
+  { id: "akk_def_n_5", sentence: "Sie findet ___ [das Geld|the money]", answer: "das", hint: "das → das" },
+  { id: "akk_def_n_6", sentence: "Wir brauchen ___ [das Wasser|the water]", answer: "das", hint: "das → das" },
+
+  // Plural (die → die)
+  { id: "akk_def_pl_1", sentence: "Ich sehe ___ [die Kinder|the children]", answer: "die", hint: "die → die (pl)" },
+  { id: "akk_def_pl_2", sentence: "Er kauft ___ [die Äpfel|the apples]", answer: "die", hint: "die → die (pl)" },
+  { id: "akk_def_pl_3", sentence: "Wir haben ___ [die Bücher|the books]", answer: "die", hint: "die → die (pl)" },
+  { id: "akk_def_pl_4", sentence: "Sie sucht ___ [die Schuhe|the shoes]", answer: "die", hint: "die → die (pl)" },
+
+  // ===================
+  // INDEFINITE ARTICLES
+  // ===================
+
+  // Masculine (ein → einen)
+  { id: "akk_ind_m_1", sentence: "Ich habe ___ [ein Bruder|a brother]", answer: "einen", hint: "ein → einen" },
+  { id: "akk_ind_m_2", sentence: "Sie sucht ___ [ein Job|a job]", answer: "einen", hint: "ein → einen" },
+  { id: "akk_ind_m_3", sentence: "Er braucht ___ [ein Computer|a computer]", answer: "einen", hint: "ein → einen" },
+  { id: "akk_ind_m_4", sentence: "Wir kaufen ___ [ein Tisch|a table]", answer: "einen", hint: "ein → einen" },
+  { id: "akk_ind_m_5", sentence: "Sie findet ___ [ein Platz|a seat]", answer: "einen", hint: "ein → einen" },
+  { id: "akk_ind_m_6", sentence: "Ich sehe ___ [ein Vogel|a bird]", answer: "einen", hint: "ein → einen" },
+
+  // Feminine (eine → eine)
+  { id: "akk_ind_f_1", sentence: "Er hat ___ [eine Schwester|a sister]", answer: "eine", hint: "eine → eine" },
+  { id: "akk_ind_f_2", sentence: "Ich kaufe ___ [eine Lampe|a lamp]", answer: "eine", hint: "eine → eine" },
+  { id: "akk_ind_f_3", sentence: "Sie sucht ___ [eine Wohnung|an apartment]", answer: "eine", hint: "eine → eine" },
+  { id: "akk_ind_f_4", sentence: "Wir brauchen ___ [eine Pause|a break]", answer: "eine", hint: "eine → eine" },
+  { id: "akk_ind_f_5", sentence: "Er findet ___ [eine Idee|an idea]", answer: "eine", hint: "eine → eine" },
+
+  // Neuter (ein → ein)
+  { id: "akk_ind_n_1", sentence: "Sie hat ___ [ein Kind|a child]", answer: "ein", hint: "ein → ein" },
+  { id: "akk_ind_n_2", sentence: "Ich kaufe ___ [ein Buch|a book]", answer: "ein", hint: "ein → ein" },
+  { id: "akk_ind_n_3", sentence: "Er braucht ___ [ein Fahrrad|a bicycle]", answer: "ein", hint: "ein → ein" },
+  { id: "akk_ind_n_4", sentence: "Wir suchen ___ [ein Hotel|a hotel]", answer: "ein", hint: "ein → ein" },
+  { id: "akk_ind_n_5", sentence: "Sie findet ___ [ein Geschenk|a gift]", answer: "ein", hint: "ein → ein" },
+
+  // ===================
+  // NEGATIVE ARTICLES
+  // ===================
+
+  // Masculine (kein → keinen)
+  { id: "akk_neg_m_1", sentence: "Ich habe ___ [kein Bruder|no brother]", answer: "keinen", hint: "kein → keinen" },
+  { id: "akk_neg_m_2", sentence: "Er sieht ___ [kein Fehler|no mistake]", answer: "keinen", hint: "kein → keinen" },
+  { id: "akk_neg_m_3", sentence: "Sie findet ___ [kein Platz|no seat]", answer: "keinen", hint: "kein → keinen" },
+  { id: "akk_neg_m_4", sentence: "Wir brauchen ___ [kein Arzt|no doctor]", answer: "keinen", hint: "kein → keinen" },
+
+  // Feminine (keine → keine)
+  { id: "akk_neg_f_1", sentence: "Ich habe ___ [keine Zeit|no time]", answer: "keine", hint: "keine → keine" },
+  { id: "akk_neg_f_2", sentence: "Er findet ___ [keine Lösung|no solution]", answer: "keine", hint: "keine → keine" },
+  { id: "akk_neg_f_3", sentence: "Sie braucht ___ [keine Hilfe|no help]", answer: "keine", hint: "keine → keine" },
+  { id: "akk_neg_f_4", sentence: "Wir sehen ___ [keine Gefahr|no danger]", answer: "keine", hint: "keine → keine" },
+
+  // Neuter (kein → kein)
+  { id: "akk_neg_n_1", sentence: "Ich habe ___ [kein Geld|no money]", answer: "kein", hint: "kein → kein" },
+  { id: "akk_neg_n_2", sentence: "Er braucht ___ [kein Auto|no car]", answer: "kein", hint: "kein → kein" },
+  { id: "akk_neg_n_3", sentence: "Sie findet ___ [kein Problem|no problem]", answer: "kein", hint: "kein → kein" },
+  { id: "akk_neg_n_4", sentence: "Wir haben ___ [kein Zimmer|no room]", answer: "kein", hint: "kein → kein" },
+
+  // Plural (keine → keine)
+  { id: "akk_neg_pl_1", sentence: "Ich habe ___ [keine Freunde|no friends]", answer: "keine", hint: "keine → keine (pl)" },
+  { id: "akk_neg_pl_2", sentence: "Er sieht ___ [keine Probleme|no problems]", answer: "keine", hint: "keine → keine (pl)" },
+  { id: "akk_neg_pl_3", sentence: "Sie findet ___ [keine Fehler|no mistakes]", answer: "keine", hint: "keine → keine (pl)" },
+  { id: "akk_neg_pl_4", sentence: "Wir brauchen ___ [keine Bücher|no books]", answer: "keine", hint: "keine → keine (pl)" },
 ];
 
+// =============================================================================
+// DATIV EXERCISES
+// =============================================================================
+
 const dativeExercises: GrammarExercise[] = [
-  // mit (with) - always dative
-  { id: "dat_1", sentence: "Ich fahre mit ___ [der Bus|the bus]", answer: "dem", hint: "der → dem" },
-  { id: "dat_2", sentence: "Sie spricht mit ___ [der Mann|the man]", answer: "dem", hint: "der → dem" },
-  { id: "dat_3", sentence: "Wir gehen mit ___ [die Frau|the woman]", answer: "der", hint: "die → der" },
-  { id: "dat_4", sentence: "Er spielt mit ___ [das Kind|the child]", answer: "dem", hint: "das → dem" },
-  // von (from) - always dative
-  { id: "dat_5", sentence: "Das Buch ist von ___ [der Lehrer|the teacher]", answer: "dem", hint: "der → dem" },
-  { id: "dat_6", sentence: "Ich komme von ___ [die Arbeit|the work]", answer: "der", hint: "die → der" },
-  // bei (at/near) - always dative
-  { id: "dat_7", sentence: "Ich wohne bei ___ [die Familie|the family]", answer: "der", hint: "die → der" },
-  { id: "dat_8", sentence: "Er arbeitet bei ___ [die Firma|the company]", answer: "der", hint: "die → der" },
-  // zu (to) - always dative
-  { id: "dat_9", sentence: "Ich gehe zu ___ [der Arzt|the doctor]", answer: "dem", hint: "der → dem" },
-  { id: "dat_10", sentence: "Wir fahren zu ___ [die Schule|the school]", answer: "der", hint: "die → der" },
-  // aus (from/out of) - always dative
-  { id: "dat_11", sentence: "Er kommt aus ___ [das Haus|the house]", answer: "dem", hint: "das → dem" },
-  { id: "dat_12", sentence: "Sie kommt aus ___ [die Stadt|the city]", answer: "der", hint: "die → der" },
+  // ===================
+  // DEFINITE ARTICLES
+  // ===================
+
+  // Masculine (der → dem)
+  { id: "dat_def_m_1", sentence: "Ich fahre mit ___ [der Bus|the bus]", answer: "dem", hint: "der → dem" },
+  { id: "dat_def_m_2", sentence: "Sie spricht mit ___ [der Mann|the man]", answer: "dem", hint: "der → dem" },
+  { id: "dat_def_m_3", sentence: "Ich gehe zu ___ [der Arzt|the doctor]", answer: "dem", hint: "der → dem" },
+  { id: "dat_def_m_4", sentence: "Das Buch ist von ___ [der Lehrer|the teacher]", answer: "dem", hint: "der → dem" },
+  { id: "dat_def_m_5", sentence: "Er wohnt bei ___ [der Freund|the friend]", answer: "dem", hint: "der → dem" },
+  { id: "dat_def_m_6", sentence: "Sie kommt aus ___ [der Park|the park]", answer: "dem", hint: "der → dem" },
+
+  // Feminine (die → der)
+  { id: "dat_def_f_1", sentence: "Wir gehen mit ___ [die Frau|the woman]", answer: "der", hint: "die → der" },
+  { id: "dat_def_f_2", sentence: "Ich komme von ___ [die Arbeit|the work]", answer: "der", hint: "die → der" },
+  { id: "dat_def_f_3", sentence: "Ich wohne bei ___ [die Familie|the family]", answer: "der", hint: "die → der" },
+  { id: "dat_def_f_4", sentence: "Wir fahren zu ___ [die Schule|the school]", answer: "der", hint: "die → der" },
+  { id: "dat_def_f_5", sentence: "Sie kommt aus ___ [die Stadt|the city]", answer: "der", hint: "die → der" },
+  { id: "dat_def_f_6", sentence: "Er arbeitet bei ___ [die Firma|the company]", answer: "der", hint: "die → der" },
+
+  // Neuter (das → dem)
+  { id: "dat_def_n_1", sentence: "Er spielt mit ___ [das Kind|the child]", answer: "dem", hint: "das → dem" },
+  { id: "dat_def_n_2", sentence: "Er kommt aus ___ [das Haus|the house]", answer: "dem", hint: "das → dem" },
+  { id: "dat_def_n_3", sentence: "Ich gehe zu ___ [das Büro|the office]", answer: "dem", hint: "das → dem" },
+  { id: "dat_def_n_4", sentence: "Sie wohnt bei ___ [das Hotel|the hotel]", answer: "dem", hint: "das → dem" },
+  { id: "dat_def_n_5", sentence: "Wir fahren mit ___ [das Auto|the car]", answer: "dem", hint: "das → dem" },
+  { id: "dat_def_n_6", sentence: "Das Geschenk ist von ___ [das Mädchen|the girl]", answer: "dem", hint: "das → dem" },
+
+  // Plural (die → den + n)
+  { id: "dat_def_pl_1", sentence: "Ich spiele mit ___ [die Kinder|the children]", answer: "den", hint: "die → den (pl)" },
+  { id: "dat_def_pl_2", sentence: "Er kommt von ___ [die Eltern|the parents]", answer: "den", hint: "die → den (pl)" },
+  { id: "dat_def_pl_3", sentence: "Sie wohnt bei ___ [die Freunde|the friends]", answer: "den", hint: "die → den (pl)" },
+  { id: "dat_def_pl_4", sentence: "Wir fahren zu ___ [die Berge|the mountains]", answer: "den", hint: "die → den (pl)" },
+
+  // ===================
+  // INDEFINITE ARTICLES
+  // ===================
+
+  // Masculine (ein → einem)
+  { id: "dat_ind_m_1", sentence: "Ich fahre mit ___ [ein Freund|a friend]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_m_2", sentence: "Sie wohnt bei ___ [ein Onkel|an uncle]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_m_3", sentence: "Er geht zu ___ [ein Arzt|a doctor]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_m_4", sentence: "Ich komme von ___ [ein Kurs|a course]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_m_5", sentence: "Das Paket ist von ___ [ein Kollege|a colleague]", answer: "einem", hint: "ein → einem" },
+
+  // Feminine (eine → einer)
+  { id: "dat_ind_f_1", sentence: "Er spricht mit ___ [eine Frau|a woman]", answer: "einer", hint: "eine → einer" },
+  { id: "dat_ind_f_2", sentence: "Sie kommt aus ___ [eine Stadt|a city]", answer: "einer", hint: "eine → einer" },
+  { id: "dat_ind_f_3", sentence: "Ich wohne bei ___ [eine Familie|a family]", answer: "einer", hint: "eine → einer" },
+  { id: "dat_ind_f_4", sentence: "Wir gehen zu ___ [eine Party|a party]", answer: "einer", hint: "eine → einer" },
+  { id: "dat_ind_f_5", sentence: "Das Buch ist von ___ [eine Autorin|a female author]", answer: "einer", hint: "eine → einer" },
+
+  // Neuter (ein → einem)
+  { id: "dat_ind_n_1", sentence: "Sie spielt mit ___ [ein Kind|a child]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_n_2", sentence: "Er kommt aus ___ [ein Dorf|a village]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_n_3", sentence: "Ich fahre zu ___ [ein Konzert|a concert]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_n_4", sentence: "Wir wohnen bei ___ [ein Hotel|a hotel]", answer: "einem", hint: "ein → einem" },
+  { id: "dat_ind_n_5", sentence: "Das Geld ist von ___ [ein Unternehmen|a company]", answer: "einem", hint: "ein → einem" },
+
+  // ===================
+  // NEGATIVE ARTICLES
+  // ===================
+
+  // Masculine (kein → keinem)
+  { id: "dat_neg_m_1", sentence: "Ich fahre mit ___ [kein Bus|no bus]", answer: "keinem", hint: "kein → keinem" },
+  { id: "dat_neg_m_2", sentence: "Sie spricht mit ___ [kein Mann|no man]", answer: "keinem", hint: "kein → keinem" },
+  { id: "dat_neg_m_3", sentence: "Er wohnt bei ___ [kein Freund|no friend]", answer: "keinem", hint: "kein → keinem" },
+  { id: "dat_neg_m_4", sentence: "Ich gehe zu ___ [kein Arzt|no doctor]", answer: "keinem", hint: "kein → keinem" },
+
+  // Feminine (keine → keiner)
+  { id: "dat_neg_f_1", sentence: "Er hilft ___ [keine Frau|no woman]", answer: "keiner", hint: "keine → keiner" },
+  { id: "dat_neg_f_2", sentence: "Sie kommt aus ___ [keine Stadt|no city]", answer: "keiner", hint: "keine → keiner" },
+  { id: "dat_neg_f_3", sentence: "Ich wohne bei ___ [keine Familie|no family]", answer: "keiner", hint: "keine → keiner" },
+  { id: "dat_neg_f_4", sentence: "Wir gehen zu ___ [keine Party|no party]", answer: "keiner", hint: "keine → keiner" },
+
+  // Neuter (kein → keinem)
+  { id: "dat_neg_n_1", sentence: "Sie spielt mit ___ [kein Kind|no child]", answer: "keinem", hint: "kein → keinem" },
+  { id: "dat_neg_n_2", sentence: "Er kommt aus ___ [kein Dorf|no village]", answer: "keinem", hint: "kein → keinem" },
+  { id: "dat_neg_n_3", sentence: "Ich fahre zu ___ [kein Konzert|no concert]", answer: "keinem", hint: "kein → keinem" },
+  { id: "dat_neg_n_4", sentence: "Das gehört ___ [kein Hotel|no hotel]", answer: "keinem", hint: "kein → keinem" },
+
+  // Plural (keine → keinen)
+  { id: "dat_neg_pl_1", sentence: "Ich spiele mit ___ [keine Kinder|no children]", answer: "keinen", hint: "keine → keinen (pl)" },
+  { id: "dat_neg_pl_2", sentence: "Er spricht mit ___ [keine Leute|no people]", answer: "keinen", hint: "keine → keinen (pl)" },
+  { id: "dat_neg_pl_3", sentence: "Sie wohnt bei ___ [keine Freunde|no friends]", answer: "keinen", hint: "keine → keinen (pl)" },
+  { id: "dat_neg_pl_4", sentence: "Wir fahren zu ___ [keine Berge|no mountains]", answer: "keinen", hint: "keine → keinen (pl)" },
 ];
 
 // =============================================================================
@@ -480,49 +343,24 @@ const dativeExercises: GrammarExercise[] = [
 // =============================================================================
 
 export const grammarLessons: GrammarLesson[] = [
-  // Gender rules
   {
     id: "gender-rules",
     name: "der/die/das Rules",
     description: "Learn patterns to predict noun genders. Type der, die, or das.",
     exercises: genderRulesExercises,
   },
-  // Case exercises
   {
     id: "accusative-articles",
-    name: "Accusative Case",
-    description: "Fill in the correct article (der→den, die→die, das→das)",
+    name: "Akkusativ Drill",
+    description: "der→den, ein→einen, kein→keinen (only masculine changes)",
     exercises: accusativeExercises,
   },
   {
     id: "dative-prepositions",
-    name: "Dative Case",
-    description: "Fill in the correct article (der→dem, die→der, das→dem)",
+    name: "Dativ Drill",
+    description: "der→dem, die→der, das→dem, die→den (all genders change)",
     exercises: dativeExercises,
   },
-  // Conjugation
-  {
-    id: "sein-haben",
-    name: "sein & haben",
-    description: "The two most important irregular verbs - memorize these conjugations:",
-    exercises: generateConjugationExercises(seinHabenVerbs, "sh"),
-  },
-  {
-    id: "regular-verbs",
-    name: "Regular Verbs",
-    description: "Regular verbs follow standard endings based on the pronoun:",
-    exercises: generateConjugationExercises(regularVerbs, "reg"),
-  },
-];
-
-// Legacy export for backwards compatibility
-export const conjugationExercises = [
-  ...generateConjugationExercises(seinHabenVerbs, "sh"),
-  ...generateConjugationExercises(regularVerbs, "reg"),
-  ...generateConjugationExercises(stemChangingEIVerbs, "ei"),
-  ...generateConjugationExercises(stemChangingAÄVerbs, "aä"),
-  ...generateConjugationExercises(modalVerbs, "mod"),
-  ...generateConjugationExercises(ierenTenVerbs, "it"),
 ];
 
 export function getGrammarLesson(id: string): GrammarLesson | undefined {

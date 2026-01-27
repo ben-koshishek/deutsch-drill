@@ -2,13 +2,17 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Collapse, Menu, Table } from "@mantine/core";
 import type { GrammarLesson } from "../types";
 import { useFillBlank } from "../hooks/useFillBlank";
-import { getBestTime, updateBestTime, resetDeckProgress, type UpdateBestTimeResult } from "../db";
+import { updateLastRun, resetDeckProgress, type UpdateLastRunResult } from "../db";
 import { useTimer } from "../hooks/useTimer";
+import { normalize } from "@/utils/normalize";
+import { MAX_LIVES, AUTO_ADVANCE_DELAY_MS, GAME_OVER_DELAY_MS, MASTERY_THRESHOLD } from "@/constants";
 import { TimeCompletionScreen } from "./TimeCompletionScreen";
 import { StreakDots } from "./ui/StreakDots";
 import { DrillInput } from "./ui/DrillInput";
 import { ProgressBar } from "./ui/ProgressBar";
-import { LiveTimer } from "./ui/LiveTimer";
+import { RunStats } from "./ui/RunStats";
+import { ResetConfirmModal } from "./ui/ResetConfirmModal";
+import { GameOverScreen } from "./ui/GameOverScreen";
 import { tableStyles } from "../styles/tableStyles";
 import { Layout } from "./Layout";
 import "./FillBlankScreen.css";
@@ -31,16 +35,6 @@ function getStoredInfoCollapsed(): boolean {
 interface FillBlankScreenProps {
   lesson: GrammarLesson;
   onExit: () => void;
-}
-
-function normalize(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/ä/g, "a")
-    .replace(/ö/g, "o")
-    .replace(/ü/g, "u")
-    .replace(/ß/g, "ss")
-    .trim();
 }
 
 // Regular verb endings
@@ -78,14 +72,12 @@ export function FillBlankScreen({
 
   const timer = useTimer();
   const [timerStarted, setTimerStarted] = useState(false);
-  const [bestTimeMs, setBestTimeMs] = useState<number | null>(null);
+  const [mistakeCount, setMistakeCount] = useState(0);
 
   const [showCompletion, setShowCompletion] = useState(false);
-  const [completionResult, setCompletionResult] = useState<UpdateBestTimeResult | null>(null);
-
-  useEffect(() => {
-    getBestTime(lesson.id).then(setBestTimeMs);
-  }, [lesson.id]);
+  const [completionResult, setCompletionResult] = useState<UpdateLastRunResult | null>(null);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
 
   const taskKey = currentTask?.exercise.id ?? null;
 
@@ -116,23 +108,33 @@ export function FillBlankScreen({
   useEffect(() => {
     if (isFinished && !showCompletion && timerStarted) {
       const finalTime = timer.stop();
-      updateBestTime(lesson.id, finalTime).then((result) => {
+      updateLastRun(lesson.id, finalTime, mistakeCount).then((result) => {
         setCompletionResult(result);
-        if (result.isNewBest) {
-          setBestTimeMs(result.currentTime);
-        }
         setShowCompletion(true);
       });
     }
-  }, [isFinished, showCompletion, lesson.id, timerStarted, timer]);
+  }, [isFinished, showCompletion, lesson.id, timerStarted, timer, mistakeCount]);
 
   const handleTryAgain = useCallback(async () => {
     await resetDeckProgress(lesson.id);
     setShowCompletion(false);
+    setShowGameOver(false);
     setCompletionResult(null);
     setTimerStarted(false);
+    setMistakeCount(0);
     timer.reset();
     prevTaskKeyRef.current = null;
+    setDrillKey((k) => k + 1);
+  }, [lesson.id, timer]);
+
+  const handleReset = useCallback(async () => {
+    await resetDeckProgress(lesson.id);
+    setShowResetModal(false);
+    setTimerStarted(false);
+    setMistakeCount(0);
+    timer.reset();
+    prevTaskKeyRef.current = null;
+    setFormState({ taskKey: null, input: "", status: "idle" });
     setDrillKey((k) => k + 1);
   }, [lesson.id, timer]);
 
@@ -141,7 +143,7 @@ export function FillBlankScreen({
       const t = setTimeout(() => {
         submitAnswer(true);
         setShouldAutoAdvance(false);
-      }, 400);
+      }, AUTO_ADVANCE_DELAY_MS);
       return () => clearTimeout(t);
     }
   }, [shouldAutoAdvance, submitAnswer]);
@@ -158,6 +160,29 @@ export function FillBlankScreen({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "1" && !e.metaKey && !e.ctrlKey && !e.altKey) {
         cycleHintMode();
+        return;
+      }
+
+      // Esc to blur input (only when modal not showing)
+      if (e.key === "Escape" && !showResetModal) {
+        inputRef.current?.blur();
+        return;
+      }
+
+      // Cmd+Left arrow to go back
+      if (e.key === "ArrowLeft" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        onExit();
+        return;
+      }
+
+      // R key to reset (when not typing in input)
+      if (e.key === "r" || e.key === "R") {
+        const isInputFocused = document.activeElement === inputRef.current;
+        if (!isInputFocused && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          setShowResetModal(true);
+        }
         return;
       }
 
@@ -180,14 +205,28 @@ export function FillBlankScreen({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [cycleHintMode, status, submitAnswer, onExit]);
+  }, [cycleHintMode, status, submitAnswer, onExit, showResetModal]);
+
+  if (showGameOver) {
+    return (
+      <Layout
+        headerLeft={<button className="fill__back-btn" onClick={onExit}>Back</button>}
+        headerCenter={<span className="fill__title">{lesson.name}</span>}
+        headerRight={null}
+      >
+        <GameOverScreen onTryAgain={handleTryAgain} onExit={onExit} />
+      </Layout>
+    );
+  }
 
   if (showCompletion && completionResult) {
     return (
       <TimeCompletionScreen
         finalTimeMs={completionResult.currentTime}
-        isNewBest={completionResult.isNewBest}
-        previousBestMs={completionResult.previousBest}
+        isPerfect={completionResult.isPerfect}
+        previousTimeMs={completionResult.previousTime}
+        mistakeCount={completionResult.currentMistakes}
+        previousMistakes={completionResult.previousMistakes}
         itemName={lesson.name}
         onTryAgain={handleTryAgain}
         onExit={onExit}
@@ -198,7 +237,7 @@ export function FillBlankScreen({
   if (!currentTask) {
     return (
       <Layout
-        headerLeft={<button className="fill__back-btn" onClick={onExit}>← Back</button>}
+        headerLeft={<button className="fill__back-btn" onClick={onExit}>Back</button>}
         headerCenter={<span className="fill__title">{lesson.name}</span>}
         headerRight={<span className="fill__counter">Loading...</span>}
       >
@@ -210,6 +249,9 @@ export function FillBlankScreen({
   const { exercise } = currentTask;
   const progress = Math.round((completedCount / totalCount) * 100);
 
+  // Try transformation format: "[Present sentence] → ___"
+  const transformMatch = exercise.sentence.match(/^\[([^\]]+)\] → ___$/);
+
   // Try conjugation format: "pronoun ___ [infinitive|english]"
   const conjugationMatch = exercise.sentence.match(/^([a-züöäß]+) ___ \[([^\|]+)\|([^\]]+)\]$/i);
 
@@ -219,6 +261,7 @@ export function FillBlankScreen({
   // Try case format: "sentence words ___ [article|english]"
   const caseMatch = exercise.sentence.match(/^(.+) ___ \[([^\|]+)\|([^\]]+)\]$/i);
 
+  const isTransformation = transformMatch !== null;
   const isConjugation = conjugationMatch !== null;
   const isGender = genderMatch !== null;
   const match = conjugationMatch ?? caseMatch;
@@ -278,6 +321,12 @@ export function FillBlankScreen({
 
     if (correct) {
       setShouldAutoAdvance(true);
+    } else {
+      const newMistakeCount = mistakeCount + 1;
+      setMistakeCount(newMistakeCount);
+      if (newMistakeCount >= MAX_LIVES) {
+        setTimeout(() => setShowGameOver(true), GAME_OVER_DELAY_MS);
+      }
     }
   };
 
@@ -288,10 +337,8 @@ export function FillBlankScreen({
     <Layout
       headerLeft={
         <div className="fill__header-left">
-          <button className="fill__back-btn" onClick={onExit}>← Back</button>
-          {timerStarted && (
-            <LiveTimer elapsedMs={timer.elapsedMs} bestTimeMs={bestTimeMs} size="sm" />
-          )}
+          <button className="fill__back-btn" onClick={onExit}>Back</button>
+          <RunStats elapsedMs={timer.elapsedMs} mistakes={mistakeCount} />
         </div>
       }
       headerCenter={
@@ -301,35 +348,20 @@ export function FillBlankScreen({
         <span className="fill__counter">{completedCount} / {totalCount}</span>
       }
     >
+      {showResetModal && (
+        <ResetConfirmModal
+          deckName={lesson.name}
+          onConfirm={handleReset}
+          onCancel={() => setShowResetModal(false)}
+        />
+      )}
+
       <div className="fill__content">
         <ProgressBar value={progress} size="sm" color="primary" />
 
         {/* Lesson info section - collapsible */}
-        <section className="fill__lesson-section">
-          <button onClick={toggleDescription} className="fill__lesson-toggle">
-            <div className="fill__lesson-title-wrapper">
-              <span className="fill__lesson-accent" />
-              <h2 className="fill__lesson-title">{lesson.name}</h2>
-            </div>
-            <div className="fill__lesson-toggle-hint">
-              <span>{showDescription ? "Hide" : "Show"} info</span>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={`fill__lesson-chevron ${showDescription ? "fill__lesson-chevron--open" : ""}`}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-          </button>
-
-          <Collapse in={showDescription}>
+        <Collapse in={showDescription}>
+          <section className="fill__lesson-section">
             <div className="fill__lesson-content">
               <div className="fill__lesson-card">
                 {isConjugation ? (
@@ -434,8 +466,26 @@ export function FillBlankScreen({
                 )}
               </div>
             </div>
-          </Collapse>
-        </section>
+          </section>
+        </Collapse>
+
+        {/* Info toggle button */}
+        <button onClick={toggleDescription} className="fill__info-toggle">
+          <span>{showDescription ? "Hide" : "Show"} info</span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`fill__info-chevron ${showDescription ? "fill__info-chevron--open" : ""}`}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
 
         <form onSubmit={handleSubmit} className="fill__form">
           {/* Prompt section */}
@@ -515,8 +565,31 @@ export function FillBlankScreen({
               </div>
             )}
 
+            {/* Transformation exercises (Präteritum) */}
+            {isTransformation && transformMatch && (
+              <div key={promptKey} className="fill__prompt-container fill__transform-container">
+                <div className="fill__transform-present">{transformMatch[1]}</div>
+                <div className="fill__transform-arrow">↓</div>
+                <div className="fill__transform-input-wrapper">
+                  <DrillInput
+                    ref={inputRef}
+                    value={displayValue}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder="Type past tense sentence..."
+                    status={status}
+                    size="lg"
+                    readOnly={status !== "idle"}
+                    style={{ width: "100%", maxWidth: "400px" }}
+                  />
+                  {exercise.hint && (
+                    <span className="fill__transform-hint">{exercise.hint}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Case exercises */}
-            {!isConjugation && !isGender && (
+            {!isConjugation && !isGender && !isTransformation && (
               <div key={promptKey} className="fill__prompt-container fill__case-container">
                 <div className="fill__case-row">
                   <span className="fill__case-text">{sentencePart}</span>
@@ -564,7 +637,7 @@ export function FillBlankScreen({
               {(() => {
                 const baseStreak = currentTask.streak;
                 const displayStreak = status === "correct"
-                  ? Math.min(baseStreak + 1, 3)
+                  ? Math.min(baseStreak + 1, MASTERY_THRESHOLD)
                   : status === "wrong"
                     ? 0
                     : baseStreak;
@@ -576,8 +649,8 @@ export function FillBlankScreen({
                 {status === "wrong" && "Incorrect — streak reset"}
                 {status === "correct" && (() => {
                   const newStreak = currentTask.streak + 1;
-                  if (newStreak >= 3) return "MASTERED!";
-                  return `Correct! ${3 - newStreak} more to master`;
+                  if (newStreak >= MASTERY_THRESHOLD) return "MASTERED!";
+                  return `Correct! ${MASTERY_THRESHOLD - newStreak} more to master`;
                 })()}
               </span>
             </div>

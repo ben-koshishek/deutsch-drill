@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 interface ResetConfirmModalProps {
   deckName: string;
   onConfirm: () => void;
@@ -9,6 +11,21 @@ export function ResetConfirmModal({
   onConfirm,
   onCancel,
 }: ResetConfirmModalProps) {
+  // Handle Esc to cancel, Enter to confirm
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCancel();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        onConfirm();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onConfirm, onCancel]);
+
   return (
     <div
       style={{

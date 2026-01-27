@@ -51,7 +51,7 @@ export function StreakDots({
           gap,
           padding: "var(--space-2)",
           borderRadius: "var(--radius-lg)",
-          background: mastered ? "rgba(249, 197, 78, 0.1)" : "transparent",
+          background: mastered ? "color-mix(in srgb, var(--color-mastery) 10%, transparent)" : "transparent",
           animation: mastered ? "masteryPulse 1.5s ease-in-out" : "none",
           transition: "background var(--transition-base)",
         }}
@@ -72,12 +72,12 @@ export function StreakDots({
                 justifyContent: "center",
                 fontSize: `calc(${dot} * 0.7)`,
                 background: isStarred
-                  ? "var(--color-neon-yellow)"
+                  ? "var(--color-mastery)"
                   : filled
                     ? "var(--color-streak)"
                     : "transparent",
                 boxShadow: isStarred
-                  ? `0 0 ${glow} var(--color-neon-yellow), 0 0 calc(${glow} * 2) rgba(249, 197, 78, 0.4)`
+                  ? `0 0 ${glow} var(--color-mastery), 0 0 calc(${glow} * 2) var(--color-mastery-glow)`
                   : filled
                     ? `0 0 ${glow} var(--color-streak)`
                     : "none",
@@ -103,7 +103,7 @@ export function StreakDots({
           style={{
             fontSize,
             color: mastered
-              ? "var(--color-neon-yellow)"
+              ? "var(--color-mastery)"
               : current > 0
                 ? "var(--color-neon-cyan)"
                 : "var(--color-text-subtle)",
