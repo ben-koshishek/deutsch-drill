@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Modal } from '@mantine/core';
 import type { DeckCheatsheet, LabelBadgeType, FilterState } from '@/types';
 import { getConceptColor } from '@/theme';
 import './CheatsheetPanel.css';
@@ -98,101 +97,100 @@ export function CheatsheetPanel({ cheatsheet, title, open, onClose, filters, fil
     });
   }, [cheatsheet.tables, filters, filterableLabels]);
 
+  if (!open) return null;
+
   return (
-    <Modal
-      opened={open}
-      onClose={onClose}
-      title={title}
-      centered
-      closeOnEscape={false}
-      trapFocus={false}
-      size="lg"
-      classNames={{
-        content: 'cheatsheet-modal-content',
-        header: 'cheatsheet-modal-header',
-        title: 'cheatsheet-modal-title',
-        body: 'cheatsheet-modal-body',
-        close: 'cheatsheet-modal-close',
-        overlay: 'cheatsheet-modal-overlay',
-      }}
-    >
-      <div className="cheatsheet-tables">
-        {cheatsheet.tables.map((table, ti) => {
-          const titleColor = table.title ? getConceptColor(table.title) : null;
-          const { cols: hiddenCols, rows: hiddenRows } = hiddenPerTable[ti];
+    <div className="cheatsheet-overlay" onClick={onClose}>
+      <div className="cheatsheet-panel" onClick={e => e.stopPropagation()}>
+        <header className="cheatsheet-header">
+          <span className="cheatsheet-title">{title}</span>
+          <button className="cheatsheet-close" onClick={onClose} aria-label="Close cheatsheet">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </header>
+        <div className="cheatsheet-body">
+          <div className="cheatsheet-tables">
+            {cheatsheet.tables.map((table, ti) => {
+              const titleColor = table.title ? getConceptColor(table.title) : null;
+              const { cols: hiddenCols, rows: hiddenRows } = hiddenPerTable[ti];
 
-          return (
-            <div key={ti} className="cheatsheet-table-wrap">
-              {table.title && (
-                <div
-                  className="cheatsheet-table-title"
-                  style={titleColor ? { color: titleColor } : undefined}
-                >
-                  {table.title}
+              return (
+                <div key={ti} className="cheatsheet-table-wrap">
+                  {table.title && (
+                    <div
+                      className="cheatsheet-table-title"
+                      style={titleColor ? { color: titleColor } : undefined}
+                    >
+                      {table.title}
+                    </div>
+                  )}
+                  <table className="cheatsheet-table">
+                    <tbody>
+                      {table.rows.map((row, ri) => {
+                        if (hiddenRows.has(ri)) return null;
+                        const isHeaderRow = ri === 0;
+
+                        return (
+                          <tr key={ri} className={isHeaderRow ? 'cheatsheet-header-row' : ''}>
+                            {row.map((cell, ci) => {
+                              if (hiddenCols.has(ci)) return null;
+
+                              const isRowLabel = ci === 0 && !isHeaderRow;
+                              const isColHeader = isHeaderRow && ci > 0;
+                              const isCorner = isHeaderRow && ci === 0;
+
+                              const conceptColor = (isColHeader || isRowLabel) ? getConceptColor(cell) : null;
+                              const cellStyle = conceptColor ? { color: conceptColor } : undefined;
+
+                              if (isCorner) {
+                                return (
+                                  <td key={ci} className="cheatsheet-cell-corner">
+                                    {renderCell(cell)}
+                                  </td>
+                                );
+                              }
+                              if (isColHeader) {
+                                return (
+                                  <th key={ci} scope="col" className="cheatsheet-cell-col-header" style={cellStyle}>
+                                    {renderCell(cell)}
+                                  </th>
+                                );
+                              }
+                              if (isRowLabel) {
+                                return (
+                                  <th key={ci} scope="row" className="cheatsheet-cell-row-label" style={cellStyle}>
+                                    {renderCell(cell)}
+                                  </th>
+                                );
+                              }
+                              return (
+                                <td key={ci} className="cheatsheet-cell-data">
+                                  {renderCell(cell)}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-              <table className="cheatsheet-table">
-                <tbody>
-                  {table.rows.map((row, ri) => {
-                    if (hiddenRows.has(ri)) return null;
-                    const isHeaderRow = ri === 0;
+              );
+            })}
 
-                    return (
-                      <tr key={ri} className={isHeaderRow ? 'cheatsheet-header-row' : ''}>
-                        {row.map((cell, ci) => {
-                          if (hiddenCols.has(ci)) return null;
-
-                          const isRowLabel = ci === 0 && !isHeaderRow;
-                          const isColHeader = isHeaderRow && ci > 0;
-                          const isCorner = isHeaderRow && ci === 0;
-
-                          const conceptColor = (isColHeader || isRowLabel) ? getConceptColor(cell) : null;
-                          const cellStyle = conceptColor ? { color: conceptColor } : undefined;
-
-                          if (isCorner) {
-                            return (
-                              <td key={ci} className="cheatsheet-cell-corner">
-                                {renderCell(cell)}
-                              </td>
-                            );
-                          }
-                          if (isColHeader) {
-                            return (
-                              <th key={ci} scope="col" className="cheatsheet-cell-col-header" style={cellStyle}>
-                                {renderCell(cell)}
-                              </th>
-                            );
-                          }
-                          if (isRowLabel) {
-                            return (
-                              <th key={ci} scope="row" className="cheatsheet-cell-row-label" style={cellStyle}>
-                                {renderCell(cell)}
-                              </th>
-                            );
-                          }
-                          return (
-                            <td key={ci} className="cheatsheet-cell-data">
-                              {renderCell(cell)}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          );
-        })}
-
-        {cheatsheet.notes && cheatsheet.notes.length > 0 && (
-          <div className="cheatsheet-notes">
-            {cheatsheet.notes.map((note, i) => (
-              <div key={i} className="cheatsheet-note">{note}</div>
-            ))}
+            {cheatsheet.notes && cheatsheet.notes.length > 0 && (
+              <div className="cheatsheet-notes">
+                {cheatsheet.notes.map((note, i) => (
+                  <div key={i} className="cheatsheet-note">{note}</div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </Modal>
+    </div>
   );
 }

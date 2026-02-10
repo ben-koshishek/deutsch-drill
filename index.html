@@ -12,6 +12,10 @@
 
     <meta name="theme-color" content="#22c55e" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#1a7f37" media="(prefers-color-scheme: light)" />
+    <script>
+      document.documentElement.setAttribute('data-color-scheme',
+        localStorage.getItem('dd-color-scheme') || 'dark');
+    </script>
   </head>
   <body>
     <div id="root"></div>

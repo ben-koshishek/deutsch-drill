@@ -13,8 +13,6 @@
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@mantine/core": "^8.3.12",
-    "@mantine/hooks": "^8.3.12",
     "clsx": "^2.1.1",
     "dexie": "^4.2.1",
     "posthog-js": "^1.345.2",

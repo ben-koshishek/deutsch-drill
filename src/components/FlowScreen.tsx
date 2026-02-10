@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Text, TextInput, Button, Modal } from '@mantine/core';
 import type { Deck, GrammarLesson, FlowCard, DeckCheatsheet, FilterState } from '../types';
 import { flowCardKey, flowCardDeckId } from '../types';
 import { useFlow } from '../hooks/useFlow';
@@ -90,13 +89,13 @@ function getExample(card: FlowCard): { german: string; english: string } | null 
 export function FlowScreen({ sources, onExit }: FlowScreenProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const prevCardKeyRef = useRef<string | null>(null);
+  const resetDialogRef = useRef<HTMLDialogElement>(null);
 
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'idle' | 'correct' | 'wrong' | 'retype'>('idle');
   const [shouldAutoAdvance, setShouldAutoAdvance] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
-  const [resetModalOpen, setResetModalOpen] = useState(false);
 
   const timer = useTimer();
   const [timerStarted, setTimerStarted] = useState(false);
@@ -231,7 +230,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     setCheatsheetOpen(false);
     setShouldAutoAdvance(false);
     setShowSummary(false);
-    setResetModalOpen(false);
+    resetDialogRef.current?.close();
   }, [resetProgress, timer]);
 
   // Keyboard shortcuts
@@ -266,7 +265,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
       // R on summary → open reset confirmation
       if (e.key === 'r' && showSummary) {
         e.preventDefault();
-        setResetModalOpen(true);
+        resetDialogRef.current?.showModal();
         return;
       }
 
@@ -447,10 +446,12 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
       {showSummary ? (
         <div className="flow-center">
           <div className="flow-summary" role="dialog" aria-label={isFinished ? 'Run complete' : 'Run paused'}>
-            <Text fw={700} size="xl" tt="uppercase" lts="0.05em"
-              c={isFinished ? 'var(--dd-success)' : 'var(--dd-text)'}>
+            <span
+              className="flow-summary-title"
+              style={{ color: isFinished ? 'var(--dd-success)' : 'var(--dd-text)' }}
+            >
               {isFinished ? 'complete' : 'paused'}
-            </Text>
+            </span>
 
             <hr className="flow-divider" />
 
@@ -471,24 +472,34 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
             <hr className="flow-divider" />
 
             <div className="flow-summary-actions">
-              <Button variant="subtle" color="red" size="md" onClick={onExit}
-                autoFocus={!canContinue}>
+              <button
+                className="flow-btn flow-btn--subtle"
+                onClick={onExit}
+                autoFocus={!canContinue || undefined}
+              >
                 exit
-              </Button>
-              <Button variant="subtle" color="red" size="md" onClick={() => setResetModalOpen(true)}>
+              </button>
+              <button
+                className="flow-btn flow-btn--subtle"
+                onClick={() => resetDialogRef.current?.showModal()}
+              >
                 reset
-              </Button>
+              </button>
               {canContinue && (
-                <Button color="brand" size="md" onClick={handleContinue} autoFocus>
+                <button
+                  className="flow-btn flow-btn--primary"
+                  onClick={handleContinue}
+                  autoFocus
+                >
                   continue
-                </Button>
+                </button>
               )}
             </div>
           </div>
         </div>
       ) : !currentCard ? (
         <div className="flow-center">
-          <Text size="md" c="var(--dd-text-subtle)">loading...</Text>
+          <span className="flow-loading">loading...</span>
         </div>
       ) : (
         <>
@@ -501,10 +512,10 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
               {/* Input + status hint */}
               <div className="flow-input-group">
                 <form onSubmit={handleSubmit} className="flow-form">
-                  <TextInput
+                  <input
                     ref={inputRef}
-                    variant="unstyled"
-                    classNames={{ input: 'flow-input' }}
+                    type="text"
+                    className="flow-input"
                     value={displayValue}
                     onChange={(e) => { if (status === 'idle' || status === 'retype') setInput(e.currentTarget.value); }}
                     placeholder={status === 'retype' ? 'retype correct answer...' : (currentCard ? getPlaceholder(currentCard) : 'type answer...')}
@@ -514,27 +525,25 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
                     spellCheck={false}
                     readOnly={status === 'correct' || status === 'wrong'}
                     autoFocus
-                    styles={{
-                      input: {
-                        borderColor: inputBorderColor,
-                        color: inputColor,
-                        background: inputBg,
-                        caretColor: status === 'retype' ? 'var(--dd-warning)' : 'var(--dd-primary)',
-                        animation: status === 'wrong' ? 'shake 0.3s ease-out' : undefined,
-                      },
+                    style={{
+                      borderColor: inputBorderColor,
+                      color: inputColor,
+                      background: inputBg,
+                      caretColor: status === 'retype' ? 'var(--dd-warning)' : 'var(--dd-primary)',
+                      animation: status === 'wrong' ? 'shake 0.3s ease-out' : undefined,
                     }}
                   />
                 </form>
 
                 {status === 'wrong' && (
-                  <Text className="flow-status-hint">
+                  <span className="flow-status-hint">
                     press enter to retype
-                  </Text>
+                  </span>
                 )}
                 {status === 'retype' && currentCard && (
-                  <Text className="flow-retype-hint">
+                  <span className="flow-retype-hint">
                     type: {getExpectedAnswer(currentCard)}
-                  </Text>
+                  </span>
                 )}
               </div>
 
@@ -561,12 +570,12 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
 
                 {example && (
                   <div className="flow-example">
-                    <Text className="flow-example-de">
+                    <span className="flow-example-de">
                       {example.german}
-                    </Text>
-                    <Text className="flow-example-en">
+                    </span>
+                    <span className="flow-example-en">
                       {example.english}
-                    </Text>
+                    </span>
                   </div>
                 )}
 
@@ -597,29 +606,26 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         )}
       </div>
 
-      <Modal
-        opened={resetModalOpen}
-        onClose={() => setResetModalOpen(false)}
-        title="Reset progress?"
-        centered
-        size="sm"
-        styles={{
-          title: { fontFamily: 'var(--dd-font-mono)', fontWeight: 700 },
-          body: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
-        }}
-      >
-        <Text size="sm" c="var(--dd-text-muted)">
+      <dialog ref={resetDialogRef} className="reset-dialog">
+        <h3 className="reset-dialog-title">Reset progress?</h3>
+        <p className="reset-dialog-text">
           This will erase all progress for {sources.length === 1 ? `"${sources[0].name}"` : 'these decks'} and start from scratch.
-        </Text>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-          <Button variant="subtle" size="md" onClick={() => setResetModalOpen(false)}>
+        </p>
+        <div className="reset-dialog-actions">
+          <button
+            className="flow-btn flow-btn--subtle"
+            onClick={() => resetDialogRef.current?.close()}
+          >
             cancel
-          </Button>
-          <Button color="red" size="md" onClick={handleReset}>
+          </button>
+          <button
+            className="flow-btn flow-btn--danger"
+            onClick={handleReset}
+          >
             reset
-          </Button>
+          </button>
         </div>
-      </Modal>
+      </dialog>
     </div>
   );
 }
@@ -635,15 +641,21 @@ function SummaryRow({ label, value, color, delta, deltaColor }: {
 }) {
   return (
     <div className="flow-summary-row">
-      <Text size="md" c="var(--dd-text-subtle)">{label}</Text>
+      <span className="flow-summary-label">{label}</span>
       <div className="flow-summary-row-values">
-        <Text size="md" fw={600} c={color ?? 'var(--dd-text)'} className="flow-tabular-nums">
+        <span
+          className="flow-summary-value flow-tabular-nums"
+          style={{ color: color ?? 'var(--dd-text)' }}
+        >
           {value}
-        </Text>
+        </span>
         {delta != null && (
-          <Text size="sm" c={deltaColor} className="flow-tabular-nums">
+          <span
+            className="flow-summary-delta flow-tabular-nums"
+            style={{ color: deltaColor }}
+          >
             {delta}
-          </Text>
+          </span>
         )}
       </div>
     </div>

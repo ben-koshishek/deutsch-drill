@@ -1,21 +1,40 @@
-/* ===== Modal overrides ===== */
+/* ===== Cheatsheet overlay ===== */
 
-.cheatsheet-modal-overlay {
+.cheatsheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
   background: var(--dd-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.15s ease-out;
 }
 
-.cheatsheet-modal-content {
+.cheatsheet-panel {
   background: var(--dd-surface-card);
   border: 1px solid var(--dd-border);
+  border-radius: var(--dd-radius);
+  width: 100%;
+  max-width: 48rem;
+  max-height: calc(100vh - 3rem);
+  max-height: calc(100dvh - 3rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.cheatsheet-modal-header {
+.cheatsheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: var(--dd-surface-card);
   border-bottom: 1px solid var(--dd-border);
   padding: 1rem 1.5rem;
 }
 
-.cheatsheet-modal-title {
+.cheatsheet-title {
   font-family: var(--dd-font-mono);
   font-size: 0.75rem;
   font-weight: 600;
@@ -24,17 +43,27 @@
   color: var(--dd-text-muted);
 }
 
-.cheatsheet-modal-close {
+.cheatsheet-close {
+  background: none;
+  border: none;
   color: var(--dd-text-subtle);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dd-radius-sm);
+  transition: color 150ms, background 150ms;
 }
 
-.cheatsheet-modal-close:hover {
+.cheatsheet-close:hover {
   color: var(--dd-text);
   background: var(--dd-surface-elevated);
 }
 
-.cheatsheet-modal-body {
+.cheatsheet-body {
   padding: 1.5rem;
+  overflow-y: auto;
 }
 
 /* ===== Tables container ===== */

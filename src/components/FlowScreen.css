@@ -79,13 +79,17 @@
 /* ── Input field ── */
 
 .flow-input {
+  width: 100%;
   border: 2px solid var(--dd-border-strong);
   border-radius: var(--dd-radius);
   font-family: var(--dd-font-mono);
   font-size: 1.25rem;
   font-weight: 600;
   text-align: center;
-  padding: 2rem;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--dd-text);
+  outline: none;
   transition: border-color 150ms, color 150ms, background 150ms, box-shadow 150ms;
 }
 
@@ -468,6 +472,127 @@
   border: 2px solid var(--dd-border-strong);
 }
 
+/* ── Summary title ── */
+
+.flow-summary-title {
+  font-family: var(--dd-font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Summary row text ── */
+
+.flow-summary-label {
+  font-family: var(--dd-font-mono);
+  font-size: 1rem;
+  color: var(--dd-text-subtle);
+}
+
+.flow-summary-value {
+  font-family: var(--dd-font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.flow-summary-delta {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+}
+
+/* ── Loading text ── */
+
+.flow-loading {
+  font-family: var(--dd-font-mono);
+  font-size: 1rem;
+  color: var(--dd-text-subtle);
+}
+
+/* ── Flow buttons ── */
+
+.flow-btn {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--dd-radius);
+  border: none;
+  cursor: pointer;
+  min-height: 2.25rem;
+  transition: background 150ms, color 150ms, opacity 150ms;
+}
+
+.flow-btn--primary {
+  background: var(--dd-btn-primary-bg);
+  color: var(--dd-btn-filled-text);
+}
+
+.flow-btn--primary:hover {
+  opacity: 0.9;
+}
+
+.flow-btn--subtle {
+  background: transparent;
+  color: var(--dd-error);
+}
+
+.flow-btn--subtle:hover {
+  background: var(--dd-surface-elevated);
+}
+
+.flow-btn--danger {
+  background: var(--dd-error);
+  color: var(--dd-btn-filled-text);
+}
+
+.flow-btn--danger:hover {
+  opacity: 0.9;
+}
+
+/* ── Reset dialog ── */
+
+.reset-dialog {
+  position: fixed;
+  margin: auto;
+  border-radius: var(--dd-radius);
+  background: var(--dd-surface-card);
+  border: 1px solid var(--dd-border);
+  padding: 1.5rem;
+  width: min(24rem, calc(100vw - 2rem));
+}
+
+.reset-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.reset-dialog-title {
+  font-family: var(--dd-font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dd-text);
+  margin: 0;
+}
+
+.reset-dialog-text {
+  font-family: var(--dd-font-mono);
+  font-size: 0.875rem;
+  color: var(--dd-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.reset-dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
 /* ── Mobile responsive ── */
 
 @media (max-width: 40rem) {
@@ -486,7 +611,7 @@
 
   .flow-input {
     font-size: 1.125rem;
-    padding: 1.5rem;
+    padding: 0.75rem 1rem;
   }
 
   .flow-kbd-bar {

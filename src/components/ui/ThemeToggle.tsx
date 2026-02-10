@@ -1,7 +1,7 @@
-import { useMantineColorScheme } from '@mantine/core';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export function ThemeToggle() {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { colorScheme, toggleColorScheme } = useColorScheme();
 
   return (
     <button

@@ -1,11 +1,11 @@
 import { useState, useEffect, lazy, Suspense } from "react";
-import { MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
+import { ColorSchemeProvider } from "./hooks/useColorScheme";
+import "./reset.css";
+import "./theme.css";
 import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/Dashboard";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useHashRouter } from "./hooks/useHashRouter";
-import { theme, resolver } from "./theme";
 import type { Deck, GrammarLesson } from "./types";
 import { trackPageView } from "./analytics";
 
@@ -29,7 +29,7 @@ export default function App() {
     navigate({ type: "flow", sources });
 
   return (
-    <MantineProvider theme={theme} defaultColorScheme="dark" cssVariablesResolver={resolver}>
+    <ColorSchemeProvider>
       <ErrorBoundary>
       {view.type === "dashboard" && (
         <Layout stats={stats}>
@@ -58,6 +58,6 @@ export default function App() {
         </Suspense>
       )}
       </ErrorBoundary>
-    </MantineProvider>
+    </ColorSchemeProvider>
   );
 }
