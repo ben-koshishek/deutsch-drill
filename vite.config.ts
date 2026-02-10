@@ -16,7 +16,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          posthog: ['posthog-js'],
+          vendor: ['posthog-js'],
         },
       },
     },

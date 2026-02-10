@@ -6,7 +6,8 @@ export function initAnalytics() {
   if (import.meta.env.DEV) return;
 
   posthog.init('phc_ouIKaDgeFfQMsyHlzfhzHADHOmCB0gVibnSKReM8jqd', {
-    api_host: 'https://eu.i.posthog.com',
+    api_host: 'https://dd-eu.mykyta-yunoshev.workers.dev',
+    ui_host: 'https://eu.i.posthog.com',
     persistence: 'localStorage',
     capture_pageview: false,
     autocapture: false,
