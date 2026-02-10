@@ -171,10 +171,10 @@
 /* ── Example sentence ── */
 
 .flow-example {
-  text-align: left;
+  text-align: start;
   animation: fadeIn 0.3s ease-out;
-  border-left: 2px solid var(--dd-primary-dim);
-  padding-left: 1rem;
+  border-inline-start: 2px solid var(--dd-primary-dim);
+  padding-inline-start: 1rem;
   align-self: stretch;
 }
 
@@ -182,9 +182,13 @@
 
 .flow-summary-actions {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
   justify-content: center;
 }
+
+
+
 
 /* ── Summary row ── */
 
@@ -372,12 +376,35 @@
   border-radius: 2px;
 }
 
-/* ── Keyboard shortcut hint inside buttons ── */
+/* ── Keyboard shortcut bar — page footer ── */
 
-.flow-kbd-hint {
-  opacity: 0.5;
+.flow-kbd-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  font-family: var(--dd-font-mono);
   font-size: 0.75rem;
-  margin-inline-start: 0.5rem;
+  color: var(--dd-text-subtle);
+  border-top: 1px solid var(--dd-border);
+  background: var(--dd-surface-section);
+}
+
+.flow-kbd-bar kbd {
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dd-text-muted);
+  background: var(--dd-surface-elevated);
+  border: 1px solid var(--dd-border);
+  border-radius: 2px;
+  padding: 0.25rem 0.5rem;
+}
+
+.flow-kbd-sep {
+  color: var(--dd-border-strong);
+  margin-inline: 0.25rem;
 }
 
 /* ── FlowPrompt: language direction labels ── */
@@ -492,5 +519,9 @@
   .flow-input {
     font-size: 1.125rem;
     padding: 1.5rem;
+  }
+
+  .flow-kbd-bar {
+    display: none;
   }
 }

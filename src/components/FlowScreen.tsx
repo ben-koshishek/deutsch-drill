@@ -118,6 +118,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     currentCard,
     currentStreak,
     submitAnswer,
+    resetProgress,
     isFinished,
     completedCount,
     totalCount,
@@ -206,6 +207,22 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     inputRef.current?.focus();
   }, [timer, timerStarted]);
 
+  const handleReset = useCallback(async () => {
+    await resetProgress();
+    timer.reset();
+    setTimerStarted(false);
+    mistakeCountRef.current = 0;
+    setMistakeCount(0);
+    savedRunRef.current = false;
+    setLastRunResult(null);
+    startTrackedRef.current = false;
+    setInput('');
+    setStatus('idle');
+    setCheatsheetOpen(false);
+    setShouldAutoAdvance(false);
+    setShowSummary(false);
+  }, [resetProgress, timer]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -235,6 +252,13 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         return;
       }
 
+      // R on summary → reset progress
+      if (e.key === 'r' && showSummary) {
+        e.preventDefault();
+        handleReset();
+        return;
+      }
+
       // Enter/Space when wrong → retype mode
       if ((e.key === 'Enter' || e.key === ' ') && status === 'wrong') {
         e.preventDefault();
@@ -245,7 +269,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [status, onExit, showSummary, timer, cheatsheet, cheatsheetOpen, isFinished, handleContinue]);
+  }, [status, onExit, showSummary, timer, cheatsheet, cheatsheetOpen, isFinished, handleContinue, handleReset]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -436,13 +460,16 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
             <hr className="flow-divider" />
 
             <div className="flow-summary-actions">
-              <Button variant="subtle" size="md" onClick={onExit} autoFocus={!canContinue}
-                c="var(--dd-text-muted)">
-                exit <span className="flow-kbd-hint">[esc]</span>
+              <Button variant="subtle" color="red" size="md" onClick={onExit}
+                autoFocus={!canContinue}>
+                exit
+              </Button>
+              <Button variant="subtle" color="red" size="md" onClick={handleReset}>
+                reset
               </Button>
               {canContinue && (
                 <Button color="brand" size="md" onClick={handleContinue} autoFocus>
-                  continue <span className="flow-kbd-hint">[enter]</span>
+                  continue
                 </Button>
               )}
             </div>
@@ -546,6 +573,23 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
           )}
         </>
       )}
+
+      <div className="flow-kbd-bar">
+        {showSummary ? (
+          <>
+            <kbd>Esc</kbd> exit <span className="flow-kbd-sep">&middot;</span>
+            <kbd>R</kbd> reset <span className="flow-kbd-sep">&middot;</span>
+            {canContinue && <><kbd>Enter</kbd> continue</>}
+            {!canContinue && <><kbd>Enter</kbd> exit</>}
+          </>
+        ) : (
+          <>
+            <kbd>Enter</kbd> submit <span className="flow-kbd-sep">&middot;</span>
+            {cheatsheet && <><kbd>Tab</kbd> cheatsheet <span className="flow-kbd-sep">&middot;</span></>}
+            <kbd>Esc</kbd> pause
+          </>
+        )}
+      </div>
     </div>
   );
 }

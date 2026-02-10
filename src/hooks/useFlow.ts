@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { Deck, GrammarLesson, FlowCard, FilterState } from '../types';
 import { flowCardKey, flowCardDeckId } from '../types';
 import { filterFlowCards } from '@/utils/flowFilters';
-import { getDeckProgress, setProgress } from '../db';
+import { getDeckProgress, setProgress, resetDeckProgress } from '../db';
 import { MASTERY_THRESHOLD, WRONG_QUEUE_PROBABILITY, DEFAULT_SPACING_SIZE } from '@/constants';
 
 export interface FlowTask {
@@ -259,10 +259,25 @@ export function useFlow(sources: FlowSource[], filters?: FilterState) {
     return willFinish;
   }, [currentTask, getStreak, pickNextTask, wrongQueue, incompleteTasks.length]);
 
+  // Reset all progress for current sources
+  const resetProgress = useCallback(async () => {
+    const ids = sources.map(s => s.id);
+    await Promise.all(ids.map(id => resetDeckProgress(id)));
+
+    setProgressMap(new Map());
+    setWrongQueue([]);
+    setRecentlyCorrect([]);
+    setTotalAnswered(0);
+    setCorrectAnswered(0);
+    initializedRef.current = false;
+    setCurrentTask(null);
+  }, [sources]);
+
   return {
     currentCard: currentTask?.card ?? null,
     currentStreak: currentTask?.streak ?? 0,
     submitAnswer,
+    resetProgress,
     isLoading,
     isFinished,
     completedCount,
