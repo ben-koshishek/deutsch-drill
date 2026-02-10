@@ -172,20 +172,28 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     }
   }, [showSummary, timer, sources, sourceIds, accuracy]);
 
+  // Stable refs for auto-advance callback (avoids timer-induced re-renders cancelling the timeout)
+  const handleFlowFinishedRef = useRef(handleFlowFinished);
+  const submitAnswerRef = useRef(submitAnswer);
+  useEffect(() => {
+    handleFlowFinishedRef.current = handleFlowFinished;
+    submitAnswerRef.current = submitAnswer;
+  });
+
   // Auto-advance after correct
   useEffect(() => {
     if (shouldAutoAdvance) {
       const t = setTimeout(async () => {
-        const finished = await submitAnswer(true);
+        const finished = await submitAnswerRef.current(true);
         setShouldAutoAdvance(false);
         setInput('');
         setStatus('idle');
         setCheatsheetOpen(false);
-        if (finished) handleFlowFinished();
+        if (finished) handleFlowFinishedRef.current();
       }, AUTO_ADVANCE_DELAY_MS);
       return () => clearTimeout(t);
     }
-  }, [shouldAutoAdvance, submitAnswer, handleFlowFinished]);
+  }, [shouldAutoAdvance]);
 
   const handleStop = useCallback(() => {
     timer.stop();
@@ -261,6 +269,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     }
 
     if (status === 'correct') {
+      setShouldAutoAdvance(false);
       const finished = await submitAnswer(true);
       setInput('');
       setStatus('idle');
