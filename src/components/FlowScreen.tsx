@@ -16,6 +16,7 @@ import { FlowFilters } from './ui/FlowFilters';
 import { AppHeader } from './AppHeader';
 import { KofiButton } from './ui/KofiButton';
 import { ThemeToggle } from './ui/ThemeToggle';
+import { trackDeckStarted, trackDeckCompleted } from '@/analytics';
 import './FlowScreen.css';
 
 type FlowSource = Deck | GrammarLesson;
@@ -133,6 +134,16 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     ? CATEGORY_CONFIG[sources[0].category]?.color
     : undefined;
 
+  // Analytics: track deck start once
+  const sourceIds = useMemo(() => sources.map(s => s.id), [sources]);
+  const startTrackedRef = useRef(false);
+  useEffect(() => {
+    if (!startTrackedRef.current && totalCount > 0) {
+      startTrackedRef.current = true;
+      trackDeckStarted(sourceIds, totalCount);
+    }
+  }, [sourceIds, totalCount]);
+
   const cheatsheet = useMemo(() => {
     if (!currentCard || sources.length > 1) return undefined;
     return getCheatsheet(currentCard, sources);
@@ -152,13 +163,14 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     if (showSummary) return;
     timer.stop();
     setShowSummary(true);
+    trackDeckCompleted(sourceIds, accuracy, timer.elapsedMs, mistakeCountRef.current);
     if (sources.length === 1 && !savedRunRef.current) {
       savedRunRef.current = true;
       updateLastRun(sources[0].id, timer.elapsedMs, mistakeCountRef.current)
         .then(setLastRunResult)
         .catch(err => console.error('Failed to save last run:', err));
     }
-  }, [showSummary, timer, sources]);
+  }, [showSummary, timer, sources, sourceIds, accuracy]);
 
   // Auto-advance after correct
   useEffect(() => {

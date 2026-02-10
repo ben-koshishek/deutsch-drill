@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Layout } from "./components/Layout";
@@ -7,6 +7,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useHashRouter } from "./hooks/useHashRouter";
 import { theme, resolver } from "./theme";
 import type { Deck, GrammarLesson } from "./types";
+import { trackPageView } from "./analytics";
 
 const FlowScreen = lazy(() => import("./components/FlowScreen").then(m => ({ default: m.FlowScreen })));
 const HowGermanWorks = lazy(() => import("./components/HowGermanWorks").then(m => ({ default: m.HowGermanWorks })));
@@ -14,6 +15,11 @@ const HowGermanWorks = lazy(() => import("./components/HowGermanWorks").then(m =
 export default function App() {
   const { view, navigate } = useHashRouter();
   const [stats, setStats] = useState<{ mastered: string } | undefined>();
+
+  const viewKey = view.type === 'flow'
+    ? `flow:${view.sources.map(s => s.id).join(',')}`
+    : view.type;
+  useEffect(() => { trackPageView(viewKey); }, [viewKey]);
 
   const handleHome = () => navigate({ type: "dashboard" });
   const handleSelectDeck = (deck: Deck) => navigate({ type: "flow", sources: [deck] });
