@@ -168,7 +168,8 @@
 
 .header-theme-toggle,
 .header-close-btn,
-.header-info-link {
+.header-info-link,
+.header-filter-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -185,7 +186,12 @@
 }
 
 .header-theme-toggle:hover,
-.header-info-link:hover {
+.header-info-link:hover,
+.header-filter-btn:hover {
+  color: var(--dd-primary);
+}
+
+.header-filter-btn--active {
   color: var(--dd-primary);
 }
 
@@ -193,7 +199,8 @@
   color: var(--dd-error);
 }
 
-.header-info-link svg {
+.header-info-link svg,
+.header-filter-btn svg {
   display: block;
 }
 

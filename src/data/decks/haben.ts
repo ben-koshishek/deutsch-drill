@@ -16,6 +16,13 @@ export const habenConjugationCards: LabelFormCard[] = [
   { id: "haben-wir-pret", answer: "hatten", context: "haben", labels: [{ label: "WIR", type: "person" }, { label: "PRÄTERITUM", type: "tense" }], examples: [{ german: "Wir hatten Spaß.", english: "We had fun." }]},
   { id: "haben-ihr-pret", answer: "hattet", context: "haben", labels: [{ label: "IHR", type: "person" }, { label: "PRÄTERITUM", type: "tense" }], examples: [{ german: "Ihr hattet Glück.", english: "You (pl.) were lucky." }]},
   { id: "haben-sie-pret", answer: "hatten", context: "haben", labels: [{ label: "SIE/SIE", type: "person" }, { label: "PRÄTERITUM", type: "tense" }], examples: [{ german: "Sie hatten Hunger.", english: "They were hungry." }]},
+  // Konjunktiv II
+  { id: "haben-ich-konj2", answer: "hätte", context: "haben", labels: [{ label: "ICH", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Ich hätte gern ein Eis.", english: "I would like an ice cream." }]},
+  { id: "haben-du-konj2", answer: "hättest", context: "haben", labels: [{ label: "DU", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Du hättest mehr Zeit.", english: "You would have more time." }]},
+  { id: "haben-er-konj2", answer: "hätte", context: "haben", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Er hätte eine Chance.", english: "He would have a chance." }]},
+  { id: "haben-wir-konj2", answer: "hätten", context: "haben", labels: [{ label: "WIR", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Wir hätten genug Platz.", english: "We would have enough space." }]},
+  { id: "haben-ihr-konj2", answer: "hättet", context: "haben", labels: [{ label: "IHR", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Ihr hättet Spaß.", english: "You (pl.) would have fun." }]},
+  { id: "haben-sie-konj2", answer: "hätten", context: "haben", labels: [{ label: "SIE/SIE", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Sie hätten recht.", english: "They would be right." }]},
 ];
 
 // ============ CHEATSHEET ============
@@ -24,13 +31,13 @@ export const habenConjugationCheatsheet: DeckCheatsheet = {
   tables: [
     {
       rows: [
-        ["", "Präsens", "Präteritum"],
-        ["ich", "hab|e", "hatt|e"],
-        ["du", "ha|st", "hatt|est"],
-        ["er/sie/es", "ha|t", "hatt|e"],
-        ["wir", "hab|en", "hatt|en"],
-        ["ihr", "hab|t", "hatt|et"],
-        ["sie/Sie", "hab|en", "hatt|en"],
+        ["", "Präsens", "Präteritum", "Konj. II"],
+        ["ich", "hab|e", "hatt|e", "hätt|e"],
+        ["du", "ha|st", "hatt|est", "hätt|est"],
+        ["er/sie/es", "ha|t", "hatt|e", "hätt|e"],
+        ["wir", "hab|en", "hatt|en", "hätt|en"],
+        ["ihr", "hab|t", "hatt|et", "hätt|et"],
+        ["sie/Sie", "hab|en", "hatt|en", "hätt|en"],
       ],
     },
   ],

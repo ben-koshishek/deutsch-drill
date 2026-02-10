@@ -257,6 +257,8 @@ const CONCEPT_COLORS: Record<string, string> = {
   // Tense
   'PRÄSENS': 'var(--dd-tense)',
   'PRÄTERITUM': 'var(--dd-tense)',
+  'KONJUNKTIV II': 'var(--dd-tense)',
+  'Konj. II': 'var(--dd-tense)',
   // Case
   'NOM': 'var(--dd-case)',
   'ACC': 'var(--dd-case)',

@@ -17,6 +17,11 @@ export const definiteArticleCards: LabelFormCard[] = [
   { id: "def-f-dat", answer: "der", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "DATIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Ich helfe der Frau.", english: "I help the woman." }]},
   { id: "def-n-dat", answer: "dem", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "DATIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Ich helfe dem Kind.", english: "I help the child." }]},
   { id: "def-pl-dat", answer: "den", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "DATIVE", type: "case" }, { label: "PLURAL", type: "number" }], examples: [{ german: "Ich helfe den Kindern.", english: "I help the children." }]},
+  // Genitive
+  { id: "def-m-gen", answer: "des", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "GENITIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Das Auto des Mannes.", english: "The man's car." }]},
+  { id: "def-f-gen", answer: "der", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "GENITIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Das Haus der Frau.", english: "The woman's house." }]},
+  { id: "def-n-gen", answer: "des", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "GENITIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Die Farbe des Autos.", english: "The color of the car." }]},
+  { id: "def-pl-gen", answer: "der", labels: [{ label: "DEFINITE", type: "articleType" }, { label: "GENITIVE", type: "case" }, { label: "PLURAL", type: "number" }], examples: [{ german: "Die Spielzeuge der Kinder.", english: "The children's toys." }]},
 ];
 
 // ============ INDEFINITE ARTICLES ============
@@ -33,6 +38,10 @@ export const indefiniteArticleCards: LabelFormCard[] = [
   { id: "indef-m-dat", answer: "einem", labels: [{ label: "INDEFINITE", type: "articleType" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "DATIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Ich helfe einem Mann.", english: "I help a man." }]},
   { id: "indef-f-dat", answer: "einer", labels: [{ label: "INDEFINITE", type: "articleType" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "DATIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Ich helfe einer Frau.", english: "I help a woman." }]},
   { id: "indef-n-dat", answer: "einem", labels: [{ label: "INDEFINITE", type: "articleType" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "DATIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Ich helfe einem Kind.", english: "I help a child." }]},
+  // Genitive
+  { id: "indef-m-gen", answer: "eines", labels: [{ label: "INDEFINITE", type: "articleType" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "GENITIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Das Auto eines Mannes.", english: "A man's car." }]},
+  { id: "indef-f-gen", answer: "einer", labels: [{ label: "INDEFINITE", type: "articleType" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "GENITIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Das Haus einer Frau.", english: "A woman's house." }]},
+  { id: "indef-n-gen", answer: "eines", labels: [{ label: "INDEFINITE", type: "articleType" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "GENITIVE", type: "case" }, { label: "SINGULAR", type: "number" }], examples: [{ german: "Die Farbe eines Autos.", english: "The color of a car." }]},
 ];
 
 // ============ CHEATSHEETS ============

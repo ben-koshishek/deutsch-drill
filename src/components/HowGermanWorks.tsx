@@ -6,7 +6,7 @@ export function HowGermanWorks() {
       <header>
         <h1 className="hgw-title">How German Works</h1>
         <p className="hgw-intro">
-          A quick overview of what changes in German and why — so you know what you're drilling.
+          A quick overview of what changes in German and why – so you know what you're drilling.
         </p>
       </header>
 
@@ -25,7 +25,7 @@ export function HowGermanWorks() {
         </p>
         <p className="hgw-text">
           Articles, pronouns, and adjectives all change form depending on context.
-          To speak fluently, picking the correct form must be automatic — not something you think about.
+          To speak fluently, picking the correct form must be automatic – not something you think about.
           That's what this app drills.
         </p>
       </section>
@@ -37,7 +37,7 @@ export function HowGermanWorks() {
           <span className="hgw-label">What changes</span>
         </div>
         <p className="hgw-text">
-          Four parts of speech change form in German. One more — prepositions — doesn't change form
+          Four parts of speech change form in German. One more – prepositions – doesn't change form
           itself, but determines the case of what follows.
         </p>
         <div className="hgw-defs">
@@ -87,20 +87,20 @@ export function HowGermanWorks() {
         </div>
         <p className="hgw-text">
           Five grammatical categories act as inputs. Given the right combination, the correct form
-          is always deterministic — there's exactly one right answer.
+          is always deterministic – there's exactly one right answer.
         </p>
         <div className="hgw-defs">
           <div className="hgw-def">
             <span className="hgw-def-term">Gender (Genus)</span>
             <span className="hgw-def-desc">
-              Maskulin, feminin, neutrum. Fixed per noun — der Tisch, die Lampe, das Buch.
+              Maskulin, feminin, neutrum. Fixed per noun – der Tisch, die Lampe, das Buch.
               Must be memorized.
             </span>
           </div>
           <div className="hgw-def">
             <span className="hgw-def-term">Case (Kasus)</span>
             <span className="hgw-def-desc">
-              Nominativ, Akkusativ, Dativ, Genitiv. Assigned by the verb or preposition — not something you choose.
+              Nominativ, Akkusativ, Dativ, Genitiv. Assigned by the verb or preposition – not something you choose.
             </span>
           </div>
           <div className="hgw-def">
@@ -131,7 +131,7 @@ export function HowGermanWorks() {
           <span className="hgw-label">How case works</span>
         </div>
         <p className="hgw-text">
-          Every noun phrase in a German sentence gets a case. The case is not random — it's
+          Every noun phrase in a German sentence gets a case. The case is not random – it's
           assigned by the verb or preposition that governs that noun phrase.
         </p>
         <div className="hgw-defs">
@@ -151,7 +151,7 @@ export function HowGermanWorks() {
           </div>
         </div>
         <p className="hgw-text">
-          Once the case is assigned, every word in the noun phrase — article, adjective, pronoun —
+          Once the case is assigned, every word in the noun phrase – article, adjective, pronoun –
           takes the form that matches that case + the noun's gender + number.
         </p>
 
@@ -187,7 +187,7 @@ export function HowGermanWorks() {
               </div>
             </div>
             <div className="hgw-diagram-translation">
-              I give the man the book. — <em>geben</em> assigns DAT (to whom) + AKK (what).
+              I give the man the book. – <em>geben</em> assigns DAT (to whom) + AKK (what).
             </div>
           </div>
 
@@ -214,7 +214,7 @@ export function HowGermanWorks() {
               </div>
             </div>
             <div className="hgw-diagram-translation">
-              I see the man. — <em>sehen</em> assigns AKK. der Mann → den Mann.
+              I see the man. – <em>sehen</em> assigns AKK. der Mann → den Mann.
             </div>
           </div>
 
@@ -245,7 +245,30 @@ export function HowGermanWorks() {
               </div>
             </div>
             <div className="hgw-diagram-translation">
-              I go with the man. — <em>mit</em> assigns DAT. der Mann → dem Mann.
+              I go with the man. – <em>mit</em> assigns DAT. der Mann → dem Mann.
+            </div>
+          </div>
+
+          {/* Example 4: genitive (possession) */}
+          <div className="hgw-diagram">
+            <div className="hgw-diagram-roles">
+              <div className="hgw-diagram-cell">
+                <span className="hgw-diagram-role hgw-case-nom">NOM</span>
+              </div>
+              <div className="hgw-diagram-cell">
+                <span className="hgw-diagram-role hgw-case-gen">GEN</span>
+              </div>
+            </div>
+            <div className="hgw-diagram-words">
+              <div className="hgw-diagram-cell">
+                <span className="hgw-diagram-word">das Auto</span>
+              </div>
+              <div className="hgw-diagram-cell">
+                <span className="hgw-diagram-word">des Mannes</span>
+              </div>
+            </div>
+            <div className="hgw-diagram-translation">
+              The man's car. – Genitive shows possession. der Mann → des Mannes.
             </div>
           </div>
         </div>
@@ -264,28 +287,28 @@ export function HowGermanWorks() {
           <div className="hgw-group-item">
             <span className="hgw-group-bullet">&gt;</span>
             <span>
-              <span className="hgw-group-name">Conjugation</span> — how verbs change form by person
+              <span className="hgw-group-name">Conjugation</span> – how verbs change form by person
               and tense. Independent of case.
             </span>
           </div>
           <div className="hgw-group-item">
             <span className="hgw-group-bullet">&gt;</span>
             <span>
-              <span className="hgw-group-name">Case: Article Forms</span> — what each case looks like.
+              <span className="hgw-group-name">Case: Article Forms</span> – what each case looks like.
               Articles carry the main signal.
             </span>
           </div>
           <div className="hgw-group-item">
             <span className="hgw-group-bullet">&gt;</span>
             <span>
-              <span className="hgw-group-name">Case: What Triggers It</span> — which verb or
+              <span className="hgw-group-name">Case: What Triggers It</span> – which verb or
               preposition requires which case.
             </span>
           </div>
           <div className="hgw-group-item">
             <span className="hgw-group-bullet">&gt;</span>
             <span>
-              <span className="hgw-group-name">Case: Pronouns & Adjectives</span> — same case
+              <span className="hgw-group-name">Case: Pronouns & Adjectives</span> – same case
               rules as articles, applied to different word types.
             </span>
           </div>

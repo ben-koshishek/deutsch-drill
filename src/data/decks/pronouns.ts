@@ -34,6 +34,15 @@ export const personalPronounCards: LabelFormCard[] = [
   { id: "pers-sie-pl-nom", answer: "sie", labels: [{ label: "SIE/SIE", type: "person" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Sie kommen morgen.", english: "They are coming tomorrow." }] },
   { id: "pers-sie-pl-acc", answer: "sie", labels: [{ label: "SIE/SIE", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich kenne sie.", english: "I know them." }] },
   { id: "pers-sie-pl-dat", answer: "ihnen", labels: [{ label: "SIE/SIE", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe ihnen.", english: "I help them." }] },
+  // Genitive (literary/formal — used with genitive verbs like sich erinnern, sich bedienen)
+  { id: "pers-ich-gen", answer: "meiner", labels: [{ label: "ICH", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Erinnere dich meiner.", english: "Remember me." }] },
+  { id: "pers-du-gen", answer: "deiner", labels: [{ label: "DU", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Ich gedenke deiner.", english: "I think of you." }] },
+  { id: "pers-er-gen", answer: "seiner", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man bedarf seiner.", english: "One needs him." }] },
+  { id: "pers-sie-f-gen", answer: "ihrer", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Er erinnert sich ihrer.", english: "He remembers her." }] },
+  { id: "pers-es-gen", answer: "seiner", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man bedarf seiner.", english: "One needs it." }] },
+  { id: "pers-wir-gen", answer: "unser", labels: [{ label: "WIR", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Gedenke unser.", english: "Remember us." }] },
+  { id: "pers-ihr-gen", answer: "euer", labels: [{ label: "IHR", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man gedenkt euer.", english: "One remembers you all." }] },
+  { id: "pers-sie-pl-gen", answer: "ihrer", labels: [{ label: "SIE/SIE", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man erinnert sich ihrer.", english: "One remembers them." }] },
 ];
 
 // ============ POSSESSIVE PRONOUNS ============
@@ -109,22 +118,22 @@ export const personalPronounsCheatsheet: DeckCheatsheet = {
     {
       title: "Singular",
       rows: [
-        ["English", "NOM", "ACC", "DAT"],
-        ["I / me", "ich", "mi|ch", "mi|r"],
-        ["you (informal)", "du", "di|ch", "di|r"],
-        ["he / him", "er", "ih|n", "ih|m"],
-        ["she / her", "sie", "sie", "ihr"],
-        ["it", "es", "es", "ih|m"],
-        ["you (formal)", "Sie", "Sie", "Ih|nen"],
+        ["English", "NOM", "ACC", "DAT", "GEN"],
+        ["I / me", "ich", "mi|ch", "mi|r", "mein|er"],
+        ["you (informal)", "du", "di|ch", "di|r", "dein|er"],
+        ["he / him", "er", "ih|n", "ih|m", "sein|er"],
+        ["she / her", "sie", "sie", "ihr", "ihr|er"],
+        ["it", "es", "es", "ih|m", "sein|er"],
+        ["you (formal)", "Sie", "Sie", "Ih|nen", "Ihr|er"],
       ],
     },
     {
       title: "Plural",
       rows: [
-        ["English", "NOM", "ACC", "DAT"],
-        ["we / us", "wir", "uns", "uns"],
-        ["you (plural)", "ihr", "euch", "euch"],
-        ["they / them", "sie", "sie", "ih|nen"],
+        ["English", "NOM", "ACC", "DAT", "GEN"],
+        ["we / us", "wir", "uns", "uns", "unser"],
+        ["you (plural)", "ihr", "euch", "euch", "euer"],
+        ["they / them", "sie", "sie", "ih|nen", "ihr|er"],
       ],
     },
   ],

@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Text, TextInput, Button } from '@mantine/core';
-import type { Deck, GrammarLesson, FlowCard, DeckCheatsheet } from '../types';
+import type { Deck, GrammarLesson, FlowCard, DeckCheatsheet, FilterState } from '../types';
 import { flowCardKey, flowCardDeckId } from '../types';
 import { useFlow } from '../hooks/useFlow';
 import { useTimer } from '../hooks/useTimer';
 import { normalize } from '@/utils/normalize';
 import { formatTime } from '@/utils/formatTime';
+import { extractFilterableLabels, buildDefaultFilters, isAllSelected } from '@/utils/flowFilters';
 import { AUTO_ADVANCE_DELAY_MS, MASTERY_THRESHOLD, CATEGORY_CONFIG } from '@/constants';
 import { updateLastRun } from '@/db';
 import type { UpdateLastRunResult } from '@/db';
 import { FlowPrompt } from './ui/FlowPrompt';
 import { CheatsheetPanel } from './ui/CheatsheetPanel';
+import { FlowFilters } from './ui/FlowFilters';
 import { AppHeader } from './AppHeader';
 import { KofiButton } from './ui/KofiButton';
 import { ThemeToggle } from './ui/ThemeToggle';
@@ -101,6 +103,16 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
   const [lastRunResult, setLastRunResult] = useState<UpdateLastRunResult | null>(null);
   const savedRunRef = useRef(false);
 
+  // Filter system
+  const filterableLabels = useMemo(() => extractFilterableLabels(sources), [sources]);
+  const hasFilters = filterableLabels.size > 0;
+  const [filters, setFilters] = useState<FilterState>(() => buildDefaultFilters(filterableLabels, sources));
+  const [filtersOpen, setFiltersOpen] = useState(() => {
+    try { return localStorage.getItem('dd-filters-open') !== 'closed'; }
+    catch { return true; }
+  });
+  const filtersActive = hasFilters && !isAllSelected(filters, filterableLabels);
+
   const {
     currentCard,
     currentStreak,
@@ -110,7 +122,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     totalCount,
     accuracy,
     totalAnswered,
-  } = useFlow(sources);
+  } = useFlow(sources, filtersActive ? filters : undefined);
 
   const cardKey = currentCard ? flowCardKey(currentCard) : null;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
@@ -325,6 +337,24 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
             </div>
             <span className="header-separator" />
             <div className="header-icon-group">
+              {hasFilters && !showSummary && (
+                <button
+                  className={`header-filter-btn${filtersOpen || filtersActive ? ' header-filter-btn--active' : ''}`}
+                  onClick={() => setFiltersOpen(prev => {
+                    const next = !prev;
+                    try { localStorage.setItem('dd-filters-open', next ? 'open' : 'closed'); }
+                    catch { /* private browsing or full storage */ }
+                    return next;
+                  })}
+                  aria-label="Toggle filters"
+                  aria-expanded={filtersOpen}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                  </svg>
+                </button>
+              )}
               <KofiButton />
               <ThemeToggle />
 
@@ -347,6 +377,15 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         progressLabel={`${completedCount} of ${totalCount} mastered`}
         progressColor={categoryColor}
       />
+
+      {/* ── Filters ── */}
+      {hasFilters && filtersOpen && !showSummary && (
+        <FlowFilters
+          filterableLabels={filterableLabels}
+          filters={filters}
+          onFilterChange={setFilters}
+        />
+      )}
 
       {/* ── Content ── */}
       {showSummary ? (
@@ -482,7 +521,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
           </div>
 
           {cheatsheet && (
-            <CheatsheetPanel cheatsheet={cheatsheet} title={deckTitle} open={cheatsheetOpen} onClose={() => setCheatsheetOpen(false)} />
+            <CheatsheetPanel cheatsheet={cheatsheet} title={deckTitle} open={cheatsheetOpen} onClose={() => setCheatsheetOpen(false)} filters={filtersActive ? filters : undefined} filterableLabels={filtersActive ? filterableLabels : undefined} />
           )}
         </>
       )}

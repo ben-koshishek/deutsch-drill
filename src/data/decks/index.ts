@@ -5,10 +5,14 @@ import { keinCards, keinCheatsheet } from "./kein";
 import { personalPronounCards, possessivePronounCards, personalPronounsCheatsheet, possessivePronounsCheatsheet } from "./pronouns";
 import { reflexivePronounCards, reflexivePronounsCheatsheet } from "./reflexive-pronouns";
 import { interrogativePronounCards, interrogativePronounsCheatsheet } from "./interrogative-pronouns";
+import { demonstrativePronounCards, demonstrativePronounsCheatsheet } from "./demonstrative-pronouns";
+import { relativePronounCards, relativePronounsCheatsheet } from "./relative-pronouns";
 import { machenConjugationCards, machenConjugationCheatsheet } from "./verbs";
 import { seinConjugationCards, seinConjugationCheatsheet } from "./sein";
 import { habenConjugationCards, habenConjugationCheatsheet } from "./haben";
-import { koennenCards, muessenCards, wollenCards, sollenCards, duerfenCards, moegenCards, modalVerbsCheatsheet } from "./modals";
+import { koennenCards, muessenCards, wollenCards, sollenCards, duerfenCards, moegenCards, koennenCheatsheet, muessenCheatsheet, wollenCheatsheet, sollenCheatsheet, duerfenCheatsheet, moegenCheatsheet } from "./modals";
+import { werdenConjugationCards, werdenConjugationCheatsheet } from "./werden";
+import { wissenConjugationCards, wissenConjugationCheatsheet } from "./wissen";
 import { grossAdjCards, adjEndingsCheatsheet } from "./adjectives";
 import { akkusativPrepositionWords, dativPrepositionWords, wechselPrepositionWords, prepositionsCheatsheet } from "./prepositions";
 
@@ -21,6 +25,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: definiteArticleCards,
     cheatsheet: definiteArticlesCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
   {
     id: "indefinite-articles",
@@ -29,6 +34,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: indefiniteArticleCards,
     cheatsheet: indefiniteArticlesCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
   {
     id: "kein-articles",
@@ -37,6 +43,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: keinCards,
     cheatsheet: keinCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
 
   // ============ PRONOUNS ============
@@ -47,6 +54,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: personalPronounCards,
     cheatsheet: personalPronounsCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
   {
     id: "possessive-pronouns",
@@ -55,6 +63,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: possessivePronounCards,
     cheatsheet: possessivePronounsCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
   {
     id: "reflexive-pronouns",
@@ -71,6 +80,25 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: interrogativePronounCards,
     cheatsheet: interrogativePronounsCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
+  },
+  {
+    id: "demonstrative-pronouns",
+    name: "Demonstrative",
+    category: "pronouns",
+    type: "label-to-form",
+    cards: demonstrativePronounCards,
+    cheatsheet: demonstrativePronounsCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
+  },
+  {
+    id: "relative-pronouns",
+    name: "Relative",
+    category: "pronouns",
+    type: "label-to-form",
+    cards: relativePronounCards,
+    cheatsheet: relativePronounsCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
 
   // ============ VERB CONJUGATION ============
@@ -89,6 +117,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: seinConjugationCards,
     cheatsheet: seinConjugationCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "haben-conjugation",
@@ -97,6 +126,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: habenConjugationCards,
     cheatsheet: habenConjugationCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "koennen-conjugation",
@@ -104,7 +134,8 @@ export const decks: Deck[] = [
     category: "verbs",
     type: "label-to-form",
     cards: koennenCards,
-    cheatsheet: modalVerbsCheatsheet,
+    cheatsheet: koennenCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "muessen-conjugation",
@@ -112,7 +143,8 @@ export const decks: Deck[] = [
     category: "verbs",
     type: "label-to-form",
     cards: muessenCards,
-    cheatsheet: modalVerbsCheatsheet,
+    cheatsheet: muessenCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "wollen-conjugation",
@@ -120,7 +152,8 @@ export const decks: Deck[] = [
     category: "verbs",
     type: "label-to-form",
     cards: wollenCards,
-    cheatsheet: modalVerbsCheatsheet,
+    cheatsheet: wollenCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "sollen-conjugation",
@@ -128,7 +161,8 @@ export const decks: Deck[] = [
     category: "verbs",
     type: "label-to-form",
     cards: sollenCards,
-    cheatsheet: modalVerbsCheatsheet,
+    cheatsheet: sollenCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "duerfen-conjugation",
@@ -136,7 +170,8 @@ export const decks: Deck[] = [
     category: "verbs",
     type: "label-to-form",
     cards: duerfenCards,
-    cheatsheet: modalVerbsCheatsheet,
+    cheatsheet: duerfenCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
   {
     id: "moegen-conjugation",
@@ -144,7 +179,26 @@ export const decks: Deck[] = [
     category: "verbs",
     type: "label-to-form",
     cards: moegenCards,
-    cheatsheet: modalVerbsCheatsheet,
+    cheatsheet: moegenCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+  },
+  {
+    id: "werden-conjugation",
+    name: "Werden",
+    category: "verbs",
+    type: "label-to-form",
+    cards: werdenConjugationCards,
+    cheatsheet: werdenConjugationCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+  },
+  {
+    id: "wissen-conjugation",
+    name: "Wissen",
+    category: "verbs",
+    type: "label-to-form",
+    cards: wissenConjugationCards,
+    cheatsheet: wissenConjugationCheatsheet,
+    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
   },
 
   // ============ ADJECTIVE ENDINGS ============
@@ -155,6 +209,7 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: grossAdjCards,
     cheatsheet: adjEndingsCheatsheet,
+    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
 
   // ============ VERB VALENCY (placeholders) ============

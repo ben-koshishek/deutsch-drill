@@ -16,6 +16,13 @@ export const seinConjugationCards: LabelFormCard[] = [
   { id: "sein-wir-pret", answer: "waren", context: "sein", labels: [{ label: "WIR", type: "person" }, { label: "PRÄTERITUM", type: "tense" }], examples: [{ german: "Wir waren im Kino.", english: "We were at the cinema." }]},
   { id: "sein-ihr-pret", answer: "wart", context: "sein", labels: [{ label: "IHR", type: "person" }, { label: "PRÄTERITUM", type: "tense" }], examples: [{ german: "Ihr wart laut.", english: "You (pl.) were loud." }]},
   { id: "sein-sie-pret", answer: "waren", context: "sein", labels: [{ label: "SIE/SIE", type: "person" }, { label: "PRÄTERITUM", type: "tense" }], examples: [{ german: "Sie waren glücklich.", english: "They were happy." }]},
+  // Konjunktiv II
+  { id: "sein-ich-konj2", answer: "wäre", context: "sein", labels: [{ label: "ICH", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Ich wäre gern dabei.", english: "I would like to be there." }]},
+  { id: "sein-du-konj2", answer: "wärest", context: "sein", labels: [{ label: "DU", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Du wärest ein guter Lehrer.", english: "You would be a good teacher." }]},
+  { id: "sein-er-konj2", answer: "wäre", context: "sein", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Das wäre schön.", english: "That would be nice." }]},
+  { id: "sein-wir-konj2", answer: "wären", context: "sein", labels: [{ label: "WIR", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Wir wären froh.", english: "We would be glad." }]},
+  { id: "sein-ihr-konj2", answer: "wäret", context: "sein", labels: [{ label: "IHR", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Ihr wäret willkommen.", english: "You (pl.) would be welcome." }]},
+  { id: "sein-sie-konj2", answer: "wären", context: "sein", labels: [{ label: "SIE/SIE", type: "person" }, { label: "KONJUNKTIV II", type: "tense" }], examples: [{ german: "Sie wären überrascht.", english: "They would be surprised." }]},
 ];
 
 // ============ CHEATSHEET ============
@@ -24,13 +31,13 @@ export const seinConjugationCheatsheet: DeckCheatsheet = {
   tables: [
     {
       rows: [
-        ["", "Präsens", "Präteritum"],
-        ["ich", "bin", "war"],
-        ["du", "bi|st", "war|st"],
-        ["er/sie/es", "ist", "war"],
-        ["wir", "sind", "war|en"],
-        ["ihr", "seid", "war|t"],
-        ["sie/Sie", "sind", "war|en"],
+        ["", "Präsens", "Präteritum", "Konj. II"],
+        ["ich", "bin", "war", "wär|e"],
+        ["du", "bi|st", "war|st", "wär|est"],
+        ["er/sie/es", "ist", "war", "wär|e"],
+        ["wir", "sind", "war|en", "wär|en"],
+        ["ihr", "seid", "war|t", "wär|et"],
+        ["sie/Sie", "sind", "war|en", "wär|en"],
       ],
     },
   ],

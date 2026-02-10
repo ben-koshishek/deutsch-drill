@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import type { Deck, GrammarLesson, FlowCard } from '../types';
+import type { Deck, GrammarLesson, FlowCard, FilterState } from '../types';
 import { flowCardKey, flowCardDeckId } from '../types';
+import { filterFlowCards } from '@/utils/flowFilters';
 import { getDeckProgress, setProgress } from '../db';
 import { MASTERY_THRESHOLD, WRONG_QUEUE_PROBABILITY, DEFAULT_SPACING_SIZE } from '@/constants';
 
@@ -38,7 +39,7 @@ function buildFlowCards(sources: FlowSource[]): FlowCard[] {
   return cards;
 }
 
-export function useFlow(sources: FlowSource[]) {
+export function useFlow(sources: FlowSource[], filters?: FilterState) {
   const [progressMap, setProgressMap] = useState<Map<string, Map<string, number>>>(new Map());
   const [currentTask, setCurrentTask] = useState<FlowTask | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +66,24 @@ export function useFlow(sources: FlowSource[]) {
 
   // All flow cards from all sources
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const allCards = useMemo(() => buildFlowCards(sources), [sourceIds]);
+  const allCardsUnfiltered = useMemo(() => buildFlowCards(sources), [sourceIds]);
+
+  // Stable serialization of filter state for dependency tracking
+  const filterKey = useMemo(() => {
+    if (!filters || filters.size === 0) return '';
+    const parts: string[] = [];
+    for (const [type, values] of filters) {
+      parts.push(`${type}:${[...values].sort().join(',')}`);
+    }
+    return parts.sort().join('|');
+  }, [filters]);
+
+  // Apply filters to cards (filterKey is a stable serialization of filters)
+  const allCards = useMemo(() => {
+    if (!filters || filters.size === 0) return allCardsUnfiltered;
+    return filterFlowCards(allCardsUnfiltered, filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allCardsUnfiltered, filterKey]);
 
   // Load progress from DB for all sources
   useEffect(() => {
@@ -94,6 +112,20 @@ export function useFlow(sources: FlowSource[]) {
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceIds]);
+
+  // Reset flow state when filters change (but not on initial mount)
+  const prevFilterKeyRef = useRef(filterKey);
+  useEffect(() => {
+    if (prevFilterKeyRef.current !== filterKey) {
+      prevFilterKeyRef.current = filterKey;
+      initializedRef.current = false;
+      setCurrentTask(null);
+      setWrongQueue([]);
+      setRecentlyCorrect([]);
+      setTotalAnswered(0);
+      setCorrectAnswered(0);
+    }
+  }, [filterKey]);
 
   // Get streak for a card from the progress maps
   const getStreak = useCallback((card: FlowCard): number => {

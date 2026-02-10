@@ -82,7 +82,7 @@
 
 .hgw-defs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
   gap: 1rem;
 }
 
@@ -121,6 +121,7 @@
 .hgw-diagrams {
   display: flex;
   flex-direction: column;
+  width: max-content;
   gap: 1rem;
 }
 
@@ -179,12 +180,13 @@
 .hgw-case-nom { color: var(--dd-primary); }
 .hgw-case-akk { color: var(--dd-masculine); }
 .hgw-case-dat { color: var(--dd-category-pronouns); }
+.hgw-case-gen { color: var(--dd-warning); }
 
 /* ── Inline list (groups connection) ── */
 
 .hgw-groups {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
   gap: 1rem;
 }
 
