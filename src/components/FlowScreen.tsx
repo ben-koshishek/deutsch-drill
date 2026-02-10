@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Text, TextInput, Button } from '@mantine/core';
+import { Text, TextInput, Button, Modal } from '@mantine/core';
 import type { Deck, GrammarLesson, FlowCard, DeckCheatsheet, FilterState } from '../types';
 import { flowCardKey, flowCardDeckId } from '../types';
 import { useFlow } from '../hooks/useFlow';
@@ -96,6 +96,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
   const [shouldAutoAdvance, setShouldAutoAdvance] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
+  const [resetModalOpen, setResetModalOpen] = useState(false);
 
   const timer = useTimer();
   const [timerStarted, setTimerStarted] = useState(false);
@@ -150,6 +151,12 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     return getCheatsheet(currentCard, sources);
   }, [currentCard, sources]);
 
+  const contextTranslation = useMemo(() => {
+    if (!currentCard || currentCard.source !== 'label-to-form') return undefined;
+    const deck = sources.find(s => s.id === currentCard.deckId);
+    return deck && deck.type === 'label-to-form' ? deck.contextTranslation : undefined;
+  }, [currentCard, sources]);
+
   // Focus input on card change
   // Focus input when card changes
   // State resets (input, status, cheatsheet) are handled by submit callers
@@ -164,6 +171,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     if (showSummary) return;
     timer.stop();
     setShowSummary(true);
+
     trackDeckCompleted(sourceIds, accuracy, timer.elapsedMs, mistakeCountRef.current);
     if (sources.length === 1 && !savedRunRef.current) {
       savedRunRef.current = true;
@@ -199,10 +207,12 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
   const handleStop = useCallback(() => {
     timer.stop();
     setShowSummary(true);
+
   }, [timer]);
 
   const handleContinue = useCallback(() => {
     setShowSummary(false);
+
     if (!timer.isRunning && timerStarted) timer.start();
     inputRef.current?.focus();
   }, [timer, timerStarted]);
@@ -221,6 +231,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     setCheatsheetOpen(false);
     setShouldAutoAdvance(false);
     setShowSummary(false);
+    setResetModalOpen(false);
   }, [resetProgress, timer]);
 
   // Keyboard shortcuts
@@ -239,7 +250,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
       if (e.key === 'Escape') {
         e.preventDefault();
         if (cheatsheetOpen) { setCheatsheetOpen(false); inputRef.current?.focus(); }
-        else if (showSummary) onExit();
+        else if (showSummary) { onExit(); }
         else { timer.stop(); setShowSummary(true); }
         return;
       }
@@ -252,10 +263,10 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         return;
       }
 
-      // R on summary → reset progress
+      // R on summary → open reset confirmation
       if (e.key === 'r' && showSummary) {
         e.preventDefault();
-        handleReset();
+        setResetModalOpen(true);
         return;
       }
 
@@ -269,7 +280,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [status, onExit, showSummary, timer, cheatsheet, cheatsheetOpen, isFinished, handleContinue, handleReset]);
+  }, [status, onExit, showSummary, timer, cheatsheet, cheatsheetOpen, isFinished, handleContinue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,7 +333,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
   const displayStreak = currentCard
     ? (status === 'correct'
         ? Math.min(currentStreak + 1, MASTERY_THRESHOLD)
-        : status === 'wrong' ? 0 : currentStreak)
+        : (status === 'wrong' || status === 'retype') ? 0 : currentStreak)
     : 0;
   const displayValue = currentCard && status === 'wrong' ? getExpectedAnswer(currentCard) : input;
   const example = currentCard && (status === 'correct' || status === 'wrong') ? getExample(currentCard) : null;
@@ -464,7 +475,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
                 autoFocus={!canContinue}>
                 exit
               </Button>
-              <Button variant="subtle" color="red" size="md" onClick={handleReset}>
+              <Button variant="subtle" color="red" size="md" onClick={() => setResetModalOpen(true)}>
                 reset
               </Button>
               {canContinue && (
@@ -483,7 +494,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         <>
           <div className="flow-drill">
             <div className="flow-prompt-zone">
-              <FlowPrompt card={currentCard} cardKey={cardKey!} />
+              <FlowPrompt card={currentCard} cardKey={cardKey!} contextTranslation={contextTranslation} />
             </div>
 
             <div className="flow-response-zone">
@@ -559,11 +570,6 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
                   </div>
                 )}
 
-                {cheatsheet && (
-                  <button className="flow-cheatsheet-hint" onClick={() => setCheatsheetOpen(true)}>
-                    cheatsheet <kbd className="flow-cheatsheet-kbd">tab</kbd>
-                  </button>
-                )}
               </div>
             </div>
           </div>
@@ -590,6 +596,30 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
           </>
         )}
       </div>
+
+      <Modal
+        opened={resetModalOpen}
+        onClose={() => setResetModalOpen(false)}
+        title="Reset progress?"
+        centered
+        size="sm"
+        styles={{
+          title: { fontFamily: 'var(--dd-font-mono)', fontWeight: 700 },
+          body: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
+        }}
+      >
+        <Text size="sm" c="var(--dd-text-muted)">
+          This will erase all progress for {sources.length === 1 ? `"${sources[0].name}"` : 'these decks'} and start from scratch.
+        </Text>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+          <Button variant="subtle" size="md" onClick={() => setResetModalOpen(false)}>
+            cancel
+          </Button>
+          <Button color="red" size="md" onClick={handleReset}>
+            reset
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

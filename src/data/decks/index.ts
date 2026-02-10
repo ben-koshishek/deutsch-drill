@@ -109,6 +109,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: machenConjugationCards,
     cheatsheet: machenConjugationCheatsheet,
+    defaultDisabledFilters: { tense: ["PRÄTERITUM"] },
+    contextTranslation: "to do / to make",
   },
   {
     id: "sein-conjugation",
@@ -117,7 +119,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: seinConjugationCards,
     cheatsheet: seinConjugationCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "to be",
   },
   {
     id: "haben-conjugation",
@@ -126,7 +129,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: habenConjugationCards,
     cheatsheet: habenConjugationCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "to have",
   },
   {
     id: "koennen-conjugation",
@@ -135,7 +139,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: koennenCards,
     cheatsheet: koennenCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "can / to be able to",
   },
   {
     id: "muessen-conjugation",
@@ -144,7 +149,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: muessenCards,
     cheatsheet: muessenCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "must / to have to",
   },
   {
     id: "wollen-conjugation",
@@ -153,7 +159,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: wollenCards,
     cheatsheet: wollenCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "to want",
   },
   {
     id: "sollen-conjugation",
@@ -162,7 +169,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: sollenCards,
     cheatsheet: sollenCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "should / to be supposed to",
   },
   {
     id: "duerfen-conjugation",
@@ -171,7 +179,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: duerfenCards,
     cheatsheet: duerfenCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "may / to be allowed to",
   },
   {
     id: "moegen-conjugation",
@@ -180,7 +189,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: moegenCards,
     cheatsheet: moegenCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "to like",
   },
   {
     id: "werden-conjugation",
@@ -189,7 +199,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: werdenConjugationCards,
     cheatsheet: werdenConjugationCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "to become",
   },
   {
     id: "wissen-conjugation",
@@ -198,7 +209,8 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: wissenConjugationCards,
     cheatsheet: wissenConjugationCheatsheet,
-    defaultDisabledFilters: { tense: ["KONJUNKTIV II"] },
+    defaultDisabledFilters: { tense: ["PRÄTERITUM", "KONJUNKTIV II"] },
+    contextTranslation: "to know (a fact)",
   },
 
   // ============ ADJECTIVE ENDINGS ============
@@ -210,6 +222,7 @@ export const decks: Deck[] = [
     cards: grossAdjCards,
     cheatsheet: adjEndingsCheatsheet,
     defaultDisabledFilters: { case: ["GENITIVE"] },
+    contextTranslation: "big / tall",
   },
 
   // ============ VERB VALENCY (placeholders) ============

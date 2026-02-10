@@ -5,6 +5,7 @@ import '../FlowScreen.css';
 interface FlowPromptProps {
   card: FlowCard;
   cardKey: string;
+  contextTranslation?: string;
 }
 
 // ── Badge CSS class by label type ──
@@ -57,27 +58,25 @@ function TranslationPrompt({ word, direction }: { word: TranslationWord; directi
 
 // ── Label-to-form prompt ──
 
-function LabelFormPrompt({ card }: { card: LabelFormCard }) {
+function LabelFormPrompt({ card, contextTranslation }: { card: LabelFormCard; contextTranslation?: string }) {
   return (
     <>
-      {card.context ? (
-        <>
-          <div className="fp-hero">{card.context}</div>
-          <div className="fp-badge-row">
-            {card.labels.map(label => (
-              <span key={label.label} className={`fp-badge fp-badge-sm ${badgeClassName(label)}`}>
-                {label.label}
-              </span>
-            ))}
-          </div>
-        </>
-      ) : (
-        <div className="fp-badge-row">
-          {card.labels.map(label => (
-            <span key={label.label} className={`fp-badge ${badgeClassName(label)}`}>
-              {label.label}
-            </span>
-          ))}
+      <div className="fp-badge-row">
+        {card.labels.map(label => (
+          <span key={label.label} className={`fp-badge ${badgeClassName(label)}`}>
+            {label.label}
+          </span>
+        ))}
+      </div>
+      {card.context && (
+        <div className="fp-context-word">
+          {card.context}
+          {contextTranslation && (
+            <>
+              <span className="fp-dot">&middot;</span>
+              <span>{contextTranslation}</span>
+            </>
+          )}
         </div>
       )}
     </>
@@ -141,14 +140,14 @@ function GrammarPrompt({ exercise }: { exercise: GrammarExercise }) {
 
 // ── Main dispatcher ──
 
-export function FlowPrompt({ card, cardKey }: FlowPromptProps) {
+export function FlowPrompt({ card, cardKey, contextTranslation }: FlowPromptProps) {
   return (
     <div key={cardKey} className="fp-wrapper">
       {card.source === 'translation' && (
         <TranslationPrompt word={card.item} direction={card.direction} />
       )}
       {card.source === 'label-to-form' && (
-        <LabelFormPrompt card={card.item} />
+        <LabelFormPrompt card={card.item} contextTranslation={contextTranslation} />
       )}
       {card.source === 'grammar' && (
         <GrammarPrompt exercise={card.exercise} />

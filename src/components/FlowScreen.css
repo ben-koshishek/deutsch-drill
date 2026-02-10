@@ -212,7 +212,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1.5rem;
   animation: promptEnter 0.2s ease-out;
 }
 
@@ -278,6 +278,8 @@
   letter-spacing: 0.06em;
   padding: 0.5rem 0.75rem;
   text-transform: uppercase;
+  min-inline-size: 4.5rem;
+  text-align: center;
 }
 
 .fp-badge-sm {
@@ -290,8 +292,6 @@
   font-size: 1.125rem;
   font-weight: 500;
   color: var(--dd-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -343,38 +343,6 @@
   color: var(--dd-text-subtle);
 }
 
-/* ── Cheatsheet hint button ── */
-
-.flow-cheatsheet-hint {
-  background: none;
-  border: none;
-  font-family: var(--dd-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--dd-text-subtle);
-  cursor: pointer;
-  min-height: 2.75rem;
-  padding: 0.25rem 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: color 150ms;
-}
-
-.flow-cheatsheet-hint:hover {
-  color: var(--dd-primary);
-}
-
-.flow-cheatsheet-kbd {
-  font-family: var(--dd-font-mono);
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--dd-text-subtle);
-  background: var(--dd-surface-elevated);
-  border: 1px solid var(--dd-border);
-  padding: 0.25rem 0.5rem;
-  border-radius: 2px;
-}
 
 /* ── Keyboard shortcut bar — page footer ── */
 

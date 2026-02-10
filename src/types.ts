@@ -109,6 +109,7 @@ export interface LabelFormDeck {
   cheatsheet?: DeckCheatsheet;
   placeholder?: boolean;
   defaultDisabledFilters?: Partial<Record<LabelBadgeType, string[]>>;
+  contextTranslation?: string;
 }
 
 export type Deck = TranslationDeck | LabelFormDeck;
