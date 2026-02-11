@@ -2,47 +2,38 @@ import type { DeckCheatsheet, LabelFormCard } from "@/types";
 
 // ============ PERSONAL PRONOUNS ============
 export const personalPronounCards: LabelFormCard[] = [
-  // ICH (1st person singular)
-  { id: "pers-ich-nom", answer: "ich", labels: [{ label: "ICH", type: "person" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Ich bin hier.", english: "I am here." }] },
-  { id: "pers-ich-acc", answer: "mich", labels: [{ label: "ICH", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Er sieht mich.", english: "He sees me." }] },
-  { id: "pers-ich-dat", answer: "mir", labels: [{ label: "ICH", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Gib mir das.", english: "Give me that." }] },
-  // DU (2nd person singular informal)
-  { id: "pers-du-nom", answer: "du", labels: [{ label: "DU", type: "person" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Du bist nett.", english: "You are nice." }] },
-  { id: "pers-du-acc", answer: "dich", labels: [{ label: "DU", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich liebe dich.", english: "I love you." }] },
-  { id: "pers-du-dat", answer: "dir", labels: [{ label: "DU", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe dir.", english: "I help you." }] },
-  // ER/SIE/ES + MASCULINE (3rd person singular masculine)
-  { id: "pers-er-nom", answer: "er", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Er arbeitet viel.", english: "He works a lot." }] },
-  { id: "pers-er-acc", answer: "ihn", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich kenne ihn.", english: "I know him." }] },
-  { id: "pers-er-dat", answer: "ihm", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich gebe ihm das Buch.", english: "I give him the book." }] },
-  // ER/SIE/ES + FEMININE (3rd person singular feminine)
-  { id: "pers-sie-f-nom", answer: "sie", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Sie singt schön.", english: "She sings beautifully." }] },
-  { id: "pers-sie-f-acc", answer: "sie", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich sehe sie.", english: "I see her." }] },
-  { id: "pers-sie-f-dat", answer: "ihr", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich gebe ihr das Buch.", english: "I give her the book." }] },
-  // ER/SIE/ES + NEUTER (3rd person singular neuter)
-  { id: "pers-es-nom", answer: "es", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Es regnet.", english: "It is raining." }] },
-  { id: "pers-es-acc", answer: "es", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich sehe es.", english: "I see it." }] },
-  { id: "pers-es-dat", answer: "ihm", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich gebe ihm Wasser.", english: "I give it water." }] },
-  // WIR (1st person plural)
-  { id: "pers-wir-nom", answer: "wir", labels: [{ label: "WIR", type: "person" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Wir gehen zusammen.", english: "We go together." }] },
-  { id: "pers-wir-acc", answer: "uns", labels: [{ label: "WIR", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Er sieht uns.", english: "He sees us." }] },
-  { id: "pers-wir-dat", answer: "uns", labels: [{ label: "WIR", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Er hilft uns.", english: "He helps us." }] },
-  // IHR (2nd person plural informal)
-  { id: "pers-ihr-nom", answer: "ihr", labels: [{ label: "IHR", type: "person" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Ihr seid willkommen.", english: "You all are welcome." }] },
-  { id: "pers-ihr-acc", answer: "euch", labels: [{ label: "IHR", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich sehe euch.", english: "I see you all." }] },
-  { id: "pers-ihr-dat", answer: "euch", labels: [{ label: "IHR", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe euch.", english: "I help you all." }] },
-  // SIE/SIE (3rd person plural / 2nd person formal)
-  { id: "pers-sie-pl-nom", answer: "sie", labels: [{ label: "SIE/SIE", type: "person" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Sie kommen morgen.", english: "They are coming tomorrow." }] },
-  { id: "pers-sie-pl-acc", answer: "sie", labels: [{ label: "SIE/SIE", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich kenne sie.", english: "I know them." }] },
-  { id: "pers-sie-pl-dat", answer: "ihnen", labels: [{ label: "SIE/SIE", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe ihnen.", english: "I help them." }] },
-  // Genitive (literary/formal — used with genitive verbs like sich erinnern, sich bedienen)
-  { id: "pers-ich-gen", answer: "meiner", labels: [{ label: "ICH", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Erinnere dich meiner.", english: "Remember me." }] },
-  { id: "pers-du-gen", answer: "deiner", labels: [{ label: "DU", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Ich gedenke deiner.", english: "I think of you." }] },
-  { id: "pers-er-gen", answer: "seiner", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "MASCULINE", type: "gender", gender: "masculine" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man bedarf seiner.", english: "One needs him." }] },
-  { id: "pers-sie-f-gen", answer: "ihrer", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "FEMININE", type: "gender", gender: "feminine" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Er erinnert sich ihrer.", english: "He remembers her." }] },
-  { id: "pers-es-gen", answer: "seiner", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "NEUTER", type: "gender", gender: "neuter" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man bedarf seiner.", english: "One needs it." }] },
-  { id: "pers-wir-gen", answer: "unser", labels: [{ label: "WIR", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Gedenke unser.", english: "Remember us." }] },
-  { id: "pers-ihr-gen", answer: "euer", labels: [{ label: "IHR", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man gedenkt euer.", english: "One remembers you all." }] },
-  { id: "pers-sie-pl-gen", answer: "ihrer", labels: [{ label: "SIE/SIE", type: "person" }, { label: "GENITIVE", type: "case" }], examples: [{ german: "Man erinnert sich ihrer.", english: "One remembers them." }] },
+  // 1st person singular
+  { id: "pers-i-nom", answer: "ich", labels: [{ label: "I", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Ich bin hier.", english: "I am here." }] },
+  { id: "pers-me-acc", answer: "mich", labels: [{ label: "ME", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Er sieht mich.", english: "He sees me." }] },
+  { id: "pers-me-dat", answer: "mir", labels: [{ label: "ME", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Gib mir das.", english: "Give me that." }] },
+  // 2nd person singular (informal)
+  { id: "pers-you-nom", answer: "du", labels: [{ label: "YOU", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Du bist nett.", english: "You are nice." }] },
+  { id: "pers-you-acc", answer: "dich", labels: [{ label: "YOU", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich liebe dich.", english: "I love you." }] },
+  { id: "pers-you-dat", answer: "dir", labels: [{ label: "YOU", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe dir.", english: "I help you." }] },
+  // 3rd person singular masculine
+  { id: "pers-he-nom", answer: "er", labels: [{ label: "HE", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Er arbeitet viel.", english: "He works a lot." }] },
+  { id: "pers-him-acc", answer: "ihn", labels: [{ label: "HIM", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich kenne ihn.", english: "I know him." }] },
+  { id: "pers-him-dat", answer: "ihm", labels: [{ label: "HIM", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich gebe ihm das Buch.", english: "I give him the book." }] },
+  // 3rd person singular feminine
+  { id: "pers-she-nom", answer: "sie", labels: [{ label: "SHE", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Sie singt schön.", english: "She sings beautifully." }] },
+  { id: "pers-her-acc", answer: "sie", labels: [{ label: "HER", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich sehe sie.", english: "I see her." }] },
+  { id: "pers-her-dat", answer: "ihr", labels: [{ label: "HER", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich gebe ihr das Buch.", english: "I give her the book." }] },
+  // 3rd person singular neuter
+  { id: "pers-it-nom", answer: "es", labels: [{ label: "IT", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Es regnet.", english: "It is raining." }] },
+  { id: "pers-it-acc", answer: "es", labels: [{ label: "IT", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich sehe es.", english: "I see it." }] },
+  { id: "pers-it-dat", answer: "ihm", labels: [{ label: "IT", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich gebe ihm Wasser.", english: "I give it water." }] },
+  // 1st person plural
+  { id: "pers-we-nom", answer: "wir", labels: [{ label: "WE", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Wir gehen zusammen.", english: "We go together." }] },
+  { id: "pers-us-acc", answer: "uns", labels: [{ label: "US", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Er sieht uns.", english: "He sees us." }] },
+  { id: "pers-us-dat", answer: "uns", labels: [{ label: "US", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Er hilft uns.", english: "He helps us." }] },
+  // 2nd person plural (informal)
+  { id: "pers-yall-nom", answer: "ihr", labels: [{ label: "YOU ALL", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Ihr seid willkommen.", english: "You all are welcome." }] },
+  { id: "pers-yall-acc", answer: "euch", labels: [{ label: "YOU ALL", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich sehe euch.", english: "I see you all." }] },
+  { id: "pers-yall-dat", answer: "euch", labels: [{ label: "YOU ALL", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe euch.", english: "I help you all." }] },
+  // 3rd person plural
+  { id: "pers-they-nom", answer: "sie", labels: [{ label: "THEY", type: "meaning" }, { label: "NOMINATIVE", type: "case" }], examples: [{ german: "Sie kommen morgen.", english: "They are coming tomorrow." }] },
+  { id: "pers-them-acc", answer: "sie", labels: [{ label: "THEM", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich kenne sie.", english: "I know them." }] },
+  { id: "pers-them-dat", answer: "ihnen", labels: [{ label: "THEM", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich helfe ihnen.", english: "I help them." }] },
 ];
 
 // ============ POSSESSIVE PRONOUNS ============

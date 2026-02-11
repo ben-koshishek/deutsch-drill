@@ -62,7 +62,8 @@ export type LabelBadgeType =
   | "person"
   | "articleType"
   | "formality"
-  | "tense";
+  | "tense"
+  | "meaning";
 
 /** Active filter selections: for each label type, the set of checked values */
 export type FilterState = Map<LabelBadgeType, Set<string>>;

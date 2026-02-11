@@ -7,6 +7,7 @@ const TYPE_LABELS: Record<LabelBadgeType, string> = {
   gender: 'Gender',
   number: 'Number',
   person: 'Person',
+  meaning: 'Meaning',
   articleType: 'Type',
   formality: 'Form',
 };

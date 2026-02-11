@@ -54,7 +54,6 @@ export const decks: Deck[] = [
     type: "label-to-form",
     cards: personalPronounCards,
     cheatsheet: personalPronounsCheatsheet,
-    defaultDisabledFilters: { case: ["GENITIVE"] },
   },
   {
     id: "possessive-pronouns",

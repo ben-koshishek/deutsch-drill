@@ -7,20 +7,20 @@ import type { DeckCheatsheet, LabelFormCard } from "@/types";
 
 export const reflexivePronounCards: LabelFormCard[] = [
   // Accusative
-  { id: "refl-ich-acc", answer: "mich", labels: [{ label: "ICH", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich wasche mich.", english: "I wash myself." }] },
-  { id: "refl-du-acc", answer: "dich", labels: [{ label: "DU", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Du freust dich.", english: "You are happy." }] },
-  { id: "refl-er-acc", answer: "sich", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Er setzt sich hin.", english: "He sits down." }] },
-  { id: "refl-wir-acc", answer: "uns", labels: [{ label: "WIR", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Wir freuen uns.", english: "We are happy." }] },
-  { id: "refl-ihr-acc", answer: "euch", labels: [{ label: "IHR", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ihr beeilt euch.", english: "You hurry up." }] },
-  { id: "refl-sie-pl-acc", answer: "sich", labels: [{ label: "SIE/SIE", type: "person" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Sie treffen sich.", english: "They meet (each other)." }] },
+  { id: "refl-myself-acc", answer: "mich", labels: [{ label: "MYSELF", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ich wasche mich.", english: "I wash myself." }] },
+  { id: "refl-yourself-acc", answer: "dich", labels: [{ label: "YOURSELF", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Du freust dich.", english: "You are happy." }] },
+  { id: "refl-oneself-acc", answer: "sich", labels: [{ label: "ONESELF", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Er setzt sich hin.", english: "He sits down." }] },
+  { id: "refl-ourselves-acc", answer: "uns", labels: [{ label: "OURSELVES", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Wir freuen uns.", english: "We are happy." }] },
+  { id: "refl-yourselves-acc", answer: "euch", labels: [{ label: "YOURSELVES", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Ihr beeilt euch.", english: "You hurry up." }] },
+  { id: "refl-themselves-acc", answer: "sich", labels: [{ label: "THEMSELVES", type: "meaning" }, { label: "ACCUSATIVE", type: "case" }], examples: [{ german: "Sie treffen sich.", english: "They meet (each other)." }] },
 
   // Dative
-  { id: "refl-ich-dat", answer: "mir", labels: [{ label: "ICH", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich kaufe mir ein Buch.", english: "I buy myself a book." }] },
-  { id: "refl-du-dat", answer: "dir", labels: [{ label: "DU", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Du wäschst dir die Hände.", english: "You wash your hands." }] },
-  { id: "refl-er-dat", answer: "sich", labels: [{ label: "ER/SIE/ES", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Sie kauft sich ein Kleid.", english: "She buys herself a dress." }] },
-  { id: "refl-wir-dat", answer: "uns", labels: [{ label: "WIR", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Wir wünschen uns Frieden.", english: "We wish ourselves peace." }] },
-  { id: "refl-ihr-dat", answer: "euch", labels: [{ label: "IHR", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ihr macht euch Sorgen.", english: "You worry (yourselves)." }] },
-  { id: "refl-sie-pl-dat", answer: "sich", labels: [{ label: "SIE/SIE", type: "person" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Sie nehmen sich Zeit.", english: "They take their time." }] },
+  { id: "refl-myself-dat", answer: "mir", labels: [{ label: "MYSELF", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ich kaufe mir ein Buch.", english: "I buy myself a book." }] },
+  { id: "refl-yourself-dat", answer: "dir", labels: [{ label: "YOURSELF", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Du wäschst dir die Hände.", english: "You wash your hands." }] },
+  { id: "refl-oneself-dat", answer: "sich", labels: [{ label: "ONESELF", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Sie kauft sich ein Kleid.", english: "She buys herself a dress." }] },
+  { id: "refl-ourselves-dat", answer: "uns", labels: [{ label: "OURSELVES", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Wir wünschen uns Frieden.", english: "We wish ourselves peace." }] },
+  { id: "refl-yourselves-dat", answer: "euch", labels: [{ label: "YOURSELVES", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Ihr macht euch Sorgen.", english: "You worry (yourselves)." }] },
+  { id: "refl-themselves-dat", answer: "sich", labels: [{ label: "THEMSELVES", type: "meaning" }, { label: "DATIVE", type: "case" }], examples: [{ german: "Sie nehmen sich Zeit.", english: "They take their time." }] },
 ];
 
 export const reflexivePronounsCheatsheet: DeckCheatsheet = {

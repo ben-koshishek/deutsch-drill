@@ -48,9 +48,11 @@ export function extractFilterableLabels(sources: FlowSource[]): Map<LabelBadgeTy
     }
   }
 
+  const NON_FILTERABLE: Set<LabelBadgeType> = new Set(['meaning']);
+
   const result = new Map<LabelBadgeType, string[]>();
   for (const [type, values] of valuesByType) {
-    if (values.size >= 2) {
+    if (values.size >= 2 && !NON_FILTERABLE.has(type)) {
       result.set(type, grammarSort(type, values));
     }
   }

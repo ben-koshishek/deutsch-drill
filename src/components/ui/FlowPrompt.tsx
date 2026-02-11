@@ -18,6 +18,7 @@ function badgeClassName(label: LabelBadge): string {
     case: 'fp-badge--case',
     number: 'fp-badge--number',
     person: 'fp-badge--person',
+    meaning: 'fp-badge--person',
     articleType: 'fp-badge--article-type',
     tense: 'fp-badge--tense',
   };
