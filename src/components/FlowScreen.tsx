@@ -25,27 +25,27 @@ interface FlowScreenProps {
   onExit: () => void;
 }
 
-function isAnswerCorrect(card: FlowCard, userInput: string): boolean {
-  const normalized = normalize(userInput);
+function isAnswerCorrect(card: FlowCard, userInput: string, strictUmlauts: boolean): boolean {
+  const normalized = normalize(userInput, strictUmlauts);
   if (!normalized) return false;
 
   switch (card.source) {
     case 'translation': {
       const word = card.item;
       const expected = card.direction === 'de_to_en' ? word.english : word.german;
-      const alternatives = expected.split(' / ').map(normalize);
+      const alternatives = expected.split(' / ').map(s => normalize(s, strictUmlauts));
       if (alternatives.some(alt => alt === normalized)) return true;
       if (word.meanings) {
         for (const meaning of word.meanings) {
-          if (normalize(meaning.english) === normalized) return true;
+          if (normalize(meaning.english, strictUmlauts) === normalized) return true;
         }
       }
       return false;
     }
     case 'label-to-form':
-      return normalized === normalize(card.item.answer);
+      return normalized === normalize(card.item.answer, strictUmlauts);
     case 'grammar':
-      return normalized === normalize(card.exercise.answer);
+      return normalized === normalize(card.exercise.answer, strictUmlauts);
   }
 }
 
@@ -112,6 +112,15 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     try { return localStorage.getItem('dd-filters-open') !== 'closed'; }
     catch { return true; }
   });
+  const [strictUmlauts, setStrictUmlauts] = useState(() => {
+    try { return localStorage.getItem('dd-strict-umlauts') === 'true'; }
+    catch { return false; }
+  });
+  const handleStrictUmlautsChange = useCallback((value: boolean) => {
+    setStrictUmlauts(value);
+    try { localStorage.setItem('dd-strict-umlauts', String(value)); }
+    catch { /* private browsing or full storage */ }
+  }, []);
   const filtersActive = hasFilters && !isAllSelected(filters, filterableLabels);
 
   const {
@@ -350,7 +359,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     }
 
     if (status === 'retype') {
-      if (isAnswerCorrect(currentCard, input)) {
+      if (isAnswerCorrect(currentCard, input, strictUmlauts)) {
         submitAnswer(false);
         setInput('');
         setStatus('idle');
@@ -374,7 +383,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
       setTimerStarted(true);
     }
 
-    const correct = isAnswerCorrect(currentCard, input);
+    const correct = isAnswerCorrect(currentCard, input, strictUmlauts);
     setStatus(correct ? 'correct' : 'wrong');
 
     if (correct) {
@@ -449,7 +458,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
             </div>
             <span className="header-separator" />
             <div className="header-icon-group">
-              {hasFilters && !showSummary && (
+              {!showSummary && (
                 <button
                   className={`header-filter-btn${filtersOpen || filtersActive ? ' header-filter-btn--active' : ''}`}
                   onClick={() => setFiltersOpen(prev => {
@@ -490,13 +499,25 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         progressColor={categoryColor}
       />
 
-      {/* ── Filters ── */}
-      {hasFilters && filtersOpen && !showSummary && (
-        <FlowFilters
-          filterableLabels={filterableLabels}
-          filters={filters}
-          onFilterChange={setFilters}
-        />
+      {/* ── Settings panel ── */}
+      {filtersOpen && !showSummary && (
+        <div className="flow-settings-panel">
+          {hasFilters && (
+            <FlowFilters
+              filterableLabels={filterableLabels}
+              filters={filters}
+              onFilterChange={setFilters}
+            />
+          )}
+          <button
+            type="button"
+            className="flow-filter-chip flow-settings-chip"
+            data-active={strictUmlauts || undefined}
+            onClick={() => handleStrictUmlautsChange(!strictUmlauts)}
+          >
+            Strict umlauts
+          </button>
+        </div>
       )}
 
       {/* ── Content ── */}
