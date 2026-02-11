@@ -539,8 +539,14 @@
   color: var(--dd-error);
 }
 
-.flow-btn--subtle:hover {
+.flow-btn--subtle:hover,
+.flow-btn--subtle:focus-visible {
   background: var(--dd-surface-elevated);
+}
+
+.flow-btn:focus-visible {
+  outline: 2px solid var(--dd-primary);
+  outline-offset: 2px;
 }
 
 .flow-btn--danger {

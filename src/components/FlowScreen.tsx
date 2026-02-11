@@ -180,6 +180,13 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     }
   }, [showSummary, timer, sources, sourceIds, accuracy]);
 
+  // Show summary immediately if all cards are already mastered on load
+  useEffect(() => {
+    if (isFinished && !currentCard && !showSummary) {
+      setShowSummary(true);
+    }
+  }, [isFinished, currentCard, showSummary]);
+
   // Stable refs for auto-advance callback (avoids timer-induced re-renders cancelling the timeout)
   const handleFlowFinishedRef = useRef(handleFlowFinished);
   const submitAnswerRef = useRef(submitAnswer);
@@ -216,6 +223,14 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     inputRef.current?.focus();
   }, [timer, timerStarted]);
 
+  const openResetDialog = useCallback(() => {
+    const dialog = resetDialogRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    // React autoFocus doesn't set HTML autofocus attr, so showModal() won't auto-focus the button
+    dialog.querySelector<HTMLButtonElement>('button')?.focus();
+  }, []);
+
   const handleReset = useCallback(async () => {
     await resetProgress();
     timer.reset();
@@ -236,6 +251,25 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // ── Reset dialog open: trap all keys inside dialog ──
+      if (resetDialogRef.current?.open) {
+        e.preventDefault();
+        const buttons = Array.from(resetDialogRef.current.querySelectorAll<HTMLButtonElement>('button'));
+        const idx = buttons.indexOf(document.activeElement as HTMLButtonElement);
+
+        if (e.key === 'Escape') {
+          resetDialogRef.current.close();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          const next = e.key === 'ArrowRight'
+            ? (idx + 1) % buttons.length
+            : (idx - 1 + buttons.length) % buttons.length;
+          buttons[idx >= 0 ? next : 0]?.focus();
+        } else if (e.key === 'Enter' && idx >= 0) {
+          buttons[idx].click();
+        }
+        return;
+      }
+
       // Tab → toggle cheatsheet
       if (e.key === 'Tab') {
         if (cheatsheet && !showSummary) {
@@ -254,8 +288,31 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
         return;
       }
 
-      // Enter on summary → continue or exit
+      // Arrow keys on summary → navigate between buttons
+      if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && showSummary) {
+        const container = document.querySelector('.flow-summary-actions');
+        if (container) {
+          const buttons = Array.from(container.querySelectorAll<HTMLButtonElement>('button'));
+          const idx = buttons.indexOf(document.activeElement as HTMLButtonElement);
+          if (idx >= 0) {
+            const next = e.key === 'ArrowRight'
+              ? (idx + 1) % buttons.length
+              : (idx - 1 + buttons.length) % buttons.length;
+            buttons[next].focus();
+          } else if (buttons.length > 0) {
+            buttons[0].focus();
+          }
+        }
+        e.preventDefault();
+        return;
+      }
+
+      // Enter on summary → activate focused button, or default to continue/exit
       if (e.key === 'Enter' && showSummary) {
+        const summaryActions = document.querySelector('.flow-summary-actions');
+        if (summaryActions?.contains(document.activeElement)) {
+          return; // let native button click handle it
+        }
         e.preventDefault();
         if (!isFinished) handleContinue();
         else onExit();
@@ -265,7 +322,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
       // R on summary → open reset confirmation
       if (e.key === 'r' && showSummary) {
         e.preventDefault();
-        resetDialogRef.current?.showModal();
+        openResetDialog();
         return;
       }
 
@@ -279,7 +336,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [status, onExit, showSummary, timer, cheatsheet, cheatsheetOpen, isFinished, handleContinue]);
+  }, [status, onExit, showSummary, timer, cheatsheet, cheatsheetOpen, isFinished, handleContinue, openResetDialog]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -481,7 +538,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
               </button>
               <button
                 className="flow-btn flow-btn--subtle"
-                onClick={() => resetDialogRef.current?.showModal()}
+                onClick={openResetDialog}
               >
                 reset
               </button>
@@ -615,6 +672,7 @@ export function FlowScreen({ sources, onExit }: FlowScreenProps) {
           <button
             className="flow-btn flow-btn--subtle"
             onClick={() => resetDialogRef.current?.close()}
+            autoFocus
           >
             cancel
           </button>

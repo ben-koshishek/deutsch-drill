@@ -275,7 +275,7 @@ export function useFlow(sources: FlowSource[], filters?: FilterState) {
 
   return {
     currentCard: currentTask?.card ?? null,
-    currentStreak: currentTask?.streak ?? 0,
+    currentStreak: currentTask ? getStreak(currentTask.card) : 0,
     submitAnswer,
     resetProgress,
     isLoading,
