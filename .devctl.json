@@ -1,0 +1,7 @@
+{
+  "name": "deutsch-drill",
+  "port": 5002,
+  "start": "pnpm dev",
+  "stop": "port",
+  "url": "http://localhost:5002"
+}
